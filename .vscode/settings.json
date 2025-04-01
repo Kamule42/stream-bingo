@@ -1,0 +1,34 @@
+{
+    "sqltools.connections": [
+        {
+            "mysqlOptions": {
+                "authProtocol": "default",
+                "enableSsl": "Disabled"
+            },
+            "previewLimit": 50,
+            "server": "localhost",
+            "port": 3306,
+            "driver": "MariaDB",
+            "name": "bingo-root",
+            "group": "bingo",
+            "database": "bingo",
+            "username": "root",
+            "password": "pwd"
+        },
+        {
+            "mysqlOptions": {
+                "authProtocol": "default",
+                "enableSsl": "Disabled"
+            },
+            "previewLimit": 50,
+            "server": "localhost",
+            "port": 3306,
+            "driver": "MariaDB",
+            "name": "bingo_backend",
+            "group": "bingo",
+            "database": "bingo",
+            "username": "bingo_backend",
+            "askForPassword": true
+        }
+    ]
+}

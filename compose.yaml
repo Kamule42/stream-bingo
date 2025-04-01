@@ -1,0 +1,27 @@
+version: '3.1'
+
+services:
+  db:
+    domainname: db
+    image: mariadb
+    restart: always
+    environment:
+      MARIADB_DATABASE: bingo
+      MARIADB_ROOT_PASSWORD: pwd
+    ports:
+      - 3306:3306
+  adminer:
+    domainname: adminer
+    image: adminer
+    restart: always
+    ports:
+      - 8080:8080
+
+  flyway:
+    domainname: flyway
+    image: flyway/flyway
+    command: -url=jdbc:mysql://db -schemas=bingo -user=root -password=pwd -connectRetries=60 migrate
+    volumes:
+      - ./migrations:/flyway/sql
+    depends_on:
+      - db

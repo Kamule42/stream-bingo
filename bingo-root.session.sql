@@ -1,0 +1,1 @@
+SET PASSWORD FOR bingo_backend = PASSWORD("password");
