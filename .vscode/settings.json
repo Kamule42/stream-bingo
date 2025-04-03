@@ -1,34 +1,24 @@
 {
     "sqltools.connections": [
         {
-            "mysqlOptions": {
-                "authProtocol": "default",
-                "enableSsl": "Disabled"
-            },
             "previewLimit": 50,
             "server": "localhost",
-            "port": 3306,
-            "driver": "MariaDB",
-            "name": "bingo-root",
+            "port": 15432,
+            "driver": "PostgreSQL",
+            "name": "local - admin",
             "group": "bingo",
             "database": "bingo",
-            "username": "root",
-            "password": "pwd"
+            "username": "root"
         },
         {
-            "mysqlOptions": {
-                "authProtocol": "default",
-                "enableSsl": "Disabled"
-            },
             "previewLimit": 50,
             "server": "localhost",
-            "port": 3306,
-            "driver": "MariaDB",
-            "name": "bingo_backend",
+            "port": 15432,
+            "driver": "PostgreSQL",
+            "name": "local - app",
             "group": "bingo",
             "database": "bingo",
-            "username": "bingo_backend",
-            "askForPassword": true
+            "username": "bingo_backend"
         }
     ]
 }

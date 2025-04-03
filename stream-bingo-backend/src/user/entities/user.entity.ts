@@ -1,17 +1,17 @@
 import { Entity, Column, PrimaryColumn, Index } from 'typeorm';
 
-@Entity('bingo.users')
+@Entity({ name: 'users', schema: 'bingo' })
 export class UserEntity {
   @PrimaryColumn()
   id: string;
 
-  @Column('discord_id')
+  @Column({ name: 'discord_id' })
   @Index()
   discordId: string;
 
-  @Column('discord_username')
+  @Column({ name: 'discord_username' })
   discordUsername: string;
 
-  @Column('discord_avatar')
+  @Column({ name: 'discord_avatar' })
   discordAvatar: string;
 }

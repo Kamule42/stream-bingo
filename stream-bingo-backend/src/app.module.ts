@@ -1,10 +1,10 @@
-import { Module } from '@nestjs/common'
-import { ConfigModule, ConfigService } from '@nestjs/config'
-import { AppController } from './app.controller'
-import { AppService } from './app.service'
-import { UserModule } from './user/user.module'
-import configuration from './config/configuration'
-import { TypeOrmModule } from '@nestjs/typeorm'
+import { Module } from '@nestjs/common';
+import { ConfigModule, ConfigService } from '@nestjs/config';
+import { AppController } from './app.controller';
+import { AppService } from './app.service';
+import { UserModule } from './user/user.module';
+import configuration from './config/configuration';
+import { TypeOrmModule } from '@nestjs/typeorm';
 
 @Module({
   imports: [
@@ -17,14 +17,14 @@ import { TypeOrmModule } from '@nestjs/typeorm'
       imports: [ConfigModule],
       inject: [ConfigService],
       useFactory: (configService: ConfigService) => ({
-        type: 'mariadb',
+        type: 'postgres',
         host: configService.get<string>('db.host') ?? 'localhost',
-        port: configService.get<number>('db.port') ?? 3306,
+        port: configService.get<number>('db.port') ?? 5432,
         username: configService.get<string>('db.username') ?? 'root',
         password: configService.get<string>('db.password') ?? 'pwd',
         database: configService.get<string>('db.database') ?? 'bingo',
-        entities: [],
         synchronize: false,
+        autoLoadEntities: true,
       }),
     }),
     UserModule,

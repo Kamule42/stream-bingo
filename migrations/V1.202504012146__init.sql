@@ -1,7 +1,8 @@
-CREATE ROLE IF NOT EXISTS role_bingo_admin;
-GRANT CREATE ON bingo.* TO role_bingo_admin;
+CREATE ROLE role_bingo_admin;
+GRANT USAGE, CREATE  ON SCHEMA  bingo TO role_bingo_admin;
 
-CREATE ROLE IF NOT EXISTS role_bingo_app;
+CREATE ROLE role_bingo_app;
+GRANT USAGE  ON SCHEMA bingo TO role_bingo_app;
 
-CREATE USER IF NOT EXISTS bingo_backend;
+CREATE USER bingo_backend;
 GRANT role_bingo_app TO bingo_backend;

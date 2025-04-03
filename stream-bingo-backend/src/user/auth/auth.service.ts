@@ -2,10 +2,19 @@ import { HttpService } from '@nestjs/axios';
 import { HttpException, HttpStatus, Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { AxiosError } from 'axios';
-import { catchError, map, mergeMap, Observable, tap } from 'rxjs';
+import { catchError, map, mergeMap, Observable, } from 'rxjs';
+import {v7 as uuid} from 'uuid';
 import { UserEntity } from '../entities/user.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
+import { randomUUID } from 'node:crypto';
+
+interface tokens {
+  access_token: string;
+  expires_in: number;
+  refresh_token: string;
+  token_type: string;
+}
 
 @Injectable()
 export class AuthService {
@@ -26,8 +35,7 @@ export class AuthService {
     return result;
   }
 
-  public validateDiscord(code: string): Observable<void> {
-    this.logger.log(code);
+  public validateDiscord(code: string): Observable<unknown> {
     const body = {
       grant_type: 'authorization_code',
       code,
@@ -38,12 +46,7 @@ export class AuthService {
       scopes: 'identify',
     };
     return this.httpService
-      .post<{
-        access_token: string;
-        expires_in: number;
-        refresh_token: string;
-        token_type: string;
-      }>('https://discord.com/api/oauth2/token', body, {
+      .post<tokens>('https://discord.com/api/oauth2/token', body, {
         headers: {
           'Content-Type': 'application/x-www-form-urlencoded',
         },
@@ -69,14 +72,29 @@ export class AuthService {
               })),
             ),
         ),
-        mergeMap((data) =>
-          this.usersRepository.findOneBy({ discordId: data.id }),
-        ),
-        tap((v) => this.logger.log(v)),
-        //
-        map(() => void 0),
+        mergeMap(async (data) => {
+          let existingUser = await this.usersRepository.findOneBy({
+            discordId: data.id,
+          });
+          if (!existingUser) {
+            existingUser = await this.usersRepository.save({
+              id: uuid(),
+              discordId: data.id,
+              discordUsername: data.username,
+              discordAvatar: data.avatar,
+            });
+          }
+          return {
+            ...data,
+            existingUser,
+          }
+        }),
         catchError((error: AxiosError) => {
-          this.logger.error(error?.response?.data);
+          if (error?.response?.data) {
+            this.logger.error(error?.response?.data);
+          } else {
+            this.logger.error(error);
+          }
           throw 'An error happened!';
         }),
       );
