@@ -1,0 +1,14 @@
+<section class="hero is-fullheight">
+    <div class="hero-body">
+        <p-card>
+            @if(isLoading()){
+                Validation...
+                <p-progress-spinner ariaLabel="loading" />
+            }
+            @else if (isError()) {
+                Erreur load de la validation, redirection dans {{ downcounter$ | async  }} s<br />
+                <a routerLink="/auth">se reconnecter</a>
+            }
+        </p-card>
+    </div>
+</section>

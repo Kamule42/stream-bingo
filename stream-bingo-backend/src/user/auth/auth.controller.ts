@@ -1,6 +1,6 @@
-import { Controller, Get, Query, Redirect } from '@nestjs/common';
+import { Body, Controller, Get, Post } from '@nestjs/common';
 import { AuthService } from './auth.service';
-import { map, Observable } from 'rxjs';
+import { Observable } from 'rxjs';
 
 @Controller('auth')
 export class AuthController {
@@ -13,15 +13,8 @@ export class AuthController {
     };
   }
 
-  @Get('redirect/discord')
-  @Redirect('/')
-  public discordRedirect(
-    @Query('code') code: string,
-  ): Observable<{ url: string }> {
-    return this.authService.validateDiscord(code).pipe(
-      map(() => ({
-        url: '/',
-      })),
-    );
+  @Post('discord-validate')
+  public discordRedirect(@Body() {code}: {code: string}): Observable<{access_token: string}> {
+    return this.authService.validateDiscord(code)
   }
 }

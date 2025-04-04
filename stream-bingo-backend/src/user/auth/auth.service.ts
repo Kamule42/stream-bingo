@@ -8,6 +8,7 @@ import { UserEntity } from '../entities/user.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { randomUUID } from 'node:crypto';
+import { JwtService } from '@nestjs/jwt';
 
 interface tokens {
   access_token: string;
@@ -22,27 +23,27 @@ export class AuthService {
 
   public constructor(
     private readonly httpService: HttpService,
-    private readonly configService: ConfigService,
+    private readonly jwtService: JwtService,
     @InjectRepository(UserEntity)
     private readonly usersRepository: Repository<UserEntity>,
+    private readonly configService: ConfigService,
   ) {}
 
   public getAuthUrl(): string {
-    const result = this.configService.get<string>('discord.redirect_uri');
+    const result = this.configService.get<string>('discord.validation_uri');
     if (!result) {
       throw new HttpException('Unknown url', HttpStatus.INTERNAL_SERVER_ERROR);
     }
     return result;
   }
 
-  public validateDiscord(code: string): Observable<unknown> {
+  public validateDiscord(code: string): Observable<{access_token: string}> {
     const body = {
       grant_type: 'authorization_code',
       code,
-      // redirect_uri: this.configService.get<string>('base_url'),
       client_id: this.configService.get<string>('discord.client_id'),
       client_secret: this.configService.get<string>('discord.client_secret'),
-      redirect_uri: 'http://localhost:4200/api/auth/redirect/discord',
+      redirect_uri: this.configService.get<string>('discord.target_uri'),
       scopes: 'identify',
     };
     return this.httpService
@@ -85,8 +86,15 @@ export class AuthService {
             });
           }
           return {
-            ...data,
-            existingUser,
+            access_token: await this.jwtService.signAsync({
+              sub: existingUser.id,
+              username: existingUser.discordUsername,
+              avatarId: existingUser.discordAvatar,
+              discord: {
+                access_token: `${data.token_type} ${data.access_token}`,
+                expires_in: data.expires_in,
+              }
+            })
           }
         }),
         catchError((error: AxiosError) => {

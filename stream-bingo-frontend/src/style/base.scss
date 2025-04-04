@@ -1,0 +1,7 @@
+// Overloading
+body{
+    width: 100%;
+    height: 100vh;
+    background: var(--main-color);
+    background: radial-gradient(circle at 100% -10%, var(--main-color) 30%, var(--secondary-color) 110%);
+}
