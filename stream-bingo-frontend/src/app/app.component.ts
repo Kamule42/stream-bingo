@@ -8,7 +8,6 @@ import { TopMenuComponent } from './components/top-menu/top-menu.component';
     imports: [RouterOutlet, TopMenuComponent, ],
     templateUrl: './app.component.html',
     styleUrl: './app.component.scss',
-    standalone: true,
 })
 export class AppComponent {
 

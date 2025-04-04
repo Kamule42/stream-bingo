@@ -1,1 +1,40 @@
-<p>top-menu works!</p>
+<nav class="navbar is-fixed-top" role="navigation" aria-label="main navigation">
+    <div class="container">
+        <div class="navbar-menu">
+            <div class="navbar-start">
+                <div class="navbar-brand">
+                    <a class="navbar-item" href="/">
+                        BStreamgo
+                    </a>
+                </div>
+                @if (isConnected()) {
+
+                }
+                @else if(isDisconnected()){
+                    <a 
+                        class="navbar-item"
+                        routerLink="/auth">
+                        Connexion
+                    </a>
+                }
+            </div>
+            <div class="navbar-end">
+                @if (isConnected()) {
+                    @let _session = session();
+                    <div class="navbar-item">
+                        {{ _session?.username }}
+                    </div>
+                    <div class="navbar-item">
+                        <figure class="image is-48x48">
+                            <img
+                                class="is-rounded"
+                                [src]="`//cdn.discordapp.com/avatars/${_session?.discord?.id}/${_session?.discord?.avatarId}`"
+                                [alt]="``" 
+                            />
+                        </figure>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</nav>

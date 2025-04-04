@@ -1,16 +1,15 @@
-import { HttpService } from '@nestjs/axios';
-import { HttpException, HttpStatus, Injectable, Logger } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
-import { AxiosError } from 'axios';
-import { catchError, map, mergeMap, Observable, } from 'rxjs';
-import {v7 as uuid} from 'uuid';
-import { UserEntity } from '../entities/user.entity';
-import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
-import { randomUUID } from 'node:crypto';
-import { JwtService } from '@nestjs/jwt';
+import { HttpService } from '@nestjs/axios'
+import { HttpException, HttpStatus, Injectable, Logger } from '@nestjs/common'
+import { ConfigService } from '@nestjs/config'
+import { AxiosError } from 'axios'
+import { catchError, map, mergeMap, Observable, } from 'rxjs'
+import { v7 as uuid } from 'uuid'
+import { UserEntity } from '../entities/user.entity'
+import { InjectRepository } from '@nestjs/typeorm'
+import { Repository } from 'typeorm'
+import { JwtService } from '@nestjs/jwt'
 
-interface tokens {
+interface ITokens {
   access_token: string;
   expires_in: number;
   refresh_token: string;
@@ -47,7 +46,7 @@ export class AuthService {
       scopes: 'identify',
     };
     return this.httpService
-      .post<tokens>('https://discord.com/api/oauth2/token', body, {
+      .post<ITokens>('https://discord.com/api/oauth2/token', body, {
         headers: {
           'Content-Type': 'application/x-www-form-urlencoded',
         },
@@ -89,8 +88,9 @@ export class AuthService {
             access_token: await this.jwtService.signAsync({
               sub: existingUser.id,
               username: existingUser.discordUsername,
-              avatarId: existingUser.discordAvatar,
               discord: {
+                id: existingUser.discordId,
+                avatarId: existingUser.discordAvatar,
                 access_token: `${data.token_type} ${data.access_token}`,
                 expires_in: data.expires_in,
               }

@@ -1,7 +1,7 @@
 import { Component, computed, inject, OnInit } from '@angular/core'
 import { ActivatedRoute, Router, RouterLink } from '@angular/router'
 import { toSignal } from '@angular/core/rxjs-interop'
-import { catchError, delay, filter, map, of, startWith, Subject, switchMap, takeWhile, tap, timer } from 'rxjs'
+import { catchError, delay, filter, map, of, share, startWith, Subject, switchMap, takeWhile, tap, timer } from 'rxjs'
 import { ProgressSpinnerModule } from 'primeng/progressspinner'
 import { HttpRequestStatus } from '../../../shared/models/http-request.status'
 import { AuthService } from '../../../services/auth/auth.service'
@@ -13,7 +13,6 @@ import { CardModule } from 'primeng/card'
   imports: [ProgressSpinnerModule, CardModule, AsyncPipe, RouterLink, ],
   templateUrl: './discord-redirect.component.html',
   styleUrl: './discord-redirect.component.scss',
-  standalone: true,
 })
 export class DiscordRedirectComponent implements OnInit{
   private readonly authService = inject(AuthService)
@@ -34,6 +33,7 @@ export class DiscordRedirectComponent implements OnInit{
       ),
     ),
     startWith(HttpRequestStatus.IDLE),
+    share(),
   )
 
   private readonly validateCodeStatus = toSignal(this.validateCode$, {initialValue: HttpRequestStatus.IDLE})

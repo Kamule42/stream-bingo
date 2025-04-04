@@ -1,7 +1,8 @@
-import { HttpClient } from '@angular/common/http';
-import { inject, Injectable } from '@angular/core';
-import { BehaviorSubject, map, Observable, Subject, tap } from 'rxjs';
-import { ValidateCodeResponse } from './interfaces';
+import { HttpClient } from '@angular/common/http'
+import { inject, Injectable } from '@angular/core'
+import { BehaviorSubject, map, Observable, Subject, tap } from 'rxjs'
+import { ISession, IValidateCodeResponse } from './interfaces'
+import { jwtDecode } from 'jwt-decode'
 
 const AUTHORIZATION_KEY = 'authorization'
 
@@ -10,8 +11,11 @@ const AUTHORIZATION_KEY = 'authorization'
 })
 export class AuthService {
   private readonly http = inject(HttpClient)
-  private readonly authorization$$: Subject<string | null>
-    = new BehaviorSubject<string | null>(null)
+  private readonly authorization$$: Subject<string | null | undefined>
+    = new BehaviorSubject<string | null | undefined>(undefined)
+  public readonly session$ = this.authorization$$.pipe(
+    map(authorization => authorization ? jwtDecode<ISession>(authorization) : null)
+  )
 
   constructor(){
     this.authorization$$.next(sessionStorage.getItem(AUTHORIZATION_KEY) ?? null)
@@ -26,7 +30,8 @@ export class AuthService {
         else{
           sessionStorage.removeItem(AUTHORIZATION_KEY)
         }
-      })
+      }),
+      map(authorization => `Bearer ${authorization}`),
     );
   }
 
@@ -41,11 +46,11 @@ export class AuthService {
     )
   }
 
-  public validateCode(code: string): Observable<ValidateCodeResponse>{
+  public validateCode(code: string): Observable<IValidateCodeResponse>{
     return this.http
-      .post<ValidateCodeResponse>('/api/auth/discord-validate', { code})
+      .post<IValidateCodeResponse>('/api/auth/discord-validate', { code})
       .pipe(
-        tap(({access_token}) => this.authorization$ = `Bearer ${access_token}`)
+        tap(({access_token}) => this.authorization$ = access_token)
       )
   }
 }

@@ -1,7 +1,8 @@
 /* You can add global styles to this file, and also import other style files */
-@use "primeicons/primeicons.css";
+@forward "primeicons/primeicons";
 
-@use './style/colors.scss';
-@use "./style/bulma.scss";
-@use "./style/discord.scss";
-@use './style/base.scss';
+@forward './style/colors';
+
+@forward "./style/bulma";
+@forward "./style/discord";
+@forward './style/base';

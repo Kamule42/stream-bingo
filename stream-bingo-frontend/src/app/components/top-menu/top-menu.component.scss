@@ -1,0 +1,8 @@
+:host{
+    .navbar{
+        background: none;
+    }
+    ::ng-deep .image img{
+        max-height: none;
+    }
+}
