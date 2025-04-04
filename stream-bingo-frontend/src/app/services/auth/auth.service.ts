@@ -35,9 +35,14 @@ export class AuthService {
     );
   }
 
-  private set authorization$(authorization: string){
+  private set authorization$(authorization: string | null){
     this.authorization$$.next(authorization)
-    sessionStorage.setItem(AUTHORIZATION_KEY, authorization)
+    if(authorization){
+      sessionStorage.setItem(AUTHORIZATION_KEY, authorization)
+    }
+    else{
+      sessionStorage.removeItem(AUTHORIZATION_KEY)
+    }
   }
 
   public getDiscordUrl(): Observable<string>{
@@ -52,5 +57,9 @@ export class AuthService {
       .pipe(
         tap(({access_token}) => this.authorization$ = access_token)
       )
+  }
+
+  public logout(){
+    this.authorization$ = null
   }
 }

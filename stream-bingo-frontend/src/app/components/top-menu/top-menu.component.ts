@@ -5,7 +5,7 @@ import { RouterLink } from '@angular/router'
 
 @Component({
   selector: 'app-top-menu',
-  imports: [RouterLink],
+  imports: [ RouterLink, ],
   templateUrl: './top-menu.component.html',
   styleUrl: './top-menu.component.scss',
 })
@@ -16,4 +16,8 @@ export class TopMenuComponent {
   readonly session = toSignal(this.session$, {initialValue: undefined}) 
   readonly isConnected = computed(() => this.session() != null) // not null nor undefined
   readonly isDisconnected = computed(() => this.session() === null) // only null
+  
+  public logout(){
+    this.authService.logout()
+  }
 }
