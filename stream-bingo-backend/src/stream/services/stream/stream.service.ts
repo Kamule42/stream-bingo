@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Observable, from, tap  } from 'rxjs';
+import { Observable, from, map, tap  } from 'rxjs';
 import { StreamEntity } from 'src/stream/entities/stream.entity';
 import { Repository } from 'typeorm';
 
@@ -26,5 +26,9 @@ export class StreamService {
         .limit(10)
         .getMany()
     )
+  }
+
+  getStreamDetail(webhandle: string): Observable<StreamEntity | null>{
+    return from(this.streamRepository.findOneBy({twitchLogin: webhandle}))
   }
 }

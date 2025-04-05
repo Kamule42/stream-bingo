@@ -1,4 +1,4 @@
-import { SubscribeMessage, WebSocketGateway, WsResponse } from '@nestjs/websockets'
+import { MessageBody, SubscribeMessage, WebSocketGateway, WsResponse } from '@nestjs/websockets'
 import { map, Observable } from 'rxjs';
 import { StreamService } from 'src/stream/services/stream/stream.service'
 import { IStream, IStreamWithNextRound } from './stream.interface' 
@@ -35,5 +35,19 @@ export class StreamGateway {
         }))
       }))
     );
+  }
+
+  @SubscribeMessage('getDetail')
+  getStreamDetail(@MessageBody('webhandle') webhandle: string): Observable<WsResponse<IStreamWithNextRound | null>>{
+    return this.streamService.getStreamDetail(webhandle).pipe(
+      map(stream => ({
+        event: 'streamDetail',
+        data: stream ? {
+          ...streamMapper(stream),
+          nextStreamStartsAt: stream.rounds?.at(0)?.streamStartAt ?? new Date(),
+          nextRoundStartsAt: stream.rounds?.at(0)?.startAt ?? new Date()
+        } : null
+      } ))
+    )
   }
 }

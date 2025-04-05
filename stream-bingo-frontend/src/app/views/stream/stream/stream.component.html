@@ -1,1 +1,22 @@
-<p>stream works!</p>
+<div class="container">
+    @if(stream$()){
+        @let stream = stream$();
+        <div class="block is-flex is-flex-row">
+            <figure class="image">
+                <img
+                    [src]="`//static-cdn.jtvnw.net/jtv_user_pictures/${stream.twitchId}-profile_image-150x150.png`"
+                    [alt]="`${stream.name} profil`"
+                    class="is-rounded"
+                />
+            </figure>
+        </div>
+    }
+    @else if(noWebhandle$() === true || stream$() === null){
+        Ce Stream n'existe pas
+    }
+    @else {
+        <div class="is-flex is-justify-content-center">
+            <p-progress-spinner ariaLabel="loading" />
+        </div>
+    }
+</div>>

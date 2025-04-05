@@ -21,15 +21,15 @@ export class StreamListComponent implements OnInit {
     )),
     map(streams => streams.map((stream: any) => ({
       ...stream,
-      nextStreamStartsAtTxt:
+      nextStreamStartsAtTxt: stream.nextStreamStartsAt ?
         Interval.fromDateTimes(DateTime.now(), stream.nextStreamStartsAt)
         .toDuration(['days', 'hours', 'minutes', 'seconds'])
         .toHuman({
           listStyle: 'long',
           unitDisplay: 'short',
           maximumFractionDigits: 0
-        }),
-      nextStreamStartsAtIso:  stream.nextStreamStartsAt.toISO(),
+        }) : null,
+      nextStreamStartsAtIso:  stream.nextStreamStartsAt?.toISO(),
     })))
   )
   readonly streams$ = toSignal(this._streams$, {initialValue: undefined})

@@ -18,17 +18,17 @@ export class AuthService {
   )
 
   constructor(){
-    this.authorization$$.next(sessionStorage.getItem(AUTHORIZATION_KEY) ?? null)
+    this.authorization$$.next(localStorage.getItem(AUTHORIZATION_KEY) ?? null)
   }
 
   public get authorization$(): Observable<string | null>{
     return this.authorization$$.pipe(
       tap(val => {
         if(val){
-          sessionStorage.setItem(AUTHORIZATION_KEY, val)
+          localStorage.setItem(AUTHORIZATION_KEY, val)
         }
         else{
-          sessionStorage.removeItem(AUTHORIZATION_KEY)
+          localStorage.removeItem(AUTHORIZATION_KEY)
         }
       }),
       map(authorization => `Bearer ${authorization}`),
@@ -38,10 +38,10 @@ export class AuthService {
   private set authorization$(authorization: string | null){
     this.authorization$$.next(authorization)
     if(authorization){
-      sessionStorage.setItem(AUTHORIZATION_KEY, authorization)
+      localStorage.setItem(AUTHORIZATION_KEY, authorization)
     }
     else{
-      sessionStorage.removeItem(AUTHORIZATION_KEY)
+      localStorage.removeItem(AUTHORIZATION_KEY)
     }
   }
 

@@ -1,7 +1,8 @@
 import { Injectable } from '@angular/core'
-import { fromEvent, map, share } from 'rxjs'
+import { catchError, fromEvent, map, of, share } from 'rxjs'
 import { io } from 'socket.io-client'
 import { DateTime } from'luxon'
+import { Params } from '@angular/router'
 
 @Injectable({
   providedIn: 'root'
@@ -19,9 +20,17 @@ export class StreamsService {
   public readonly nextStreams$ = fromEvent(this.socket, 'nextStreams').pipe(
     map(streams => streams.map((stream: any) => ({
       ...stream,
-      nextStreamStartsAt: DateTime.fromISO(stream.nextStreamStartsAt),
-      nextRoundStartsAt: DateTime.fromISO(stream.nextRoundStartsAt),
+      nextStreamStartsAt: stream.nextStreamStartsAt ? DateTime.fromISO(stream.nextStreamStartsAt) : null,
+      nextRoundStartsAt: stream.nextStreamStartsAt ? DateTime.fromISO(stream.nextRoundStartsAt) : null,
     }))),
+    share(),
+  )
+  public readonly streamDetail$ = fromEvent(this.socket, 'streamDetail').pipe(
+    map(stream =>  (stream ? {
+      ...stream,
+      nextStreamStartsAt: stream.nextStreamStartsAt ? DateTime.fromISO(stream.nextStreamStartsAt) : null,
+      nextRoundStartsAt: stream.nextStreamStartsAt ? DateTime.fromISO(stream.nextRoundStartsAt) : null,
+    } : null)),
     share(),
   )
 
@@ -30,6 +39,9 @@ export class StreamsService {
   }
   public getNextStreams(): void{
     this.sendMessage('getNexts')
+  }
+  public fetchDetails(webhandle: string) {
+    this.sendMessage('getDetail', {webhandle})
   }
 
   private sendMessage(id: string, payload?: unknown): void {
