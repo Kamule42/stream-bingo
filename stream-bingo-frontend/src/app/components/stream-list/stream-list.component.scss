@@ -1,9 +1,13 @@
 :host{
+    #next-streams{
+        gap: 2rem;
+    }
     .card{    
-        width: 350px;
-        img{
         width: 300px;
-        height: 300px;
+        height: 100%;
+        img{
+            width: 300px;
+            height: 300px;
         }
     }
 }

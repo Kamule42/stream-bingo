@@ -1,10 +1,10 @@
 <div>
     <h3 class="title is-3">Les prochains streams</h3>
-    <div>
+    <div id="next-streams" class="is-flex is-flex-row">
         @if(streams$() !== undefined){
             @for(stream of streams$(); track stream.id){
                 <div class="card">
-                        <a [routerLink]="`/s/${stream.urlHandle}`">
+                    <a [routerLink]="`/s/${stream.urlHandle}`">
                         <div class="card-image is-flex is-justify-content-center">
                             <figure class="image ">
                                 <img
