@@ -1,4 +1,4 @@
-<nav class="navbar is-fixed-top" role="navigation" aria-label="main navigation">
+<!-- <nav class="navbar is-fixed-top" role="navigation" aria-label="main navigation">
     <div class="container">
         <div class="navbar-menu">
             <div class="navbar-start">
@@ -11,37 +11,70 @@
 
                 }
                 @else if(isDisconnected()){
-                    <a 
-                        class="navbar-item"
-                        routerLink="/auth">
-                        Connexion
-                    </a>
                 }
             </div>
             <div class="navbar-end">
                 @if (isConnected()) {
                     @let _session = session();
-                    <div class="navbar-item">
-                        {{ _session?.username }}
-                    </div>
-                    <div class="navbar-item">
-                        <figure class="image is-48x48">
-                            <img
-                                class="is-rounded"
-                                [src]="`//cdn.discordapp.com/avatars/${_session?.discord?.id}/${_session?.discord?.avatarId}`"
-                                [alt]="``" 
-                            />
-                        </figure>
-                    </div>
-                    <a class="navbar-item" (click)="logout()">
-                        <span class="icon-text">
-                            <span class="icon">
-                              <i class="mdi mdi-logout"></i>
-                            </span>
+                    <div class="navbar-item has-dropdown is-hoverable ">
+                        <span class="navbar-link">
+                            <span>{{ _session?.username }}</span>
+                            <figure class="image is-48x48">
+                                <img
+                                    class="is-rounded"
+                                    [src]="`//cdn.discordapp.com/avatars/${_session?.discord?.id}/${_session?.discord?.avatarId}`"
+                                    [alt]="``" 
+                                />
+                            </figure>
                         </span>
-                    </a>
+                        <div class="navbar-dropdown  is-right">
+                            <a class="navbar-item"(click)="logout()">
+                                <span class="icon-text">
+                                    <span class="icon">
+                                      <i class="mdi mdi-logout"></i>
+                                    </span>
+                                </span>
+                                Déconnexion
+                            </a>
+                        </div>
+                    </div>
+                }
+                @else if(isDisconnected()){
+                    <div class="navbar-item">
+                        <app-discord-auth />
+                    </div>
                 }
             </div>
         </div>
+    </div>
+</nav> -->
+
+<nav class="navbar is-fixed-top" role="navigation" aria-label="main navigation">
+    <div class="container">
+        <p-menubar [model]="items">
+            <ng-template #end>
+                <div class="flex items-center gap-2">
+                    @if (isConnected()) {
+                        @let _session = session();
+                        <a pRipple  (click)="loggedinMenu.toggle($event)" class="flex items-center p-menubar-item-link">
+                            <span>{{ _session?.username }}</span>
+                            <p-avatar [image]="`//cdn.discordapp.com/avatars/${_session?.discord?.id}/${_session?.discord?.avatarId}`" shape="circle" />
+                            <span class="mdi mdi-dots-vertical"></span>
+                        </a>
+                        <p-menu
+                            #loggedinMenu
+                            [model]="logoutItems"
+                            [popup]="true"
+                            appendTo="body"
+                            tooltipPosition="right" />
+                    }
+                    @else if(isDisconnected()){
+                        <div class="navbar-item">
+                            <app-discord-auth />
+                        </div>
+                    }
+                </div>
+            </ng-template>
+        </p-menubar>
     </div>
 </nav>

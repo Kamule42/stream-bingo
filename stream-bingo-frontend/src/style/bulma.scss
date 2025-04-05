@@ -10,16 +10,23 @@
 
 
 // Components
+@forward "bulma/sass/components/card";
+@forward "bulma/sass/components/dropdown";
 @forward "bulma/sass/components/navbar";
 
 // Elements
+@forward "bulma/sass/elements/content";
 @forward "bulma/sass/elements/image";
 @forward "bulma/sass/elements/icon";
+@forward "bulma/sass/elements/title";
 
 // Helpers
 @forward "bulma/sass/helpers/color";
+@forward "bulma/sass/helpers/flexbox";
 @forward "bulma/sass/helpers/typography";
+@forward "bulma/sass/helpers/visibility";
 
 // Layout
 @forward "bulma/sass/layout/container";
 @forward "bulma/sass/layout/hero";
+@forward "bulma/sass/layout/media";

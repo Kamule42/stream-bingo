@@ -1,8 +1,12 @@
 :host{
+    p-menubar{
+        width: 100%;
+        ::ng-deep .p-menubar{
+            background: none;
+            border: none;
+        }
+    }
     .navbar{
         background: none;
-    }
-    ::ng-deep .image img{
-        max-height: none;
     }
 }

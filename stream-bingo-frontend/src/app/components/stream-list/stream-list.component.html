@@ -1,0 +1,27 @@
+<div>
+    <h3 class="title is-3">Les prochains streams</h3>
+    <div>
+        @if(streams$() !== undefined){
+            @for(stream of streams$(); track stream.id){
+                <div class="card">
+                        <a [routerLink]="`/s/${stream.urlHandle}`">
+                        <div class="card-image is-flex is-justify-content-center">
+                            <figure class="image ">
+                                <img
+                                    [src]="`//static-cdn.jtvnw.net/jtv_user_pictures/${stream.twitchId}-profile_image-300x300.png`"
+                                    [alt]="`${stream.name} profil`"
+                                />
+                            </figure>
+                        </div>
+                        <div class="card-content">
+                            <h5 class="title is-5">{{ stream.name }}</h5>
+                            <div class="content">
+                                Dans <time [dateTime]="stream.nextStreamStartsAtIso">{{ stream.nextStreamStartsAtTxt }}</time>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+            }
+        }
+    </div>
+</div>

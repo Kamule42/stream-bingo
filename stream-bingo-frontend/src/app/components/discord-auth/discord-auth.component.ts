@@ -1,19 +1,17 @@
-import { Component, computed, inject, OnInit, } from '@angular/core'
-import { AuthService } from '../../../services/auth'
-import { catchError, map, of, share, shareReplay, startWith, Subject, switchMap, tap } from 'rxjs'
-import { HttpRequestStatus } from '../../../shared/models/http-request.status'
+import { Component, computed, inject } from '@angular/core'
 import { toSignal } from '@angular/core/rxjs-interop'
-import { CardModule } from 'primeng/card'
 import { ButtonModule } from 'primeng/button'
-import { ProgressSpinnerModule } from 'primeng/progressspinner'
+import { catchError, map, of, share, startWith, Subject, switchMap, tap } from 'rxjs'
+import { AuthService } from '../../services/auth'
+import { HttpRequestStatus } from '../../shared/models/http-request.status'
 
 @Component({
-  selector: 'app-auth',
-  imports:  [ButtonModule, CardModule, ProgressSpinnerModule, ],
-  templateUrl: './auth.component.html',
-  styleUrl: './auth.component.scss',
+  selector: 'app-discord-auth',
+    imports:  [ButtonModule, ],
+  templateUrl: './discord-auth.component.html',
+  styleUrl: './discord-auth.component.scss'
 })
-export class AuthComponent implements OnInit {
+export class DiscordAuthComponent {
   private readonly authService = inject(AuthService)
   private readonly authTrigger$$ = new Subject<void>()
   private readonly authResponse$ = this.authTrigger$$.pipe(

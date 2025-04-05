@@ -3,5 +3,14 @@ body{
     width: 100%;
     height: 100vh;
     background: var(--main-color);
-    background: radial-gradient(circle at 100% -10%, var(--main-color) 30%, var(--secondary-color) 110%);
+    background: radial-gradient(circle at 100% -10%, var(--main-color) 40%, var(--secondary-color) 110%);
+    // background-size: 150% 100%;
+
+    // animation: gradient 10s ease infinite;
+}
+
+@keyframes gradient { 
+    0% {background-position: 0% 50%;}
+	50% {background-position: 100% 50%;}
+	100% {background-position: 0% 50%;}
 }

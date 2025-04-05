@@ -1,8 +1,13 @@
 {
-    "/api/**": {
-      "target": "http://localhost:3000",
-      "pathRewrite": {
-        "^/api": ""
-      }
+  "/api/**": {
+    "target": "http://localhost:3000",
+    "pathRewrite": {
+      "^/api": ""
     }
+  },
+  "/socket.io": {
+    "target": "ws://localhost:3000",
+    "ws": true,
+    "rewriteWsOrigin": true
+  }
 }
