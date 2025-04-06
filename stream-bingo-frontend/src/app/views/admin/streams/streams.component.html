@@ -1,0 +1,31 @@
+@if(streams$() && streamMeta$()){
+    <p-table
+        [value]="streams$()"
+        [tableStyle]="{ 'min-width': '50rem' }"
+        
+    >
+        <ng-template #header>
+            <tr>
+                <th pSortableColumn="name">
+                    Name  <p-sortIcon field="name" />
+                </th>
+                <th pSortableColumn="urlHandle">
+                    Twitch handle  <p-sortIcon field="urlHandle" />
+                </th>
+            </tr>
+        </ng-template>
+        <ng-template #body let-stream>
+            <tr>
+                <td>{{ stream.name }}</td>
+                <td>{{ stream.urlHandle }}</td>
+            </tr>
+        </ng-template>
+    </p-table>
+    <p-paginator
+    [first]="page()"
+    [rows]="limit()"
+    [totalRecords]="totalItems$()"
+    [rowsPerPageOptions]="[1, 10, 25, 50]"
+    (onPageChange)="updatePagination($event)"
+     />
+}

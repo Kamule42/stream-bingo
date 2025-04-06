@@ -1,8 +1,8 @@
 import { Injectable } from '@angular/core'
-import { catchError, fromEvent, map, of, share } from 'rxjs'
+import { fromEvent, map, share, } from 'rxjs'
 import { io } from 'socket.io-client'
 import { DateTime } from'luxon'
-import { Params } from '@angular/router'
+import { IPagination } from '../../shared/models/pagination.interface'
 
 @Injectable({
   providedIn: 'root'
@@ -14,9 +14,25 @@ export class StreamsService {
     reconnectionAttempts: 5,
     transports: ['websocket', 'polling'],
   })
-  public readonly listEvent$ = fromEvent(this.socket, 'streamList').pipe(
+
+  private readonly _streams$ = fromEvent(this.socket, 'streamList').pipe(
+    share()
+  )
+  
+  public readonly streams$ = this._streams$.pipe(
+    map(({data: streams}) => streams.map((stream: any) => ({
+      ...stream,
+      nextStreamStartsAt: stream.nextStreamStartsAt ? DateTime.fromISO(stream.nextStreamStartsAt) : null,
+      nextRoundStartsAt: stream.nextStreamStartsAt ? DateTime.fromISO(stream.nextRoundStartsAt) : null,
+    }))),
     share(),
   )
+  public readonly streamMeta$ = this._streams$.pipe(
+    map(({meta}) => meta),
+    share(),
+  )
+
+
   public readonly nextStreams$ = fromEvent(this.socket, 'nextStreams').pipe(
     map(streams => streams.map((stream: any) => ({
       ...stream,
@@ -34,8 +50,15 @@ export class StreamsService {
     share(),
   )
 
-  public listStreams(): void{
-    this.sendMessage('getList')
+  public listStreams(pagination? : IPagination): void{
+    this.sendMessage('getList', pagination ? 
+      {
+        ...pagination,
+        page: (pagination.page ?? 0) + 1
+      } : {
+      page: 1,
+      limit: 25,
+    })
   }
   public getNextStreams(): void{
     this.sendMessage('getNexts')

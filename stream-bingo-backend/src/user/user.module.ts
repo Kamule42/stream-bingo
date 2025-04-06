@@ -6,9 +6,13 @@ import { HttpModule } from '@nestjs/axios';
 import { UserEntity } from './entities/user.entity';
 import { JwtModule } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
+import { RightEntity } from './entities/rights.entity';
 
 @Module({
-  imports: [HttpModule, TypeOrmModule.forFeature([UserEntity]), JwtModule.registerAsync({
+  imports: [
+    HttpModule,
+    TypeOrmModule.forFeature([ UserEntity, RightEntity, ]),
+    JwtModule.registerAsync({
     inject: [ConfigService],
     useFactory: (configService: ConfigService) => ({
       global: true,

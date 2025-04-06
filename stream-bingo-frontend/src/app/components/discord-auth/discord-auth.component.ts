@@ -1,7 +1,7 @@
 import { Component, computed, inject } from '@angular/core'
 import { toSignal } from '@angular/core/rxjs-interop'
 import { ButtonModule } from 'primeng/button'
-import { catchError, map, of, share, startWith, Subject, switchMap, tap } from 'rxjs'
+import { catchError, map, of, share, startWith, Subject, switchMap } from 'rxjs'
 import { AuthService } from '../../services/auth'
 import { HttpRequestStatus } from '../../shared/models/http-request.status'
 
@@ -15,7 +15,6 @@ export class DiscordAuthComponent {
   private readonly authService = inject(AuthService)
   private readonly authTrigger$$ = new Subject<void>()
   private readonly authResponse$ = this.authTrigger$$.pipe(
-    tap(() => console.log('fetch discord url')),
     switchMap(() => this.authService.getDiscordUrl()),
     share(),
   )

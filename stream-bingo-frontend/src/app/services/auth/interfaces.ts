@@ -9,5 +9,9 @@ export interface ISession{
         id: string,
         avatarId: string,
         access_token: string,
-    }
+    },
+    rights: [{
+        right: string,
+        streamId?: string,
+    }],
 }

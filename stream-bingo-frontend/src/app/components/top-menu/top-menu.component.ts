@@ -8,6 +8,7 @@ import { AuthService } from '../../services/auth'
 import { DiscordAuthComponent } from '../discord-auth/discord-auth.component'
 import { NgcCookieConsentService } from 'ngx-cookieconsent';
 import { RouterLink } from '@angular/router';
+import { MenuItem } from 'primeng/api';
 
 @Component({
   selector: 'app-top-menu',
@@ -24,13 +25,25 @@ export class TopMenuComponent {
   readonly isConnected = computed(() => this.session() != null) // not null nor undefined
   readonly isDisconnected = computed(() => this.session() === null) // only null
 
-  readonly items = [
-    {
-      label: 'BStreamgo',
-      icon: 'mdi mdi-home-outline',
-      route: '/',
-    },
-  ]
+  readonly isAdmin = toSignal(this.authService.isAdmin)
+
+  readonly items = computed(() => {
+    const result: Array<MenuItem> = [
+      {
+        label: 'BStreamgo',
+        icon: 'mdi mdi-home-outline',
+        route: '/',
+      },
+    ]
+    if(this.isAdmin()){
+      result.push({
+        label: 'Administration',
+        icon: 'mdi mdi-shield-crown-outline',
+        route: '/admin',
+      })
+    }
+    return result
+  })
 
   readonly logoutItems = [
     {

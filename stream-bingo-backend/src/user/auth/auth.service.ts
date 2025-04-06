@@ -73,8 +73,9 @@ export class AuthService {
             ),
         ),
         mergeMap(async (data) => {
-          let existingUser = await this.usersRepository.findOneBy({
-            discordId: data.id,
+          let existingUser = await this.usersRepository.findOne({
+            where: {discordId: data.id,},
+            relations: ['rights'],
           });
           if (!existingUser) {
             existingUser = await this.usersRepository.save({
@@ -93,7 +94,11 @@ export class AuthService {
                 avatarId: existingUser.discordAvatar,
                 access_token: `${data.token_type} ${data.access_token}`,
                 expires_in: data.expires_in,
-              }
+              },
+              rights: existingUser.rights?.map(({rightKey, stream}) => ({
+                right: rightKey,
+                stream: stream?.id
+              }))
             })
           }
         }),

@@ -62,4 +62,14 @@ export class AuthService {
   public logout(){
     this.authorization$ = null
   }
+
+  public hasRight(r: string): Observable<boolean>{
+    return this.session$.pipe(
+      map(session => session?.rights.find(({right}) => r === right) !== undefined)
+    )
+  }
+
+  public get isAdmin(): Observable<boolean>{
+    return this.hasRight('a')
+  }
 }
