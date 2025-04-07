@@ -36,7 +36,7 @@ export class AuthService {
     return result;
   }
 
-  public validateDiscord(code: string): Observable<{access_token: string}> {
+  public validateDiscord(code: string): Observable<{access_token: string, user_id: string,}> {
     const body = {
       grant_type: 'authorization_code',
       code,
@@ -86,6 +86,7 @@ export class AuthService {
             });
           }
           return {
+            user_id: existingUser.id,
             access_token: await this.jwtService.signAsync({
               sub: existingUser.id,
               username: existingUser.discordUsername,

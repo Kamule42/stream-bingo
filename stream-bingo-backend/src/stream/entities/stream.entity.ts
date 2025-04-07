@@ -1,5 +1,6 @@
 import { Entity, Column, PrimaryColumn, OneToMany, JoinColumn } from 'typeorm'
 import { RoundEntity } from './round.entity'
+import { RightEntity } from 'src/user/entities/rights.entity'
 
 @Entity({ name: 'streams', schema: 'bingo' })
 export class StreamEntity {
@@ -29,5 +30,9 @@ export class StreamEntity {
 
   @OneToMany(() => RoundEntity, (round) => round.stream)
   @JoinColumn({name: 'stream_id'})
-  rounds: RoundEntity[]
+  rounds: Array<RoundEntity>
+
+  @OneToMany(() => RightEntity, (right) => right.stream)
+  @JoinColumn({name: 'stream_id'})
+  rights: Array<RightEntity>
 }

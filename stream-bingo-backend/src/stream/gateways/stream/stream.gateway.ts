@@ -21,7 +21,7 @@ export class StreamGateway {
       map(result => ({
         event: 'streamList',
         data: {
-          data: result.data.map(streamMapper),
+          data: result.data.map(s => streamMapper(s, true)),
           link: result.links,
           meta: result.meta,
         }

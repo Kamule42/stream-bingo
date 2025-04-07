@@ -61,7 +61,7 @@ export class DiscordRedirectComponent implements OnInit{
         )
       )
     ).subscribe({
-      next: (status) => this.router.navigateByUrl(status === HttpRequestStatus.FINISHED ? '/' : '/auth')
+      next: () => this.router.navigateByUrl('/')
     })
   }
 }

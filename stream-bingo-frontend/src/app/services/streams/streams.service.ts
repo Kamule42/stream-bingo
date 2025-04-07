@@ -2,7 +2,8 @@ import { Injectable } from '@angular/core'
 import { fromEvent, map, share, } from 'rxjs'
 import { io } from 'socket.io-client'
 import { DateTime } from'luxon'
-import { IPagination } from '../../shared/models/pagination.interface'
+import { IPaginated, IPagination } from '../../shared/models/pagination.interface'
+import { IStream } from './stream.interface'
 
 @Injectable({
   providedIn: 'root'
@@ -15,7 +16,7 @@ export class StreamsService {
     transports: ['websocket', 'polling'],
   })
 
-  private readonly _streams$ = fromEvent(this.socket, 'streamList').pipe(
+  private readonly _streams$ = fromEvent<IPaginated<Array<IStream>>>(this.socket, 'streamList').pipe(
     share()
   )
   
