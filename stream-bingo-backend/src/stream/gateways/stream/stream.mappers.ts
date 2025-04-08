@@ -15,5 +15,5 @@ export const streamMapper = ({id, name, twitchLogin, twitchId, enabled, rights}:
 export const rightsMapper = (rights: Array<RightEntity>) => rights?.map(({ rightKey, user }) => ({
   right: rightKey,
   user_id: user.id,
-  usernma: user.discordUsername
+  username: user.discordUsername
 }))

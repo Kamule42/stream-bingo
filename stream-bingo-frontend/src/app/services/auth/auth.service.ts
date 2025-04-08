@@ -2,7 +2,7 @@ import { HttpClient } from '@angular/common/http'
 import { inject, Injectable } from '@angular/core'
 import { BehaviorSubject, map, Observable, Subject, tap } from 'rxjs'
 import { ISession, IValidateCodeResponse } from './interfaces'
-import { jwtDecode } from 'jwt-decode'
+import { jwtDecode, } from 'jwt-decode'
 import { Router } from '@angular/router'
 
 const AUTHORIZATION_KEY = 'authorization'
@@ -16,7 +16,12 @@ export class AuthService {
   private readonly authorization$$: Subject<string | null | undefined>
     = new BehaviorSubject<string | null | undefined>(undefined)
   public readonly session$ = this.authorization$$.pipe(
-    map(authorization => authorization ? jwtDecode<ISession>(authorization) : null)
+    map(authorization => authorization ? jwtDecode<ISession>(authorization) : null),
+    tap(session => {
+      if(session && session.exp < new Date().getTime()/1000){
+       this.logout()
+      }
+    })
   )
 
   constructor(){

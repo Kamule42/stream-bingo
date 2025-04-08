@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core'
 import { io, Socket } from 'socket.io-client'
 import { WebsocketService } from '../ws/websocket.service'
+import { fromEvent, share } from 'rxjs'
 
 @Injectable({
   providedIn: 'root'
@@ -14,6 +15,12 @@ export class UsersService extends WebsocketService {
     auth: this.auth,
     withCredentials: true,
   })
+
+  
+  readonly userList$ = fromEvent<Array<{id: string, name: string}>>(this.socket, 'userList').pipe(
+      share()
+    )
+
   override get socket(): Socket {
     return this._socket
   }

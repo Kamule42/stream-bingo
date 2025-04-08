@@ -8,6 +8,7 @@ import { JwtModule } from '@nestjs/jwt'
 import { ConfigService } from '@nestjs/config'
 import { RightEntity } from './entities/rights.entity'
 import { UserGateway } from './gateways/user/user.gateway'
+import { UserService } from './services/user/user/user.service';
 
 @Module({
   imports: [
@@ -18,10 +19,10 @@ import { UserGateway } from './gateways/user/user.gateway'
     useFactory: (configService: ConfigService) => ({
       global: true,
       secret: configService.get<string>('jwt.secret') ?? 'secret',
-      signOptions: { expiresIn: '60m' },
+      signOptions: { expiresIn: '7d' },
     })
   }),],
-  providers: [AuthService, UserGateway],
+  providers: [AuthService, UserGateway, UserService],
   exports: [ AuthService ],
   controllers: [AuthController],
 })

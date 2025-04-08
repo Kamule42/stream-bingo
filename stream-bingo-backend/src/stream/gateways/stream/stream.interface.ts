@@ -3,6 +3,11 @@ export interface IStream{
     name: string,
     urlHandle: string,
     enabled?: boolean,
+    rights?: Array<{
+        right: string,
+        user_id: string,
+        username: string
+    }>,
 }
 
 export interface IStreamWithNextRound extends IStream{

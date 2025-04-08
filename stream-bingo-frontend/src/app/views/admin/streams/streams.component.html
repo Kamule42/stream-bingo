@@ -44,16 +44,16 @@
         </ng-template>
     </p-table>
     <p-paginator
-    [first]="page()"
-    [rows]="limit()"
-    [totalRecords]="totalItems$()"
-    [rowsPerPageOptions]="[1, 10, 25, 50]"
-    (onPageChange)="updatePagination($event)"
+        [first]="page()"
+        [rows]="limit()"
+        [totalRecords]="totalItems$()"
+        [rowsPerPageOptions]="[1, 10, 25, 50]"
+        (onPageChange)="updatePagination($event)"
      />
 }
 
 
-<p-dialog [header]="modalTitle$()" [modal]="true" [(visible)]="showDialog$" [style]="{ width: '25rem' }">
+<p-dialog [header]="modalTitle$()" [modal]="true" [(visible)]="showDialog$" [style]="{ width: '45rem' }">
     <div id="edit-stream-root" class="is-flex is-flex-direction-column">
         <app-edit-stream [(stream)]="toEdit$"/>
         <div id="edit-stream-actions" class="is-flex is-justify-content-end is-gap-2">

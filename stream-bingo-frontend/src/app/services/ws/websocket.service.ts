@@ -15,7 +15,6 @@ export abstract class WebsocketService {
 
   protected get auth(): ((cb: (data: object) => void) => void){
     return (cb) => {
-      console.log(this.authorization())
       cb({
         token: this.authorization()
       })

@@ -1,24 +1,50 @@
 <div class="field">
-    <label class="label" for="stream-name">Nom du stream</label>
-    <div class="control">
-      <input 
-        [(ngModel)]="stream().name"
-        id="stream-name" class="input" type="text" placeholder="Nom du stream">
-    </div>
+  <label class="label" for="stream-name">Nom du stream</label>
+  <div class="control">
+    <input [(ngModel)]="stream().name" id="stream-name" class="input" type="text" placeholder="Nom du stream">
+  </div>
 </div>
 <div class="field">
-    <label class="label" for="stream-name">Id twitch</label>
-    <div class="control">
-      <input 
-        [(ngModel)]="stream().twitchId"
-        id="stream-name" class="input" type="text" placeholder="Nom du stream">
-    </div>
+  <label class="label" for="stream-name">Id twitch</label>
+  <div class="control">
+    <input [(ngModel)]="stream().twitchId" id="stream-name" class="input" type="text" placeholder="Nom du stream">
+  </div>
 </div>
 <div class="field">
-    <label class="label" for="stream-name">Url handle</label>
-    <div class="control">
-      <input 
-        [(ngModel)]="stream().urlHandle"
-        id="stream-name" class="input" type="text" placeholder="Nom du stream">
-    </div>
+  <label class="label" for="stream-name">Url handle</label>
+  <div class="control">
+    <input [(ngModel)]="stream().urlHandle" id="stream-name" class="input" type="text" placeholder="Nom du stream">
+  </div>
 </div>
+<hr />
+<p-table [value]="stream().rights ?? []">
+  <ng-template #caption>
+    <div class="is-flex is-flex-direction-row is-justify-content-space-between">
+      <span class="text-xl font-bold">Products</span>
+      <div>
+          <p-inputgroup>
+            <p-autocomplete
+              [(ngModel)]="searchField"
+              [suggestions]="userList$() ?? []"
+              (completeMethod)="search($event)"
+              optionLabel="name"
+              styleClass="is-full-width"
+              />
+            <p-button label="Ajouter" />
+        </p-inputgroup>
+      </div>
+    </div>
+  </ng-template>
+  <ng-template #header>
+    <tr>
+      <th>Nom</th>
+      <th>Droits</th>
+    </tr>
+  </ng-template>
+  <ng-template #body let-stream>
+    <tr>
+      <td>{{ stream.usernmae }}</td>
+      <td>{{ stream.right }}</td>
+    </tr>
+  </ng-template>
+</p-table>

@@ -8,6 +8,7 @@ import { UseGuards } from '@nestjs/common'
 import { AuthGuard } from 'src/shared/guards/auth/auth.guard'
 import { Socket } from 'socket.io'
 import { Session } from 'src/shared/decorators/auth/session.decorator'
+import { Roles } from 'src/shared/decorators/auth/roles.decorator'
 
 @WebSocketGateway({
   namespace: 'streams',
@@ -20,7 +21,7 @@ export class StreamGateway {
   ){}
 
   @SubscribeMessage('getList')
-  //Paginated<IStream>
+  @Roles(['a'])
   getStreams(
     @Paginate() query: PaginateQuery,
     @ConnectedSocket() client: Socket,

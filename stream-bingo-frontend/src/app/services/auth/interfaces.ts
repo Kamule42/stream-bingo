@@ -5,6 +5,8 @@ export interface IValidateCodeResponse{
 export interface ISession{
     sub: string,
     username: string,
+    iat: number,
+    exp: number,
     discord: {
         id: string,
         avatarId: string,
