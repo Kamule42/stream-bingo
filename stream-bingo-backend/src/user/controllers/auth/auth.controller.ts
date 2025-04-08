@@ -1,14 +1,13 @@
 import { Body, Controller, Get, Post, Res } from '@nestjs/common'
-import { AuthService } from './auth.service'
+import { AuthService } from '../../services/auth/auth.service'
 import { map, Observable, tap } from 'rxjs'
 import { FastifyReply } from 'fastify'
-import { ConfigService } from '@nestjs/config';
+import { DateTime } from 'luxon'
 
 @Controller('auth')
 export class AuthController {
   constructor(
     private readonly authService: AuthService,
-    private readonly configService: ConfigService,
   ) {}
 
   @Get('discord-url')
@@ -30,6 +29,7 @@ export class AuthController {
         httpOnly: true,
         secure: true,
         sameSite: true,
+        expires: DateTime.now().plus({week: 1}).endOf('day').toJSDate()
       })),
       map(({access_token}) => ({access_token})),
     )

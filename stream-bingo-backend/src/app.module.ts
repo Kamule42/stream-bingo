@@ -1,10 +1,12 @@
-import { Module } from '@nestjs/common';
-import { ConfigModule, ConfigService } from '@nestjs/config';
-import { AppController } from './app.controller';
-import { UserModule } from './user/user.module';
-import configuration from './config/configuration';
-import { TypeOrmModule } from '@nestjs/typeorm';
-import { StreamModule } from './stream/stream.module';
+import { Module } from '@nestjs/common'
+import { ConfigModule, ConfigService } from '@nestjs/config'
+import { AppController } from './app.controller'
+import { UserModule } from './user/user.module'
+import configuration from './config/configuration'
+import { TypeOrmModule } from '@nestjs/typeorm'
+import { StreamModule } from './stream/stream.module'
+import { APP_GUARD, APP_INTERCEPTOR } from '@nestjs/core'
+import { AuthGuard } from './shared/guards/auth/auth.guard'
 
 @Module({
   imports: [
@@ -31,6 +33,11 @@ import { StreamModule } from './stream/stream.module';
     StreamModule,
   ],
   controllers: [AppController],
-  providers: [],
+  providers: [
+    {
+      provide: APP_GUARD,
+      useClass: AuthGuard,
+    },
+  ],
 })
 export class AppModule {}

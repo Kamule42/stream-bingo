@@ -1,4 +1,5 @@
 import { Routes } from '@angular/router';
+import { hasRightGuard } from './guards/has-right.guard';
 
 export const routes: Routes = [
     {path: '', loadComponent: () =>  import('./views/main/home/home.component').then(c => c.HomeComponent)},
@@ -9,6 +10,10 @@ export const routes: Routes = [
     {
         path: 'admin',
         loadComponent: () => import('./views/admin/main/main.component').then(c => c.MainComponent),
+        canActivate: [hasRightGuard],
+        data: {
+            rights: ['a'],
+        },
         children:[
             {path: 'streams', loadComponent: () => import('./views/admin/streams/streams.component').then(c => c.StreamsComponent)}
         ]

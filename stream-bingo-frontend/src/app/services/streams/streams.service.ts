@@ -1,20 +1,26 @@
 import { Injectable } from '@angular/core'
 import { fromEvent, map, share, } from 'rxjs'
-import { io } from 'socket.io-client'
+import { io, Socket } from 'socket.io-client'
 import { DateTime } from'luxon'
 import { IPaginated, IPagination } from '../../shared/models/pagination.interface'
 import { IStream } from './stream.interface'
+import { WebsocketService } from '../ws/websocket.service'
 
 @Injectable({
   providedIn: 'root'
 })
-export class StreamsService {
-  private readonly socket = io('/streams', {
+export class StreamsService extends WebsocketService{
+  private readonly _socket = io('/streams', {
     reconnection: true,
     reconnectionDelay: 1000,
     reconnectionAttempts: 5,
     transports: ['websocket', 'polling'],
+    withCredentials: true,
+    auth: this.auth,
   })
+  override get socket(): Socket {
+    return this._socket
+  }
 
   private readonly _streams$ = fromEvent<IPaginated<Array<IStream>>>(this.socket, 'streamList').pipe(
     share()
@@ -66,9 +72,5 @@ export class StreamsService {
   }
   public fetchDetails(webhandle: string) {
     this.sendMessage('getDetail', {webhandle})
-  }
-
-  private sendMessage(id: string, payload?: unknown): void {
-    this.socket.emit(id, payload);
   }
 }

@@ -1,14 +1,19 @@
-import { MessageBody, SubscribeMessage, WebSocketGateway, WsResponse } from '@nestjs/websockets'
-import { map, Observable } from 'rxjs';
+import { ConnectedSocket, MessageBody, SubscribeMessage, WebSocketGateway, WsResponse } from '@nestjs/websockets'
+import { map, Observable } from 'rxjs'
 import { StreamService } from 'src/stream/services/stream/stream.service'
 import { IStreamWithNextRound } from './stream.interface' 
-import { streamMapper } from './stream.mappers';
-import { Paginate, PaginateQuery } from 'nestjs-paginate';
+import { streamMapper } from './stream.mappers'
+import { Paginate, PaginateQuery } from 'nestjs-paginate'
+import { UseGuards } from '@nestjs/common'
+import { AuthGuard } from 'src/shared/guards/auth/auth.guard'
+import { Socket } from 'socket.io'
+import { Session } from 'src/shared/decorators/auth/session.decorator'
 
 @WebSocketGateway({
   namespace: 'streams',
   transports: ['websocket', 'polling']
 })
+@UseGuards(AuthGuard)
 export class StreamGateway {
   constructor(
     private readonly streamService: StreamService
@@ -16,7 +21,12 @@ export class StreamGateway {
 
   @SubscribeMessage('getList')
   //Paginated<IStream>
-  getStreals(@Paginate() query: PaginateQuery): Observable<WsResponse<any>> {
+  getStreams(
+    @Paginate() query: PaginateQuery,
+    @ConnectedSocket() client: Socket,
+    @Session() session,
+  ): Observable<WsResponse<any>> {
+    console.log('session',session)
     return this.streamService.listServices(query).pipe(
       map(result => ({
         event: 'streamList',

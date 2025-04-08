@@ -3,6 +3,7 @@ import { inject, Injectable } from '@angular/core'
 import { BehaviorSubject, map, Observable, Subject, tap } from 'rxjs'
 import { ISession, IValidateCodeResponse } from './interfaces'
 import { jwtDecode } from 'jwt-decode'
+import { Router } from '@angular/router'
 
 const AUTHORIZATION_KEY = 'authorization'
 
@@ -11,6 +12,7 @@ const AUTHORIZATION_KEY = 'authorization'
 })
 export class AuthService {
   private readonly http = inject(HttpClient)
+  private readonly router = inject(Router)
   private readonly authorization$$: Subject<string | null | undefined>
     = new BehaviorSubject<string | null | undefined>(undefined)
   public readonly session$ = this.authorization$$.pipe(
@@ -61,6 +63,10 @@ export class AuthService {
 
   public logout(){
     this.authorization$ = null
+    const url = this.router.url
+    this.router.navigate(['/']).then(() => {
+      this.router.navigate([url])
+    })
   }
 
   public hasRight(r: string): Observable<boolean>{
