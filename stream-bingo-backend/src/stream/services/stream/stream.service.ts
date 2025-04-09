@@ -61,20 +61,20 @@ export class StreamService {
         for (const right of toRemove) {
           await manager.remove(right)
         }
-        const toUpdate = {
-          ...existingStream,
-          name: updatedStream.name,
-          twitchId: updatedStream.twitchId,
-          twitchLogin: updatedStream.urlHandle,
-          enabled: updatedStream.enabled ?? true,
-          rights: updatedStream.rights?.map(({user_id, right}) => ({
-            rightKey: right,
-            stream: {id: existingStream.id },
-            user: {id: user_id},
-          })) ?? []
-        }
-        await manager.save(StreamEntity,toUpdate)
       }
+      const toUpdate = {
+        id: updatedStream.id,
+        name: updatedStream.name,
+        twitchId: updatedStream.twitchId,
+        twitchLogin: updatedStream.urlHandle,
+        enabled: updatedStream.enabled ?? true,
+        rights: updatedStream.rights?.map(({user_id, right}) => ({
+          rightKey: right,
+          stream: {id: updatedStream.id },
+          user: {id: user_id},
+        })) ?? []
+      }
+      await manager.save(StreamEntity,toUpdate)
     })
   }
 }
