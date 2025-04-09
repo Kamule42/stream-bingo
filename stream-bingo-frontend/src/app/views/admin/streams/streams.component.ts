@@ -69,4 +69,7 @@ export class StreamsComponent{
     this.toEdit$.set(stream)
     this.showDialog$.set(true)
   }
+  reload(){
+    this.streamService.listStreams(this.pagination())
+  }
 }

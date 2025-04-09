@@ -9,6 +9,7 @@ import { provideNgcCookieConsent } from 'ngx-cookieconsent'
 import { routes } from './app.routes'
 import { httpInterceptor } from './interceptors/http/http.interceptor'
 import { cookieConfig } from './config/cookieconsent.config'
+import { MessageService } from 'primeng/api'
 
 
 export const appConfig: ApplicationConfig = {
@@ -24,5 +25,6 @@ export const appConfig: ApplicationConfig = {
       withInterceptors([httpInterceptor])
     ),
     provideNgcCookieConsent(cookieConfig),
+    MessageService,
   ]
 };

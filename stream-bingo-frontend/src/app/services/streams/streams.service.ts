@@ -3,7 +3,7 @@ import { fromEvent, map, share, } from 'rxjs'
 import { io, Socket } from 'socket.io-client'
 import { DateTime } from'luxon'
 import { IPaginated, IPagination } from '../../shared/models/pagination.interface'
-import { IStream } from './stream.interface'
+import { IRight, IStream } from './stream.interface'
 import { WebsocketService } from '../ws/websocket.service'
 
 @Injectable({
@@ -72,5 +72,8 @@ export class StreamsService extends WebsocketService{
   }
   public fetchDetails(webhandle: string) {
     this.sendMessage('getDetail', {webhandle})
+  }
+  public update(stream: IStream<Omit<IRight, 'username'>>) {
+    this.sendMessage('updateStream', stream)
   }
 }

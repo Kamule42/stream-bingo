@@ -53,13 +53,10 @@
 }
 
 
-<p-dialog [header]="modalTitle$()" [modal]="true" [(visible)]="showDialog$" [style]="{ width: '45rem' }">
-    <div id="edit-stream-root" class="is-flex is-flex-direction-column">
-        <app-edit-stream [(stream)]="toEdit$"/>
-        <div id="edit-stream-actions" class="is-flex is-justify-content-end is-gap-2">
-            <p-button label="Annuler" severity="secondary" (click)="showDialog$.set(false)" />
-            <p-button label="Valider" (click)="showDialog$.set(false)" />
-        </div>
-            
-    </div>
+<p-dialog [header]="modalTitle$()" [modal]="true" [(visible)]="showDialog$" [style]="{ width: '55rem' }">
+    <app-edit-stream
+        [stream]="toEdit$()"
+        (saved)="showDialog$.set(false); reload()"
+        (cancelled)="showDialog$.set(false); reload()"
+    />
 </p-dialog>

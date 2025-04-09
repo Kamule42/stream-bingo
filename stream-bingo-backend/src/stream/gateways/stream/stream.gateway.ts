@@ -1,7 +1,7 @@
 import { ConnectedSocket, MessageBody, SubscribeMessage, WebSocketGateway, WsResponse } from '@nestjs/websockets'
 import { map, Observable } from 'rxjs'
 import { StreamService } from 'src/stream/services/stream/stream.service'
-import { IStreamWithNextRound } from './stream.interface' 
+import { IRight, IStream, IStreamWithNextRound } from './stream.interface' 
 import { streamMapper } from './stream.mappers'
 import { Paginate, PaginateQuery } from 'nestjs-paginate'
 import { UseGuards } from '@nestjs/common'
@@ -24,10 +24,7 @@ export class StreamGateway {
   @Roles(['a'])
   getStreams(
     @Paginate() query: PaginateQuery,
-    @ConnectedSocket() client: Socket,
-    @Session() session,
   ): Observable<WsResponse<any>> {
-    console.log('session',session)
     return this.streamService.listServices(query).pipe(
       map(result => ({
         event: 'streamList',
@@ -37,7 +34,16 @@ export class StreamGateway {
           meta: result.meta,
         }
       }))
-    );
+    )
+  }
+
+  
+  @SubscribeMessage('updateStream')
+  @Roles(['a'])
+  updateStream(
+    @Paginate() stream: IStream<Omit<IRight, 'username'>>,
+  ): void {
+    this.streamService.updateStream(stream)
   }
 
   @SubscribeMessage('getNexts')

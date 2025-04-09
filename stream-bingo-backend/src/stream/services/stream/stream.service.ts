@@ -3,6 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm'
 import { paginate, Paginated, PaginateQuery } from 'nestjs-paginate'
 import { Observable, from,  } from 'rxjs'
 import { StreamEntity } from 'src/stream/entities/stream.entity'
+import { IStream, IRight } from 'src/stream/gateways/stream/stream.interface';
 import { Repository } from 'typeorm';
 
 @Injectable()
@@ -37,5 +38,19 @@ export class StreamService {
 
   getStreamDetail(webhandle: string): Observable<StreamEntity | null>{
     return from(this.streamRepository.findOneBy({twitchLogin: webhandle}))
+  }
+
+  async updateStream(stream: IStream<Omit<IRight, "username">>) {
+    const existingStream = await this.streamRepository.findOneBy({
+      id: stream.id
+    })
+    if(existingStream){
+      this.streamRepository.save({
+        ...existingStream,
+        name: stream.name,
+        twitchId: stream.twitchId,
+        twitchLogin: stream.urlHandle
+      })
+    }
   }
 }

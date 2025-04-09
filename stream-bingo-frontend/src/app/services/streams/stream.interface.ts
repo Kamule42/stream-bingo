@@ -1,14 +1,16 @@
-export interface IStream{
+export interface IRight{
+    right: string,
+    user_id: string,
+    username: string,
+}
+
+export interface IStream<T = IRight>{
     id: string,
     name: string,
     twitchId: string,
     urlHandle: string,
     enabled?: boolean,
-    rights?: Array<{
-        right: string,
-        user_id: string,
-        username: string
-    }>,
+    rights?: Array<T>,
 }
 
 export interface IStreamWithNextRound extends IStream{
