@@ -25,7 +25,7 @@ export class StreamGateway {
   getStreams(
     @Paginate() query: PaginateQuery,
   ): Observable<WsResponse<any>> {
-    return this.streamService.listServices(query).pipe(
+    return this.streamService.listServices(query, false).pipe(
       map(result => ({
         event: 'streamList',
         data: {
@@ -41,7 +41,7 @@ export class StreamGateway {
   @SubscribeMessage('updateStream')
   @Roles(['a'])
   updateStream(
-    @Paginate() stream: IStream<Omit<IRight, 'username'>>,
+    @MessageBody() stream: IStream<Omit<IRight, 'username'>>,
   ): void {
     this.streamService.updateStream(stream)
   }

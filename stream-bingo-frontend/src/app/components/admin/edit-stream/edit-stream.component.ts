@@ -135,6 +135,7 @@ export class EditStreamComponent {
       name: stream.name!,
       twitchId: stream.twitchId!,
       urlHandle: stream.urlHandle!,
+      enabled: stream.enabled!,
       rights: this.streamRights()
         .flatMap(({user_id, rights}) => rights
         .map(right => ({

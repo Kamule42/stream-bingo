@@ -28,11 +28,11 @@ export class StreamEntity {
   @Column({ name: 'deleted_at' })
   deletedAt: Date
 
-  @OneToMany(() => RoundEntity, (round) => round.stream)
+  @OneToMany(() => RoundEntity, (round) => round.stream, { cascade: true })
   @JoinColumn({name: 'stream_id'})
   rounds: Array<RoundEntity>
 
-  @OneToMany(() => RightEntity, (right) => right.stream)
+  @OneToMany(() => RightEntity, (right) => right.stream, { cascade: true })
   @JoinColumn({name: 'stream_id'})
   rights: Array<RightEntity>
 }

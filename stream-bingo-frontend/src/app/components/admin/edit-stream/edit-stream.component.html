@@ -19,6 +19,14 @@
         <input [(ngModel)]="stream().urlHandle" id="stream-name" class="input" type="text" placeholder="Nom du stream">
       </div>
     </div>
+    <div class="field">
+      <div class="control">
+        <label class="checkbox">
+          <input  [(ngModel)]="stream().enabled" type="checkbox">
+          Activé
+        </label>
+      </div>
+    </div>
     <hr />
     <p-table [value]="streamRights()">
       <ng-template #caption>
