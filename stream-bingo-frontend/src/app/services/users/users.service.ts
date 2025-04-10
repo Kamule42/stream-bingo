@@ -18,8 +18,8 @@ export class UsersService extends WebsocketService {
 
   
   readonly userList$ = fromEvent<Array<{id: string, name: string}>>(this.socket, 'userList').pipe(
-      share()
-    )
+    share()
+  )
 
   override get socket(): Socket {
     return this._socket
@@ -27,5 +27,8 @@ export class UsersService extends WebsocketService {
 
   public searchByName(name: string) {
     this.sendMessage('searchByName', {name})
+  }
+  getFavs(): any {
+    this.sendMessage('getMyFavs')
   }
 }

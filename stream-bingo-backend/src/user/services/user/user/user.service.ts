@@ -17,4 +17,10 @@ export class UserService {
         }
     })
   }
+  getFavs(id: string) {
+    return this.usersRepository.findOne({
+      where: { id },
+      relations: ['favs']
+    })
+  }
 }

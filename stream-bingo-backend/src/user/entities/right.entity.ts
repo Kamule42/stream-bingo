@@ -1,5 +1,5 @@
 import { StreamEntity } from 'src/stream/entities/stream.entity'
-import { Entity, Column, ManyToOne, JoinColumn, Index, PrimaryColumn } from 'typeorm'
+import { Entity, ManyToOne, JoinColumn, Index, PrimaryColumn } from 'typeorm'
 import { UserEntity } from './user.entity'
 
 @Entity({ name: 'rights', schema: 'bingo' })

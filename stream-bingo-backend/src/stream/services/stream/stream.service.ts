@@ -67,7 +67,7 @@ export class StreamService {
         name: updatedStream.name,
         twitchId: updatedStream.twitchId,
         twitchLogin: updatedStream.urlHandle,
-        enabled: updatedStream.enabled ?? true,
+        enabled: updatedStream.enabled ?? false,
         rights: updatedStream.rights?.map(({user_id, right}) => ({
           rightKey: right,
           stream: {id: updatedStream.id },

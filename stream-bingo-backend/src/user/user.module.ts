@@ -6,9 +6,9 @@ import { HttpModule } from '@nestjs/axios'
 import { UserEntity } from './entities/user.entity'
 import { JwtModule } from '@nestjs/jwt'
 import { ConfigService } from '@nestjs/config'
-import { RightEntity } from './entities/rights.entity'
+import { RightEntity } from './entities/right.entity'
 import { UserGateway } from './gateways/user/user.gateway'
-import { UserService } from './services/user/user/user.service';
+import { UserService } from './services/user/user/user.service'
 
 @Module({
   imports: [

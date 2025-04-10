@@ -1,6 +1,5 @@
 import { CanActivate, ExecutionContext, Injectable } from '@nestjs/common'
 import { Reflector } from '@nestjs/core'
-import { WsException } from '@nestjs/websockets'
 import { Observable } from 'rxjs'
 import { Socket } from 'socket.io'
 import { Roles } from 'src/shared/decorators/auth/roles.decorator'
@@ -32,8 +31,9 @@ export class AuthGuard implements CanActivate {
       case 'http': break;
     }
 
-    const roles = this.reflector.get(Roles, context.getHandler())
-   return !roles ||  // Only a session needed
-    session && roles.some(role => session.rights.some(({right}) => right === role)) // At least one role matches
+    const roles = this.reflector.get<Array<string> | Object>(Roles, context.getHandler())
+    return !roles || // Only a session needed
+    session && Array.isArray(roles) && roles.some(role => session.rights.some(({right}) => right === role)) ||  // At least one role matches 
+    session
   }
 }

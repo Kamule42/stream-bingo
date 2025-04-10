@@ -1,6 +1,6 @@
 import { Entity, Column, PrimaryColumn, OneToMany, JoinColumn } from 'typeorm'
 import { RoundEntity } from './round.entity'
-import { RightEntity } from 'src/user/entities/rights.entity'
+import { RightEntity } from 'src/user/entities/right.entity'
 
 @Entity({ name: 'streams', schema: 'bingo' })
 export class StreamEntity {

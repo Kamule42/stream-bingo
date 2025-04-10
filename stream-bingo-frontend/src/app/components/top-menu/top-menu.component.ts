@@ -6,9 +6,9 @@ import { MenuModule } from 'primeng/menu';
 import { ButtonModule } from 'primeng/button'
 import { AuthService } from '../../services/auth'
 import { DiscordAuthComponent } from '../discord-auth/discord-auth.component'
-import { NgcCookieConsentService } from 'ngx-cookieconsent';
 import { RouterLink } from '@angular/router';
 import { MenuItem } from 'primeng/api';
+import { SessionService } from '../../services/session/session.service';
 
 @Component({
   selector: 'app-top-menu',
@@ -18,14 +18,12 @@ import { MenuItem } from 'primeng/api';
 })
 export class TopMenuComponent {
   private readonly authService = inject(AuthService)
-  private readonly session$ = this.authService.session$
-  private readonly ccSerice = inject(NgcCookieConsentService)
+  private readonly sessionService = inject(SessionService)
 
-  readonly session = toSignal(this.session$, {initialValue: undefined}) 
+  readonly session = this.sessionService.session$
   readonly isConnected = computed(() => this.session() != null) // not null nor undefined
   readonly isDisconnected = computed(() => this.session() === null) // only null
 
-  readonly isAdmin = toSignal(this.authService.isAdmin)
 
   readonly items = computed(() => {
     const result: Array<MenuItem> = [
@@ -35,7 +33,7 @@ export class TopMenuComponent {
         route: '/',
       },
     ]
-    if(this.isAdmin()){
+    if(this.sessionService.isAdmin){
       result.push({
         label: 'Administration',
         icon: 'mdi mdi-shield-crown-outline',
