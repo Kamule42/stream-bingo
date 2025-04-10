@@ -1,12 +1,17 @@
 :host{
     $star-size: 2;
     #stream-header{
-        gap: 1rem;
+        gap: 0.5rem;
+        align-items: center;
+        figure{
+            height: fit-content
+        }
         #stream-data{
             margin-left: 3rem;
             padding-top: #{($star-size - 1)*0.8}rem;
         }
         #stream-fav{
+            align-self: start;
             font-size: #{$star-size}rem;
         }
     }

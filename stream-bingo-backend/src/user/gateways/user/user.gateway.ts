@@ -58,14 +58,5 @@ export class UserGateway {
    )
   {
     this.userService.flipFav(session.sub, streamId)
-    // .then(user => ({
-    //   event: 'myFavs',
-    //   data: user.favs?.map(stream => ({
-    //     streamId: stream.id,
-    //     streamName: stream.name,
-    //     twitchId: stream.twitchId,
-    //     streamTwitchHandle: stream.twitchLogin,
-    //   })) ?? []
-    // }))
   }
 }

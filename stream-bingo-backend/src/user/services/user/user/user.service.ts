@@ -23,7 +23,10 @@ export class UserService {
   getFavs(id: string): Promise<UserEntity | null> {
     return this.usersRepository.findOne({
       where: { id },
-      relations: ['favs']
+      relations: ['favs'],
+      order: {
+        favs: { name: 'ASC' }
+      }
     })
   }
   async flipFav(userId: string, streamId: string): Promise<UserEntity> {
