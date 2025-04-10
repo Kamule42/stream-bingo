@@ -12,6 +12,15 @@ export interface IStream<T = IRight>{
     enabled?: boolean,
     rights?: Array<T>,
 }
+export interface INextStream{
+    id: string,
+    name: string,
+    twitchId: string,
+    urlHandle: string,
+    enabled?: boolean,
+    startAt: Date,
+}
+
 
 export interface IStreamWithNextRound extends IStream{
     nextStreamStartsAt: Date,

@@ -1,0 +1,25 @@
+<div class="container">
+    <h4 class="title is-4">Mes favoris</h4>
+    <div class="is-flex is-flex-row">
+        @for(fav of favs$(); track fav.streamId){
+            <div class="card">
+                <a [routerLink]="`/s/${fav.streamTwitchHandle}`">
+                    <div class="card-image is-flex is-justify-content-center">
+                        <figure class="image ">
+                            <img
+                                [src]="`//static-cdn.jtvnw.net/jtv_user_pictures/${fav.twitchId}-profile_image-300x300.png`"
+                                [alt]="`${fav.streamName} profil`"
+                            />
+                        </figure>
+                    </div>
+                    <div class="card-content">
+                        <h5 class="title is-5">{{ fav.streamName }}</h5>
+                        <div class="content">
+                            Bla bla bla
+                        </div>
+                    </div>
+                </a>
+            </div>
+        }
+    </div>
+</div>>

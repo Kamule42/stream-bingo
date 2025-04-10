@@ -1,24 +1,36 @@
 <nav class="navbar is-fixed-top" role="navigation" aria-label="main navigation">
     <div class="container">
-        <p-menubar [model]="items()">
-            <ng-template  #item let-item>
+        <p-menubar
+         [model]="items()"
+         [autoDisplay]="true"
+        >
+            <ng-template  #item let-item let-root>
                 @if(item.route){
                     <a [routerLink]="item.route" class="p-menubar-item-link">
                         <span [class]="item.icon"></span>
                         <span class="ml-2">{{ item.label }}</span>
+                        @if(item.items){
+                            <span [ngClass]="[' ml-2 pi pi-fw', root ? 'pi-angle-down' : 'pi-angle-right']"></span>
+                        }
                     </a>
                 }
                 @else if(item.url){
                     <a [href]="item.url" class="p-menubar-item-link">
                         <span [class]="item.icon"></span>
                         <span class="ml-2">{{ item.label }}</span>
+                        @if(item.items){
+                            <span [ngClass]="[' ml-2 pi pi-fw', root ? 'pi-angle-down' : 'pi-angle-right']"></span>
+                        }
                     </a>
                 }
                 @else {
                     <div class="p-menubar-item-link">
                         <span [class]="item.icon"></span>
-                        <span class="ml-2">{{ item.label }}</span>
-                        <span class="pi pi-fw pi-angle-down ml-2"></span>
+                        <span class="ml-2">{{ item.label }} 
+                            {{ root }}</span>
+                        @if(item.items){
+                            <span [ngClass]="[' ml-2 pi pi-fw', root ? 'pi-angle-down' : 'pi-angle-right']"></span>
+                        }
                     </div>
                 }
             </ng-template>

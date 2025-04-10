@@ -6,10 +6,11 @@ import { StreamEntity } from './entities/stream.entity';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { RoundEntity } from './entities/round.entity';
 import { UserModule } from 'src/user/user.module';
+import { NextStreamEntity } from './entities/next-stream.entity';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([StreamEntity, RoundEntity,]),
+    TypeOrmModule.forFeature([StreamEntity, RoundEntity, NextStreamEntity,]),
     UserModule,
   ],
   controllers: [StreamController],

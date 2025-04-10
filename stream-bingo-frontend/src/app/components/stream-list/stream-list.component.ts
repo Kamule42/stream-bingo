@@ -1,10 +1,11 @@
-import { Component, inject, OnInit } from '@angular/core'
+import { Component, inject, input, OnInit } from '@angular/core'
 import { StreamsService } from '../../services/streams/streams.service'
 import { toSignal } from '@angular/core/rxjs-interop'
 import { map, switchMap, timer } from 'rxjs'
 import { DateTime, Interval } from 'luxon'
 import { CardModule } from 'primeng/card'
 import { RouterLink } from '@angular/router'
+
 
 @Component({
   selector: 'app-stream-list',
@@ -14,6 +15,7 @@ import { RouterLink } from '@angular/router'
 })
 export class StreamListComponent implements OnInit {
   private readonly streamService = inject(StreamsService)
+  readonly streamType = input<'next', 'all'>
 
   private readonly _streams$ = this.streamService.nextStreams$.pipe(
     switchMap((streams) => timer(0, 1000).pipe(

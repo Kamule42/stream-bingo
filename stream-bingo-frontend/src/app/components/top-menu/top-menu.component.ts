@@ -9,10 +9,14 @@ import { DiscordAuthComponent } from '../discord-auth/discord-auth.component'
 import { RouterLink } from '@angular/router';
 import { MenuItem } from 'primeng/api';
 import { SessionService } from '../../services/session/session.service';
+import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'app-top-menu',
-  imports: [ DiscordAuthComponent, MenubarModule, AvatarModule, MenuModule, ButtonModule, RouterLink ],
+  imports: [ 
+    CommonModule,
+    DiscordAuthComponent, MenubarModule,
+    AvatarModule, MenuModule, ButtonModule, RouterLink ],
   templateUrl: './top-menu.component.html',
   styleUrl: './top-menu.component.scss',
 })
@@ -23,6 +27,7 @@ export class TopMenuComponent {
   readonly session = this.sessionService.session$
   readonly isConnected = computed(() => this.session() != null) // not null nor undefined
   readonly isDisconnected = computed(() => this.session() === null) // only null
+  readonly favs = this.sessionService.favs$
 
 
   readonly items = computed(() => {
@@ -33,6 +38,18 @@ export class TopMenuComponent {
         route: '/',
       },
     ]
+    if(this.sessionService.isAuthenticated){
+      result.push({
+        label: 'Mes favoris',
+        icon: 'mdi mdi-star-outline',
+        route: '/@me/favs',
+        items: this.sessionService.favs$()
+          ?.map(fav => ({
+            label: fav.streamName,
+            route: `/s/${fav.streamTwitchHandle}`
+          }))
+      })
+    }
     if(this.sessionService.isAdmin){
       result.push({
         label: 'Administration',

@@ -4,7 +4,7 @@ import { Roles } from 'src/shared/decorators/auth/roles.decorator';
 import { Session } from 'src/shared/decorators/auth/session.decorator';
 import { AuthGuard } from 'src/shared/guards/auth/auth.guard';
 import { UserService } from 'src/user/services/user/user/user.service';
-import { IFavs, ISearchResult } from './user.responses';
+import { IFav, ISearchResult } from './user.responses';
 import { ISession } from 'src/user/interfaces/session.interface';
 
 @WebSocketGateway({
@@ -35,7 +35,7 @@ export class UserGateway {
   @SubscribeMessage('getMyFavs')
   getMyFavs(
     @Session() session: ISession
-   ) : Promise<WsResponse<Array<IFavs>>>
+   ) : Promise<WsResponse<Array<IFav>>>
   {
     return this.userService
       .getFavs(session.sub)
@@ -48,5 +48,24 @@ export class UserGateway {
           streamTwitchHandle: stream.twitchLogin,
         })) ?? []
     }))
+  }
+
+  @Roles()
+  @SubscribeMessage('flipFav')
+  flipFav(
+    @MessageBody('id') streamId: string,
+    @Session() session: ISession
+   )
+  {
+    this.userService.flipFav(session.sub, streamId)
+    // .then(user => ({
+    //   event: 'myFavs',
+    //   data: user.favs?.map(stream => ({
+    //     streamId: stream.id,
+    //     streamName: stream.name,
+    //     twitchId: stream.twitchId,
+    //     streamTwitchHandle: stream.twitchLogin,
+    //   })) ?? []
+    // }))
   }
 }

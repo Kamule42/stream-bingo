@@ -2,16 +2,19 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm'
 import { paginate, Paginated, PaginateQuery } from 'nestjs-paginate'
 import { Observable, from,  } from 'rxjs'
-import { AuthGuard } from 'src/shared/guards/auth/auth.guard';
+import { NextStreamEntity } from 'src/stream/entities/next-stream.entity';
 import { StreamEntity } from 'src/stream/entities/stream.entity'
 import { IStream, IRight } from 'src/stream/gateways/stream/stream.interface'
-import { Repository, DataSource } from 'typeorm'
+import { Repository, DataSource, Not, IsNull, } from 'typeorm'
 
 @Injectable()
 export class StreamService {
   constructor(
     @InjectRepository(StreamEntity)
     private readonly streamRepository: Repository<StreamEntity>,
+    @InjectRepository(NextStreamEntity)
+    private readonly nextStreamRepository: Repository<NextStreamEntity>,
+    
     private readonly dataSource: DataSource,
   ){}
 
@@ -27,23 +30,29 @@ export class StreamService {
     }))
   }
 
-  listNextServices(): Observable<Array<StreamEntity>> {
-    return from (this.streamRepository
-        .createQueryBuilder('streams')
-        .leftJoinAndSelect('streams.rounds', 'rounds')
-        .where('rounds.created_at IS NOT NULL')
-        .andWhere('rounds.startAt <= now()')
-        .andWhere('rounds.streamStartAt > now()')
-        .orderBy('streams.id', 'ASC')
-        .addOrderBy('rounds.streamStartAt', 'ASC') 
-        .distinctOn(['streams.id'])
-        .limit(10)
-        .getMany()
-    )
+  listNextServices( 
+    query: PaginateQuery,
+  ): Observable<Paginated<NextStreamEntity>> {
+    return from (paginate(
+      query,
+      this.nextStreamRepository ,
+      {
+        where: {
+          startAt: Not(IsNull())
+        },
+        sortableColumns: ['startAt'],
+        defaultSortBy: [
+          ['id', 'ASC'],
+          ['startAt', 'ASC']
+        ],
+      }
+    ))
   }
 
-  getStreamDetail(webhandle: string): Observable<StreamEntity | null>{
-    return from(this.streamRepository.findOneBy({twitchLogin: webhandle}))
+  getStreamDetail(webhandle: string): Observable<NextStreamEntity | null>{
+    return from(this.nextStreamRepository.findOneBy({
+      twitchLogin: webhandle
+    }))
   }
 
   async updateStream(updatedStream: IStream<Omit<IRight, "username">>) {

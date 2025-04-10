@@ -1,7 +1,7 @@
 <div class="container">
     @if(stream$()){
         @let stream = stream$();
-        <div class="block is-flex is-flex-row">
+        <div id="stream-header" class="block is-flex is-flex-direction-row">
             <figure class="image">
                 <img
                     [src]="`//static-cdn.jtvnw.net/jtv_user_pictures/${stream.twitchId}-profile_image-150x150.png`"
@@ -9,6 +9,25 @@
                     class="is-rounded"
                 />
             </figure>
+            <div  id="stream-data" class="is-flex is-flex-direction-column">
+                <h5 class="title is-5">{{ stream.name }}</h5>
+                <div class="content">
+                    @if(stream.nextStreamStartsAtIso && stream.nextStreamStartsAt){
+                        Prochain stream dans <time [dateTime]="stream.nextStreamStartsAtIso">{{ stream.nextStreamStartsAtTxt }}</time>
+                    }
+                    @else {
+                        Pas de stream prévu
+                    }
+                </div>
+            </div>
+            <div id="stream-fav">
+                <a (click)="flip()">
+                    <span
+                        class="mdi"
+                        [class]="`mdi-star${stream.isFav ? '' : '-outline'}`"
+                    ></span>
+                </a>
+            </div>
         </div>
     }
     @else if(noWebhandle$() === true || stream$() === null){

@@ -1,7 +1,9 @@
 import { Injectable } from '@angular/core'
 import { io, Socket } from 'socket.io-client'
 import { WebsocketService } from '../ws/websocket.service'
-import { fromEvent, share } from 'rxjs'
+import { fromEvent, merge, share, Subject, tap } from 'rxjs'
+import { IFav, ISeachResult } from './users.interface'
+import { toSignal } from '@angular/core/rxjs-interop'
 
 @Injectable({
   providedIn: 'root'
@@ -16,10 +18,19 @@ export class UsersService extends WebsocketService {
     withCredentials: true,
   })
 
-  
-  readonly userList$ = fromEvent<Array<{id: string, name: string}>>(this.socket, 'userList').pipe(
-    share()
+
+  readonly userList$ = fromEvent<Array<ISeachResult>>(this.socket, 'userList').pipe(
+    share(),
   )
+  private readonly forceFavs$ = new Subject<Array<IFav>>()
+  readonly favs$ = merge(
+    fromEvent<Array<IFav>>(this.socket, 'myFavs'),
+    this.forceFavs$,
+  ).pipe(
+    share(),
+  )
+
+  private readonly _favs$ = toSignal(this.favs$) 
 
   override get socket(): Socket {
     return this._socket
@@ -28,7 +39,26 @@ export class UsersService extends WebsocketService {
   public searchByName(name: string) {
     this.sendMessage('searchByName', {name})
   }
-  getFavs(): any {
+  public getFavs(): any {
     this.sendMessage('getMyFavs')
+  }
+  public flipFav(id: string, {streamName, twitchId, streamTwitchHandle}: Omit<IFav, 'streamId'>) {
+    const hasFav = this._favs$()?.some(({streamId}) => streamId === id)
+    console.log(hasFav)
+    if(hasFav){
+      this.forceFavs$.next(this._favs$()?.filter(({streamId}) => streamId !== id) ?? [])
+    }
+    else{
+      this.forceFavs$.next([
+        ...this._favs$() ?? [],
+        {
+          streamId: id,
+          streamName,
+          twitchId,
+          streamTwitchHandle
+        }
+      ])
+    }
+    this.sendMessage('flipFav', { id })
   }
 }

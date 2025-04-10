@@ -41,18 +41,16 @@ export class StreamsService extends WebsocketService{
 
 
   public readonly nextStreams$ = fromEvent(this.socket, 'nextStreams').pipe(
-    map(streams => streams.map((stream: any) => ({
+    map(streams => streams?.data.map((stream: any) => ({
       ...stream,
-      nextStreamStartsAt: stream.nextStreamStartsAt ? DateTime.fromISO(stream.nextStreamStartsAt) : null,
-      nextRoundStartsAt: stream.nextStreamStartsAt ? DateTime.fromISO(stream.nextRoundStartsAt) : null,
-    }))),
+      nextStreamStartsAt: stream.startAt ? DateTime.fromISO(stream.startAt) : null,
+    })) ?? []),
     share(),
   )
   public readonly streamDetail$ = fromEvent(this.socket, 'streamDetail').pipe(
     map(stream =>  (stream ? {
       ...stream,
-      nextStreamStartsAt: stream.nextStreamStartsAt ? DateTime.fromISO(stream.nextStreamStartsAt) : null,
-      nextRoundStartsAt: stream.nextStreamStartsAt ? DateTime.fromISO(stream.nextRoundStartsAt) : null,
+      nextStreamStartsAt: stream.startAt ? DateTime.fromISO(stream.startAt) : null,
     } : null)),
     share(),
   )
@@ -67,8 +65,15 @@ export class StreamsService extends WebsocketService{
       limit: 25,
     })
   }
-  public getNextStreams(): void{
-    this.sendMessage('getNexts')
+  public getNextStreams(pagination? : IPagination): void{
+    this.sendMessage('getNexts',pagination ? 
+      {
+        ...pagination,
+        page: (pagination.page ?? 0) + 1
+      } : {
+      page: 1,
+      limit: 10,
+    })
   }
   public fetchDetails(webhandle: string) {
     this.sendMessage('getDetail', {webhandle})

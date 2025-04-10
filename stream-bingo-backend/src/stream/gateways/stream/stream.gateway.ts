@@ -1,14 +1,14 @@
-import { ConnectedSocket, MessageBody, SubscribeMessage, WebSocketGateway, WsResponse } from '@nestjs/websockets'
+import { MessageBody, SubscribeMessage, WebSocketGateway, WsResponse } from '@nestjs/websockets'
 import { map, Observable } from 'rxjs'
 import { StreamService } from 'src/stream/services/stream/stream.service'
-import { IRight, IStream, IStreamWithNextRound } from './stream.interface' 
-import { streamMapper } from './stream.mappers'
+import { INextStream, IRight, IStream, IStreamWithNextRound } from './stream.interface' 
+import { nextStreamMapper, streamMapper } from './stream.mappers'
 import { Paginate, PaginateQuery } from 'nestjs-paginate'
 import { UseGuards } from '@nestjs/common'
 import { AuthGuard } from 'src/shared/guards/auth/auth.guard'
-import { Socket } from 'socket.io'
-import { Session } from 'src/shared/decorators/auth/session.decorator'
 import { Roles } from 'src/shared/decorators/auth/roles.decorator'
+import { IPaginatedResponse } from 'src/shared/interfaces/paginated.interface'
+import { toPaginationMetal } from 'src/shared/functions/paginated'
 
 @WebSocketGateway({
   namespace: 'streams',
@@ -24,14 +24,13 @@ export class StreamGateway {
   @Roles(['a'])
   getStreams(
     @Paginate() query: PaginateQuery,
-  ): Observable<WsResponse<any>> {
+  ): Observable<WsResponse<IPaginatedResponse<IStream>>> {
     return this.streamService.listServices(query, false).pipe(
       map(result => ({
         event: 'streamList',
         data: {
           data: result.data.map(s => streamMapper(s, true)),
-          link: result.links,
-          meta: result.meta,
+          meta: toPaginationMetal(result.meta),
         }
       }))
     )
@@ -47,29 +46,26 @@ export class StreamGateway {
   }
 
   @SubscribeMessage('getNexts')
-  getNextStreams(): Observable<WsResponse<Array<IStreamWithNextRound>>> {
-    return this.streamService.listNextServices().pipe(
-      map(streams => ({
+  getNextStreams(
+    @Paginate() query: PaginateQuery,
+  ): Observable<WsResponse<IPaginatedResponse<INextStream>>> {
+    return this.streamService.listNextServices(query).pipe(
+      map(result => ({
         event: 'nextStreams',
-        data: streams.map(stream => ({
-          ...streamMapper(stream),
-          nextStreamStartsAt: stream.rounds?.at(0)?.streamStartAt ?? new Date(),
-          nextRoundStartsAt: stream.rounds?.at(0)?.startAt ?? new Date()
-        }))
+        data: {
+          data: result.data.map(nextStreamMapper).filter(val => val != null),
+          meta: toPaginationMetal(result.meta),
+        }
       }))
     );
   }
 
   @SubscribeMessage('getDetail')
-  getStreamDetail(@MessageBody('webhandle') webhandle: string): Observable<WsResponse<IStreamWithNextRound | null>>{
+  getStreamDetail(@MessageBody('webhandle') webhandle: string): Observable<WsResponse<INextStream | null>>{
     return this.streamService.getStreamDetail(webhandle).pipe(
       map(stream => ({
         event: 'streamDetail',
-        data: stream ? {
-          ...streamMapper(stream),
-          nextStreamStartsAt: stream.rounds?.at(0)?.streamStartAt ?? new Date(),
-          nextRoundStartsAt: stream.rounds?.at(0)?.startAt ?? new Date()
-        } : null
+        data: nextStreamMapper(stream)
       } ))
     )
   }

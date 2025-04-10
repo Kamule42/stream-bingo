@@ -6,6 +6,16 @@ export const routes: Routes = [
     {path: 'auth/redirect/discord', loadComponent: () =>  import('./views/auth/discord-redirect/discord-redirect.component').then(c => c.DiscordRedirectComponent)},
     {path: 's/:webhandle', loadComponent: () =>  import('./views/stream/stream/stream.component').then(c => c.StreamComponent)},
 
+    // @Me
+
+    {
+        path: '@me',
+        canActivate: [hasRightGuard],
+        children: [
+            {path: 'favs', loadComponent: () => import('./views/@me/favs/favs.component').then(c => c.FavsComponent)}
+        ]
+    },
+
     // Admin
     {
         path: 'admin',
