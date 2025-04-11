@@ -44,7 +44,6 @@ export class UsersService extends WebsocketService {
   }
   public flipFav(id: string, {streamName, twitchId, streamTwitchHandle}: Omit<IFav, 'streamId'>) {
     const hasFav = this._favs$()?.some(({streamId}) => streamId === id)
-    console.log(hasFav)
     if(hasFav){
       this.forceFavs$.next(this._favs$()?.filter(({streamId}) => streamId !== id) ?? [])
     }

@@ -1,15 +1,19 @@
-import { Component, computed, inject, signal } from '@angular/core';
+import { Component, computed, effect, inject, signal } from '@angular/core';
 import { StreamsService } from '../../../services/streams/streams.service';
-import { map, switchMap, tap, timer } from 'rxjs';
+import { delay, flatMap, map, mergeMap, share, switchMap, take, tap, timer, withLatestFrom } from 'rxjs';
 import { DateTime, Interval } from 'luxon';
-import { toSignal } from '@angular/core/rxjs-interop';
+import { toObservable, toSignal } from '@angular/core/rxjs-interop';
 import { ActivatedRoute } from '@angular/router';
 import { ProgressSpinnerModule } from 'primeng/progressspinner';
 import { SessionService } from '../../../services/session/session.service';
+import { BingoComponent } from '../../../components/bingo/bingo.component';
+import { IStream } from '../../../services/streams/stream.interface';
+
+declare const Twitch: any
 
 @Component({
   selector: 'app-stream',
-  imports: [ProgressSpinnerModule],
+  imports: [ProgressSpinnerModule, BingoComponent],
   templateUrl: './stream.component.html',
   styleUrl: './stream.component.scss'
 })
@@ -18,31 +22,40 @@ export class StreamComponent{
   private readonly streamService = inject(StreamsService)
   private readonly sessionService = inject(SessionService)
 
-  private readonly _stream$ =  toSignal(this.streamService.streamDetail$.pipe(
-      switchMap((stream) => timer(0, 1000).pipe(
-        map(() => stream)
-      )),
-      map(stream =>  stream ? {
-        ...stream,
-        nextStreamStartsAtTxt: stream.nextStreamStartsAt >= DateTime.now() ? 
-          Interval.fromDateTimes(DateTime.now(), stream.nextStreamStartsAt)
-          .toDuration(['days', 'hours', 'minutes', 'seconds'])
-          .toHuman({
-            listStyle: 'long',
-            unitDisplay: 'short',
-            maximumFractionDigits: 0
-          }) : null,
-        nextStreamStartsAtIso: stream.nextStreamStartsAt >= DateTime.now() && stream.nextStreamStartsAt?.toISO(),
-      } : null),
-    ))
-  readonly stream$ = computed(() => {
-    const isFav =  this.sessionService.favs$()?.some(({streamId}) => streamId === this._stream$()?.id)
+  private readonly _stream$$ = this.streamService.streamDetail$.pipe(
+    switchMap((stream) => timer(0, 1000).pipe(
+      map(() => stream)
+    )),
+    map(stream =>  stream ? {
+      ...stream,
+      startAtTxt: stream?.startAt && stream.startAt >= DateTime.now() ? 
+        Interval.fromDateTimes(DateTime.now(), stream.startAt)
+        .toDuration(['days', 'hours', 'minutes', 'seconds'])
+        .toHuman({
+          listStyle: 'long',
+          unitDisplay: 'short',
+          maximumFractionDigits: 0
+        }) : undefined,
+        startAtIso: stream?.startAt && stream.startAt >= DateTime.now() ?
+          stream.startAt.toISO() ?? undefined :
+          undefined,
+    } : null),
+    share(),
+  )
+  private readonly _stream$ =  toSignal(this._stream$$)
+  readonly stream$ = computed<IStream | null>(() => {
+    const stream = this._stream$()
+    if(stream == null){
+      return null
+    }
+    const isFav =  this.sessionService.favs$()?.some(({streamId}) => streamId === stream.id)
     return {
-      ...this._stream$(),
+      ...stream,
       isFav 
     }
   })
-
+  private readonly streamObs$ = toObservable(this.stream$)
+  private embedTwitch: any = undefined
   readonly noWebhandle$ = signal<boolean>(false)
 
   
@@ -61,6 +74,32 @@ export class StreamComponent{
         this.streamService.fetchDetails(webhandle)
       }
     })
+    this.streamService.streamDetail$.pipe(
+      switchMap(stream => this.streamObs$.pipe(
+        take(1),
+        delay(5), // wait for the template to refresh
+        map(() => stream)
+      )),
+    )
+    .subscribe({
+      next: (stream) => {
+        if(!stream) return
+        if(!this.embedTwitch){
+          this.embedTwitch = new Twitch.Embed("twitch-embed", {
+            width: 854,
+            height: 480,
+            channel: stream.urlHandle,
+            layout: 'video',
+            // Only needed if this page is going to be embedded on other websites
+            parent: ["localhost"]
+          })
+        }
+        else{
+          this.embedTwitch.setChannel(stream.urlHandle)
+        }
+      }
+    })
+    
   }
 
   flip() {

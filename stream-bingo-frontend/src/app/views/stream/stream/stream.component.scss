@@ -1,5 +1,10 @@
 :host{
     $star-size: 2;
+    #stream-root{
+        display: flex;
+        flex-direction: column;
+        gap: 3rem;
+    }
     #stream-header{
         gap: 0.5rem;
         align-items: center;
@@ -13,6 +18,19 @@
         #stream-fav{
             align-self: start;
             font-size: #{$star-size}rem;
+        }
+    }
+    #stream-body{
+        display: flex;
+        flex-direction: row;
+        gap: 2rem;
+        justify-content: center;
+        > *{
+            flex: 1;
+            &:first-child{
+                display: flex;
+                justify-content: flex-end;
+            }
         }
     }
 }

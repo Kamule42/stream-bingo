@@ -47,11 +47,20 @@ export class StreamsService extends WebsocketService{
     })) ?? []),
     share(),
   )
-  public readonly streamDetail$ = fromEvent(this.socket, 'streamDetail').pipe(
-    map(stream =>  (stream ? {
-      ...stream,
-      nextStreamStartsAt: stream.startAt ? DateTime.fromISO(stream.startAt) : null,
-    } : null)),
+  public readonly streamDetail$ = fromEvent<IStream & {startAt: string}>(this.socket, 'streamDetail').pipe(
+    map(stream =>  {
+      if(!stream){
+        return undefined
+      } 
+      let startAt = stream.startAt ? DateTime.fromISO(stream.startAt) : undefined
+      if(!startAt?.isValid){
+        startAt = undefined
+      }
+      return {
+        ...stream,
+        startAt: startAt as DateTime | undefined,
+      }   
+  }),
     share(),
   )
 

@@ -1,7 +1,6 @@
-<div class="container">
-    @if(stream$()){
-        @let stream = stream$();
-        <div id="stream-header" class="block is-flex is-flex-direction-row">
+<div id="stream-root">
+    @if(stream$(); as stream){
+        <div id="stream-header" class="container block is-flex is-flex-direction-row">
             <figure class="image">
                 <img
                     [src]="`//static-cdn.jtvnw.net/jtv_user_pictures/${stream.twitchId}-profile_image-70x70.png`"
@@ -12,8 +11,8 @@
             <div  id="stream-data" class="is-flex is-flex-direction-column">
                 <h5 class="title is-5">{{ stream.name }}</h5>
                 <div class="content">
-                    @if(stream.nextStreamStartsAtIso && stream.nextStreamStartsAt){
-                        Prochain stream dans <time [dateTime]="stream.nextStreamStartsAtIso">{{ stream.nextStreamStartsAtTxt }}</time>
+                    @if(stream.startAtTxt && stream.startAtIso){
+                        Prochain stream dans <time [dateTime]="stream.startAtIso">{{ stream.startAtTxt }}</time>
                     }
                     @else {
                         Pas de stream prévu
@@ -29,6 +28,10 @@
                 </a>
             </div>
         </div>
+        <div id="stream-body" class="container is-fluid">
+            <div id="twitch-embed"></div>
+            <app-bingo [stream]="stream" />
+        </div>
     }
     @else if(noWebhandle$() === true || stream$() === null){
         Ce Stream n'existe pas
@@ -38,4 +41,4 @@
             <p-progress-spinner ariaLabel="loading" />
         </div>
     }
-</div>>
+</div>
