@@ -84,7 +84,11 @@ export class EditStreamComponent {
     {
       code: 'mod',
       label: 'Modérateur'
-    }
+    },
+    {
+      code: 'plan',
+      label: 'Planificateur'
+    },
   ]
 
   search($event: AutoCompleteCompleteEvent){

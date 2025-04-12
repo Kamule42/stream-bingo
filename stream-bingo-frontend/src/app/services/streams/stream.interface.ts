@@ -19,3 +19,10 @@ export interface IStream<T = IRight>{
     isFav?: boolean
 }
 
+
+export interface ICell{
+    id: string,
+    name: string, 
+    description: string,
+    active: boolean,
+}

@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core'
 import { io, Socket } from 'socket.io-client'
 import { WebsocketService } from '../ws/websocket.service'
-import { fromEvent, merge, share, Subject, tap } from 'rxjs'
+import { fromEvent, merge, share, shareReplay, Subject, tap } from 'rxjs'
 import { IFav, ISeachResult } from './users.interface'
 import { toSignal } from '@angular/core/rxjs-interop'
 
@@ -27,7 +27,7 @@ export class UsersService extends WebsocketService {
     fromEvent<Array<IFav>>(this.socket, 'myFavs'),
     this.forceFavs$,
   ).pipe(
-    share(),
+    shareReplay(1),
   )
 
   private readonly _favs$ = toSignal(this.favs$) 

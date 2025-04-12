@@ -1,0 +1,111 @@
+<div id="stream-edit-root" class="fluid-container">
+  @if(toEdit()){
+  <div id="stream-edit-main" class="is-flex is-flex-direction-row">
+    <div id="stream-info" class="is-flex is-flex-direction-column">
+      <h5 class="title is-5">Détails</h5>
+      <p-card>
+        <div class="is-flex is-flex-direction-column">
+          <div class="field">
+            <label class="label" for="stream-name">Nom du stream</label>
+            <div class="control">
+              <input [(ngModel)]="toEdit().name" id="stream-name" class="input" type="text" placeholder="Nom du stream">
+            </div>
+          </div>
+          <div class="field">
+            <label class="label" for="stream-name">Id twitch</label>
+            <div class="control">
+              <input [(ngModel)]="toEdit().twitchId" [readOnly]="!isAdmin$()" id="stream-name" class="input" type="text"
+                placeholder="Id twitch du stream">
+            </div>
+          </div>
+          <div class="field">
+            <label class="label" for="stream-name">Url handle</label>
+            <div class="control">
+              <input [(ngModel)]="toEdit().urlHandle" [readOnly]="!isAdmin$()" id="stream-name" class="input"
+                type="text" placeholder="webhandle twitch du stream">
+            </div>
+          </div>
+          <div class="field">
+            <div class="control">
+              <label class="checkbox">
+                <input [(ngModel)]="toEdit().enabled" type="checkbox">
+                Activé
+              </label>
+            </div>
+          </div>
+        </div>
+      </p-card>
+      <div id="stream-edit-actions">
+        <p-button severity="primary" label="Sauvegarder" icon="mdi mdi-content-save-outline" (onClick)="save()" />
+        <p-button severity="secondary" label="Annuler" icon="mdi mdi-cancel" (onClick)="cancel()" />
+      </div>
+    </div>
+    <div id="stream-edit-center" class="is-flex is-flex-direction-column">
+      <div id="stream-edit-cells" class="is-flex is-flex-direction-column">
+        <h5 class="title is-5">Cases</h5>
+        @if(toEdit().cells){
+        <p-card>
+          <p-table
+            dataKey="id"
+            [value]="toEdit().cells ?? []"
+            [paginator]="true"
+            stripedRows
+            [rows]="10"
+            [rowsPerPageOptions]="[10, 20, 50]"
+            [tableStyle]="{'min-width': '50rem'}">
+            <ng-template #emptymessage>
+              Aucune case
+            </ng-template>
+            <ng-template #caption>
+              <div class="is-flex is-flex-direction-row is-justify-content-end">
+                <p-button label="Ajouter" icon="mdi mdi-plus" text (onClick)="addNewCell()" />
+              </div>
+            </ng-template>
+            <ng-template #header>
+              <tr>
+                <th pSortableColumn="name">Nom <p-sortIcon field="name" /></th>
+                <th pSortableColumn="description">Description <p-sortIcon field="description" /></th>
+                <th pSortableColumn="active" style="width: 7rem;">Activée <p-sortIcon field="active" /></th>
+              </tr>
+            </ng-template>
+            <ng-template #body let-cell>
+              <tr>
+                <td [pEditableColumn]="cell.name"  pEditableColumnField="name"  class="overflow-ellipsis" >
+                  <p-cellEditor>
+                    <ng-template #input>
+                      <input pInputText type="text" [(ngModel)]="cell.name" (keydown)="stopNavigation($event)"/>
+                    </ng-template>
+                    <ng-template #output>
+                      {{ cell.name }}
+                    </ng-template>
+                  </p-cellEditor>
+                </td>
+                <td [pEditableColumn]="cell.description" pEditableColumnField="description">
+                  <p-cellEditor>
+                    <ng-template #input>
+                      <textarea rows="1" class="expand-on-focus" pTextarea [(ngModel)]="cell.description"  (keydown)="stopNavigation($event)"></textarea>
+                    </ng-template>
+                    <ng-template #output>
+                      @let breakIndex = cell.description?.indexOf('\n') ?? -1;
+                      {{ cell.description?.slice(0, breakIndex) }}
+                      @if(breakIndex > 0) {
+                        &hellip;
+                      }
+                    </ng-template>
+                  </p-cellEditor>
+                </td>
+                <td><p-checkbox [(ngModel)]="cell.active" [binary]="true" /></td>
+              </tr>
+            </ng-template>
+          </p-table>
+        </p-card>
+        }
+        @else if(cells$() === undefined){
+        <p-progress-spinner ariaLabel="loading" />
+        }
+      </div>
+
+    </div>
+  </div>
+  }
+</div>

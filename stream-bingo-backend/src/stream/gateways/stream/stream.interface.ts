@@ -26,3 +26,10 @@ export interface IStreamWithNextRound extends IStream{
     nextStreamStartsAt: Date,
     nextRoundStartsAt: Date,
 }
+
+export interface ICell{
+    id: string,
+    name: string, 
+    description: string,
+    active: boolean,
+}

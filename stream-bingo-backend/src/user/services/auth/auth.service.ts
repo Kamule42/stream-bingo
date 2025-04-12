@@ -75,7 +75,7 @@ export class AuthService {
         mergeMap(async (data) => {
           let existingUser = await this.usersRepository.findOne({
             where: {discordId: data.id,},
-            relations: ['rights'],
+            relations: ['rights', 'rights.stream'],
           });
           if (!existingUser) {
             existingUser = await this.usersRepository.save({
@@ -96,9 +96,11 @@ export class AuthService {
                 access_token: `${data.token_type} ${data.access_token}`,
                 expires_in: data.expires_in,
               },
-              rights: existingUser.rights?.map(({rightKey, stream}) => ({
+              rights: existingUser.rights?.map(val => {
+                return val
+              })?.map(({rightKey, stream}) => ({
                 right: rightKey,
-                stream: stream?.id
+                streamId: stream?.id
               }))
             })
           }

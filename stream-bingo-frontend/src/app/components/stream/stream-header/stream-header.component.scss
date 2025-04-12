@@ -1,0 +1,17 @@
+:host{
+    #stream-header{
+        gap: 0.5rem;
+        align-items: center;
+        figure{
+            height: fit-content
+        }
+        #stream-data{
+            margin-left: 3rem;
+        }
+    }
+    #stream-actions{
+        display: flex;
+        flex-direction: row;
+        gap: 1rem;
+    }
+}

@@ -10,5 +10,5 @@ import { RouterLink } from '@angular/router';
 })
 export class FavsComponent {
   private readonly sessionService = inject(SessionService)
-  readonly favs$ = this.sessionService.favs$
+  readonly favs$ = this.sessionService.favs
 }

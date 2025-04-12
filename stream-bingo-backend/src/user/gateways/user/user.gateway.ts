@@ -41,7 +41,13 @@ export class UserGateway {
       .getFavs(session.sub)
       .then(user => ({
         event: 'myFavs',
-        data: user?.favs?.map(stream => ({
+        data: [
+          ...user?.favs ?? [],
+          ...user?.rights
+            .map(({stream}) => stream) ?? []
+        ]
+        .filter(stream => stream != undefined)
+        .map(stream => ({
           streamId: stream.id,
           streamName: stream.name,
           twitchId: stream.twitchId,

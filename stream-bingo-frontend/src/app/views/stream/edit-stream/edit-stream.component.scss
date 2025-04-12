@@ -1,0 +1,42 @@
+:host{
+  #stream-edit-root{
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+  }
+
+  #stream-edit-main{
+      gap: 1rem;
+  }
+  #stream-info{
+      gap: 1rem;
+      width: 23rem;
+  }
+  #stream-edit-actions{
+    display: flex;
+    flex-direction: row;
+    justify-content: end;
+  }
+  #stream-edit-cells{
+    width: 70rem;
+    ::ng-deep table tr {
+      td, th{
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        &:first-of-type{  
+          width: 250px;
+          max-width: 250px;
+        }
+      }
+    }
+  }
+  #stream-edit-center, #stream-edit-actions, #stream-edit-cells{
+      gap: 1rem;
+  }
+
+  .expand-on-focus {
+    width: 100%;
+    height: 8rem;
+  }
+}

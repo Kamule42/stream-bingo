@@ -1,0 +1,41 @@
+<div id="stream-header" class="container block is-flex is-flex-direction-row">
+    <figure class="image">
+        <img
+            [src]="`//static-cdn.jtvnw.net/jtv_user_pictures/${stream().twitchId}-profile_image-70x70.png`"
+            [alt]="`${stream.name} profil`"
+            class="is-rounded"
+        />
+    </figure>
+    <div  id="stream-data" class="is-flex is-flex-direction-column">
+        <h5 class="title is-5">{{ stream().name }}</h5>
+        <div class="content">
+            @if(stream().startAtTxt && stream().startAtIso){
+                Prochain stream dans <time [dateTime]="stream().startAtIso">{{ stream().startAtTxt }}</time>
+            }
+            @else {
+                Pas de stream prévu
+            }
+        </div>
+        <div id="stream-actions">
+            <p-button
+                severity="secondary"
+                [label]="stream().isFav ? 'Suivi' : 'Suivre'"
+                [icon]="`mdi mdi-star${stream().isFav ? '' : '-outline'}`"
+                (click)="flip()" />
+            @if( isPlanificator$() ){
+                <p-button
+                    severity="secondary"
+                    label="Planifier"
+                    icon="mdi mdi-calendar-month-outline"
+                    routerLink="./plan" />
+            }
+            @if( isManager$() && !isEditing$()){
+                <p-button
+                    severity="secondary"
+                    label="Modifier"
+                    icon="mdi mdi-pencil-outline"
+                    routerLink="./edit" />
+            }
+        </div>
+    </div>
+</div>

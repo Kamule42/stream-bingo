@@ -1,37 +1,7 @@
 <div id="stream-root">
     @if(stream$(); as stream){
-        <div id="stream-header" class="container block is-flex is-flex-direction-row">
-            <figure class="image">
-                <img
-                    [src]="`//static-cdn.jtvnw.net/jtv_user_pictures/${stream.twitchId}-profile_image-70x70.png`"
-                    [alt]="`${stream.name} profil`"
-                    class="is-rounded"
-                />
-            </figure>
-            <div  id="stream-data" class="is-flex is-flex-direction-column">
-                <h5 class="title is-5">{{ stream.name }}</h5>
-                <div class="content">
-                    @if(stream.startAtTxt && stream.startAtIso){
-                        Prochain stream dans <time [dateTime]="stream.startAtIso">{{ stream.startAtTxt }}</time>
-                    }
-                    @else {
-                        Pas de stream prévu
-                    }
-                </div>
-            </div>
-            <div id="stream-fav">
-                <a (click)="flip()">
-                    <span
-                        class="mdi"
-                        [class]="`mdi-star${stream.isFav ? '' : '-outline'}`"
-                    ></span>
-                </a>
-            </div>
-        </div>
-        <div id="stream-body" class="container is-fluid">
-            <div id="twitch-embed"></div>
-            <app-bingo [stream]="stream" />
-        </div>
+        <app-stream-header [stream]="stream" />
+        <router-outlet></router-outlet>
     }
     @else if(noWebhandle$() === true || stream$() === null){
         Ce Stream n'existe pas

@@ -7,13 +7,15 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { RoundEntity } from './entities/round.entity';
 import { UserModule } from 'src/user/user.module';
 import { NextStreamEntity } from './entities/next-stream.entity';
+import { CellService } from './services/cell/cell.service';
+import { CellEntity } from 'src/user/entities/cell.entity';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([StreamEntity, RoundEntity, NextStreamEntity,]),
+    TypeOrmModule.forFeature([StreamEntity, RoundEntity, NextStreamEntity, CellEntity,]),
     UserModule,
   ],
   controllers: [StreamController],
-  providers: [StreamGateway, StreamService]
+  providers: [StreamGateway, StreamService, CellService]
 })
 export class StreamModule {}

@@ -1,4 +1,4 @@
-import { CanActivate, ExecutionContext, Injectable } from '@nestjs/common'
+import { CanActivate, ExecutionContext, Injectable, Logger } from '@nestjs/common'
 import { Reflector } from '@nestjs/core'
 import { Observable } from 'rxjs'
 import { Socket } from 'socket.io'
@@ -7,9 +7,11 @@ import { AuthService } from 'src/user/services/auth/auth.service'
 
 @Injectable()
 export class AuthGuard implements CanActivate {
+  
+  private readonly logger = new Logger(AuthGuard.name)
   constructor(
     private readonly authService: AuthService,
-    private readonly reflector: Reflector,
+    private readonly reflector: Reflector
   ){}
 
   canActivate(
@@ -23,7 +25,12 @@ export class AuthGuard implements CanActivate {
         const token = client.handshake.auth.token
         delete client.handshake.auth._session
         if(token){
-          session = this.authService.validateToken(token)
+          try{
+            session = this.authService.validateToken(token)
+          }
+          catch(error){
+            this.logger.error('Error while validating token', error)
+          }
           client.handshake.auth._session = session
         }
         break;

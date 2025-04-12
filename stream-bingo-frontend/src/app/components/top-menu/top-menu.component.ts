@@ -27,7 +27,7 @@ export class TopMenuComponent {
   readonly session = this.sessionService.session$
   readonly isConnected = computed(() => this.session() != null) // not null nor undefined
   readonly isDisconnected = computed(() => this.session() === null) // only null
-  readonly favs = this.sessionService.favs$
+  readonly favs = this.sessionService.favs
 
 
   readonly items = computed(() => {
@@ -43,7 +43,7 @@ export class TopMenuComponent {
         label: 'Mes favoris',
         icon: 'mdi mdi-star-outline',
         route: '/@me/favs',
-        items: this.sessionService.favs$()
+        items: this.favs()
           ?.map(fav => ({
             label: fav.streamName,
             route: `/s/${fav.streamTwitchHandle}`

@@ -1,0 +1,15 @@
+:host{
+    #stream-body{
+        display: flex;
+        flex-direction: row;
+        gap: 2rem;
+        justify-content: center;
+        > *{
+            flex: 1;
+            &:first-child{
+                display: flex;
+                justify-content: flex-end;
+            }
+        }
+    }
+}

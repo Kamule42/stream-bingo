@@ -1,36 +1,7 @@
 :host{
-    $star-size: 2;
     #stream-root{
         display: flex;
         flex-direction: column;
         gap: 3rem;
-    }
-    #stream-header{
-        gap: 0.5rem;
-        align-items: center;
-        figure{
-            height: fit-content
-        }
-        #stream-data{
-            margin-left: 3rem;
-            padding-top: #{($star-size - 1)*0.8}rem;
-        }
-        #stream-fav{
-            align-self: start;
-            font-size: #{$star-size}rem;
-        }
-    }
-    #stream-body{
-        display: flex;
-        flex-direction: row;
-        gap: 2rem;
-        justify-content: center;
-        > *{
-            flex: 1;
-            &:first-child{
-                display: flex;
-                justify-content: flex-end;
-            }
-        }
     }
 }

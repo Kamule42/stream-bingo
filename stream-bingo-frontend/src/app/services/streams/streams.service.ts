@@ -1,9 +1,9 @@
 import { Injectable } from '@angular/core'
-import { fromEvent, map, share, } from 'rxjs'
+import { fromEvent, map, share, shareReplay, } from 'rxjs'
 import { io, Socket } from 'socket.io-client'
 import { DateTime } from'luxon'
 import { IPaginated, IPagination } from '../../shared/models/pagination.interface'
-import { IRight, IStream } from './stream.interface'
+import { ICell, IRight, IStream } from './stream.interface'
 import { WebsocketService } from '../ws/websocket.service'
 
 @Injectable({
@@ -61,7 +61,11 @@ export class StreamsService extends WebsocketService{
         startAt: startAt as DateTime | undefined,
       }   
   }),
-    share(),
+    shareReplay(1),
+  )
+
+  public readonly cells$ = fromEvent<Array<ICell>>(this.socket, 'streamCells').pipe(
+    shareReplay(1)
   )
 
   public listStreams(pagination? : IPagination): void{
@@ -89,5 +93,14 @@ export class StreamsService extends WebsocketService{
   }
   public update(stream: IStream<Omit<IRight, 'username'>>) {
     this.sendMessage('updateStream', stream)
+  }
+  public updateCells(id: string | undefined, cells: Partial<ICell>[] | undefined) {
+    this.sendMessage('updateCellsFormStream', {
+      id,
+      cells
+    })
+  }
+  public fetchCells(id: string) {
+    this.sendMessage('getStreamCells', {id})
   }
 }

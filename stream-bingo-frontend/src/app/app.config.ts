@@ -1,5 +1,5 @@
 import { ApplicationConfig } from '@angular/core'
-import { provideRouter } from '@angular/router'
+import { provideRouter, withComponentInputBinding, withRouterConfig } from '@angular/router'
 import { provideHttpClient, withInterceptors } from '@angular/common/http'
 import { provideAnimationsAsync } from '@angular/platform-browser/animations/async'
 import { providePrimeNG } from 'primeng/config'
@@ -14,7 +14,12 @@ import { MessageService } from 'primeng/api'
 
 export const appConfig: ApplicationConfig = {
   providers: [
-    provideRouter(routes),
+    provideRouter(
+      routes,
+      withRouterConfig({
+        paramsInheritanceStrategy: 'always'
+      }),
+      withComponentInputBinding()),
     provideAnimationsAsync(),
     providePrimeNG({
         theme: {

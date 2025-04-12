@@ -1,11 +1,8 @@
-import { Injectable } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
-import { WsException } from '@nestjs/websockets';
-import { StreamEntity } from 'src/stream/entities/stream.entity';
-import { IStream } from 'src/stream/gateways/stream/stream.interface';
-import { UserEntity } from 'src/user/entities/user.entity';
-import { ILike, Repository } from 'typeorm';
-
+import { Injectable } from '@nestjs/common'
+import { InjectRepository } from '@nestjs/typeorm'
+import { StreamEntity } from 'src/stream/entities/stream.entity'
+import { UserEntity } from 'src/user/entities/user.entity'
+import { ILike, Repository } from 'typeorm'
 @Injectable()
 export class UserService {
  public constructor(
@@ -23,7 +20,7 @@ export class UserService {
   getFavs(id: string): Promise<UserEntity | null> {
     return this.usersRepository.findOne({
       where: { id },
-      relations: ['favs'],
+      relations: ['favs', 'rights.stream'],
       order: {
         favs: { name: 'ASC' }
       }
