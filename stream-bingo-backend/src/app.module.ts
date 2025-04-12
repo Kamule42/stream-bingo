@@ -7,7 +7,6 @@ import { TypeOrmModule } from '@nestjs/typeorm'
 import { StreamModule } from './stream/stream.module'
 import { APP_GUARD, APP_INTERCEPTOR } from '@nestjs/core'
 import { AuthGuard } from './shared/guards/auth/auth.guard'
-import { RoundModule } from './round/round.module';
 
 @Module({
   imports: [
@@ -32,7 +31,6 @@ import { RoundModule } from './round/round.module';
     }),
     UserModule,
     StreamModule,
-    RoundModule,
   ],
   controllers: [AppController],
   providers: [

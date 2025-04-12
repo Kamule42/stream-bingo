@@ -1,3 +1,79 @@
-<div class="container">
+<div id="plan-root" class="container">
     <h4 class="title is-4">Planification</h4>
+    <p-card>
+        <div id="plan-content">
+            <p-table [value]="toEdit$()" dataKey="id" stripedRows>
+                <ng-template #emptymessage>
+                    Aucune partie de prévue
+                </ng-template>
+                <ng-template #caption>
+                    <div class="is-flex is-flex-direction-row is-justify-content-end">
+                    <p-button label="Ajouter" icon="mdi mdi-plus" text (onClick)="addNewRound()" />
+                    </div>
+                </ng-template>
+                <ng-template #header>
+                    <tr>
+                    <th pSortableColumn="name">Nom <p-sortIcon field="name" /></th>
+                    <th pSortableColumn="streamStartAt">Début estimé du stream <p-sortIcon field="streamStartAt" /></th>
+                    <th pSortableColumn="startAt">Ouverture <p-sortIcon field="startAt" /></th>
+                </tr>
+                </ng-template>
+                <ng-template #body let-round>
+                <tr>
+                    <td [pEditableColumn]="round.name"  pEditableColumnField="name">
+                    <p-cellEditor>
+                        <ng-template #input>
+                        <input pInputText type="text" [(ngModel)]="round.name" (keydown)="stopNavigation($event)"/>
+                        </ng-template>
+                        <ng-template #output>
+                        {{ round.name }}
+                        </ng-template>
+                    </p-cellEditor>
+                    </td>
+                    <td [pEditableColumn]="round.streamStartAt" pEditableColumnField="streamStartAt">
+                        <p-cellEditor>
+                        <ng-template #input>
+                            <p-datepicker
+                                [(ngModel)]="round.streamStartAt"
+                                [minDate]="now"
+                                [showTime]="true"
+                                appendTo="body"
+                                (keydown)="stopNavigation($event)" />
+                        </ng-template>
+                        <ng-template #output>
+                            {{ round.streamStartAt | date }}
+                        </ng-template>
+                        </p-cellEditor>
+                    </td>
+                    <td [pEditableColumn]="round.startAt" pEditableColumnField="startAt">
+                    <p-cellEditor>
+                        <ng-template #input>
+                            <p-datepicker
+                                [(ngModel)]="round.startAt"
+                                [maxDate]="round.streamStartAt"
+                                [showTime]="true"
+                                appendTo="body"
+                                (keydown)="stopNavigation($event)" />
+                        </ng-template>
+                        <ng-template #output>
+                        {{ round.startAt | date }}
+                        </ng-template>
+                    </p-cellEditor>
+                    </td>
+                </tr>
+                </ng-template>
+            </p-table>
+            <div id="plan-actions">
+                <p-button
+                    label="Annuler"
+                    severity="secondary"
+                    (onClick)="cancel()"    
+                />
+                <p-button
+                    label="Sauvegarder"
+                    (onClick)="save()"    
+                />
+            </div>   
+        </div>
+    </p-card>
 </div>>
