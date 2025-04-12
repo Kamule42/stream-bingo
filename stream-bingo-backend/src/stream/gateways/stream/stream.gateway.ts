@@ -1,7 +1,7 @@
 import { MessageBody, SubscribeMessage, WebSocketGateway, WsResponse } from '@nestjs/websockets'
 import { map, Observable } from 'rxjs'
 import { StreamService } from 'src/stream/services/stream/stream.service'
-import { ICell, INextStream, IRight, IStream, IStreamWithNextRound } from './stream.interface' 
+import { ICell, INextStream, IRight, IStream } from './stream.interface' 
 import { cellsMapper, nextStreamMapper, streamMapper } from './stream.mappers'
 import { Paginate, PaginateQuery } from 'nestjs-paginate'
 import { UseGuards } from '@nestjs/common'
@@ -10,6 +10,9 @@ import { Roles } from 'src/shared/decorators/auth/roles.decorator'
 import { IPaginatedResponse } from 'src/shared/interfaces/paginated.interface'
 import { toPaginationMetal } from 'src/shared/functions/paginated'
 import { CellService } from 'src/stream/services/cell/cell.service'
+import { ISession } from 'src/user/interfaces/session.interface'
+import { IFav } from 'src/user/gateways/user/user.responses'
+import { Session } from 'src/shared/decorators/auth/session.decorator'
 
 @WebSocketGateway({
   namespace: 'streams',
@@ -96,5 +99,30 @@ export class StreamGateway {
     @MessageBody('cells') cells: Array<ICell>
   ){
     this.cellService.updateCells(id, cells)
+  }
+
+  @Roles()
+  @SubscribeMessage('getMyFavs')
+  getMyFavs(
+    @Session() session: ISession
+   ) : Promise<WsResponse<Array<IFav>>>
+  {
+    return this.streamService
+      .getFavs(session.sub)
+      .then(streams => ({
+        event: 'myFavs',
+        data: streams
+          .filter(stream => stream != undefined)
+          .map(stream => ({
+            streamId: stream.id,
+            streamName: stream.name,
+            twitchId: stream.twitchId,
+            streamTwitchHandle: stream.twitchLogin,
+          })) ?? []
+    }))
+    .then(({event, data}) => ({
+      event,
+      data: [...new Set(data)]
+    }))
   }
 }

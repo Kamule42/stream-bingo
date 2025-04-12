@@ -7,7 +7,7 @@ export interface ISession{
       access_token: string,
       expires_in: number
     },
-    rights: Array<{ right: string, stream?: string }>,
+    rights: Array<{ right: string, streamId?: string }>,
     iat: number,
     exp: number
 }

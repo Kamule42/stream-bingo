@@ -1,10 +1,12 @@
 import { Injectable } from '@angular/core'
-import { fromEvent, map, share, shareReplay, } from 'rxjs'
+import { fromEvent, map, merge, share, shareReplay, Subject, } from 'rxjs'
 import { io, Socket } from 'socket.io-client'
 import { DateTime } from'luxon'
 import { IPaginated, IPagination } from '../../shared/models/pagination.interface'
 import { ICell, IRight, IStream } from './stream.interface'
 import { WebsocketService } from '../ws/websocket.service'
+import { IFav, ISeachResult } from '../users/users.interface'
+import { toSignal } from '@angular/core/rxjs-interop'
 
 @Injectable({
   providedIn: 'root'
@@ -68,6 +70,15 @@ export class StreamsService extends WebsocketService{
     shareReplay(1)
   )
 
+  private readonly forceFavs$ = new Subject<Array<IFav>>()
+  readonly favs$ = merge(
+    fromEvent<Array<IFav>>(this.socket, 'myFavs'),
+    this.forceFavs$,
+  ).pipe(
+    shareReplay(1),
+  )
+  private readonly _favs$ = toSignal(this.favs$) 
+
   public listStreams(pagination? : IPagination): void{
     this.sendMessage('getList', pagination ? 
       {
@@ -102,5 +113,27 @@ export class StreamsService extends WebsocketService{
   }
   public fetchCells(id: string) {
     this.sendMessage('getStreamCells', {id})
+  }
+
+  public getFavs(): any {
+    this.sendMessage('getMyFavs')
+  }
+  public flipFav(id: string, {streamName, twitchId, streamTwitchHandle}: Omit<IFav, 'streamId'>) {
+    const hasFav = this._favs$()?.some(({streamId}) => streamId === id)
+    if(hasFav){
+      this.forceFavs$.next(this._favs$()?.filter(({streamId}) => streamId !== id) ?? [])
+    }
+    else{
+      this.forceFavs$.next([
+        ...this._favs$() ?? [],
+        {
+          streamId: id,
+          streamName,
+          twitchId,
+          streamTwitchHandle
+        }
+      ])
+    }
+    this.sendMessage('flipFav', { id })
   }
 }

@@ -3,6 +3,8 @@
         <p-menubar
          [model]="items()"
          [autoDisplay]="true"
+         [autoHide]="true"
+         [autoHideDelay]="500"
         >
             <ng-template  #item let-item let-root>
                 @if(item.route){

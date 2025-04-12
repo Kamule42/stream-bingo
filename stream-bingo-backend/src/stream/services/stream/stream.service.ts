@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm'
 import { paginate, Paginated, PaginateQuery } from 'nestjs-paginate'
 import { Observable, from,  } from 'rxjs'
-import { NextStreamEntity } from 'src/stream/entities/next-stream.entity';
+import { NextStreamEntity } from 'src/stream/entities/next-stream.entity'
 import { StreamEntity } from 'src/stream/entities/stream.entity'
 import { IStream, IRight } from 'src/stream/gateways/stream/stream.interface'
 import { Repository, DataSource, Not, IsNull, } from 'typeorm'
@@ -86,4 +86,17 @@ export class StreamService {
       await manager.save(StreamEntity,toUpdate)
     })
   }
+
+  getFavs(id: string): Promise<Array<StreamEntity>> {
+    return this.streamRepository.find({
+      where: [
+        { rights: { user: { id }}},
+        { favBy: { id }}
+      ],
+      order: {
+        name: 'ASC'
+      }
+    })
+  }
+
 }

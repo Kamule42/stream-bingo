@@ -1,7 +1,8 @@
-import { Entity, Column, PrimaryColumn, OneToMany, JoinColumn } from 'typeorm'
+import { Entity, Column, PrimaryColumn, OneToMany, JoinColumn, ManyToMany, JoinTable } from 'typeorm'
 import { RoundEntity } from './round.entity'
 import { RightEntity } from 'src/user/entities/right.entity'
 import { CellEntity } from 'src/user/entities/cell.entity'
+import { UserEntity } from 'src/user/entities/user.entity'
 
 @Entity({ name: 'streams', schema: 'bingo' })
 export class StreamEntity {
@@ -36,6 +37,19 @@ export class StreamEntity {
   @OneToMany(() => RightEntity, (right) => right.stream, { cascade: true })
   @JoinColumn({name: 'stream_id'})
   rights: Array<RightEntity>
+
+  @ManyToMany(() => UserEntity)
+  @JoinTable({
+    schema: 'bingo',
+    name: 'favs',
+    joinColumn: {
+      name: 'stream_id'
+    },
+    inverseJoinColumn: {
+      name: 'user_id'
+    }
+  })
+  favBy: Array<UserEntity>
 
   @OneToMany(() => CellEntity, (cell) => cell.stream, { cascade: true })
   @JoinColumn({name: 'stream_id'})

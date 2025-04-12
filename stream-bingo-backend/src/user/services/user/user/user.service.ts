@@ -12,17 +12,8 @@ export class UserService {
 
   findByName(name: string): Promise<Array<UserEntity>> {
     return this.usersRepository.find({
-        where: {
-            discordUsername: ILike(`${name}%`)
-        }
-    })
-  }
-  getFavs(id: string): Promise<UserEntity | null> {
-    return this.usersRepository.findOne({
-      where: { id },
-      relations: ['favs', 'rights.stream'],
-      order: {
-        favs: { name: 'ASC' }
+      where: {
+          discordUsername: ILike(`${name}%`)
       }
     })
   }

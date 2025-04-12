@@ -3,6 +3,8 @@ import { Reflector } from '@nestjs/core'
 import { Observable } from 'rxjs'
 import { Socket } from 'socket.io'
 import { Roles } from 'src/shared/decorators/auth/roles.decorator'
+import { IRole } from 'src/shared/interfaces/auth.interface'
+import { ISession } from 'src/user/interfaces/session.interface'
 import { AuthService } from 'src/user/services/auth/auth.service'
 
 @Injectable()
@@ -17,7 +19,8 @@ export class AuthGuard implements CanActivate {
   canActivate(
     context: ExecutionContext,
   ): boolean | Promise<boolean> | Observable<boolean> {
-    let session
+    let session: ISession | undefined = undefined
+    let data: Object = {}
     switch(context.getType()){
       case 'ws': {
         const wsContext = context.switchToWs()
@@ -27,6 +30,10 @@ export class AuthGuard implements CanActivate {
         if(token){
           try{
             session = this.authService.validateToken(token)
+            data = {
+              ...wsContext.getData(),
+              ws: wsContext.getData()
+            }
           }
           catch(error){
             this.logger.error('Error while validating token', error)
@@ -38,9 +45,19 @@ export class AuthGuard implements CanActivate {
       case 'http': break;
     }
 
-    const roles = this.reflector.get<Array<string> | Object>(Roles, context.getHandler())
-    return !roles || // Only a session needed
-    session && Array.isArray(roles) && roles.some(role => session.rights.some(({right}) => right === role)) ||  // At least one role matches 
-    session
+    const roles = this.reflector.get<Array<IRole> | Object>(Roles, context.getHandler())
+    const result = roles == null ||
+      session != null && Array.isArray(roles) && [...roles, 'a'].some((role: IRole) => 
+        session.rights.some(({ right , streamId}) => {
+          if(typeof role === 'string'){
+            return right === role
+          }
+          const { id, streamKey } = role
+          const s = streamKey.split('.').reduce((o, i) => o[i], data)
+          return id === right && streamId === s && streamId !== undefined
+        })
+      ) || 
+      session != null && !Array.isArray(roles)
+      return result
   }
 }
