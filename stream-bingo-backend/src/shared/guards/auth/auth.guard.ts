@@ -27,7 +27,7 @@ export class AuthGuard implements CanActivate {
         const client = wsContext.getClient<Socket>()
         const token = client.handshake.auth.token
         delete client.handshake.auth._session
-        if(token){
+        if(token != null && token.trim().replace('Bearer ', '') != 'null'){
           try{
             session = this.authService.validateToken(token)
             data = {

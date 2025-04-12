@@ -1,1 +1,9 @@
-<p>bingo works!</p>
+@if(grid$(); as grid){
+
+}
+@else {
+    <div>
+        <div>Vous n'avez pas encore de grille</div>
+        <p-button label="Générez en une" (onClick)="generateGrid()"/>
+    </div>
+}

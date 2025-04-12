@@ -1,7 +1,7 @@
 import { inject, Injectable, } from '@angular/core'
 import { AuthService } from '../auth'
 import { toSignal } from '@angular/core/rxjs-interop'
-import { tap } from 'rxjs'
+import { of, switchMap, tap } from 'rxjs'
 import { IFav } from '../users/users.interface'
 import { StreamsService } from '../streams/streams.service'
 
@@ -11,7 +11,6 @@ import { StreamsService } from '../streams/streams.service'
 export class SessionService {
   private readonly authService = inject(AuthService)
   private readonly streamService = inject(StreamsService)
-  readonly favs$ = this.streamService.favs$
   readonly favs = toSignal<Array<IFav>>(this.streamService.favs$)
 
   private readonly _session$ = this.authService.session$.pipe(
@@ -22,6 +21,15 @@ export class SessionService {
     })
   )
   public readonly session$ = toSignal(this._session$)
+  
+  readonly favs$ = this._session$.pipe(
+    switchMap(session => {
+      if(session){
+        return this.streamService.favs$
+      }
+      return of([])
+    })
+  )
 
   
   public get isAuthenticated(): boolean{

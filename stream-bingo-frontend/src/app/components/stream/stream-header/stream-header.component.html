@@ -17,24 +17,26 @@
             }
         </div>
         <div id="stream-actions">
-            <p-button
-                severity="secondary"
-                [label]="stream().isFav ? 'Suivi' : 'Suivre'"
-                [icon]="`mdi mdi-star${stream().isFav ? '' : '-outline'}`"
-                (click)="flip()" />
-            @if( isPlanificator$() ){
+            @if(session$()){
                 <p-button
                     severity="secondary"
-                    label="Planifier"
-                    icon="mdi mdi-calendar-month-outline"
-                    routerLink="./plan" />
-            }
-            @if( isManager$() && !isEditing$()){
-                <p-button
-                    severity="secondary"
-                    label="Modifier"
-                    icon="mdi mdi-pencil-outline"
-                    routerLink="./edit" />
+                    [label]="stream().isFav ? 'Suivi' : 'Suivre'"
+                    [icon]="`mdi mdi-star${stream().isFav ? '' : '-outline'}`"
+                    (click)="flip()" />
+                @if( isPlanificator$() ){
+                    <p-button
+                        severity="secondary"
+                        label="Planifier"
+                        icon="mdi mdi-calendar-month-outline"
+                        routerLink="./plan" />
+                }
+                @if( isManager$() && !isEditing$()){
+                    <p-button
+                        severity="secondary"
+                        label="Modifier"
+                        icon="mdi mdi-pencil-outline"
+                        routerLink="./edit" />
+                }
             }
         </div>
     </div>

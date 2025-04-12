@@ -11,7 +11,10 @@ export const routes: Routes = [
         loadComponent: () =>  import('./views/stream/stream/stream.component').then(c => c.StreamComponent),
         children: [
             { path: '', loadComponent: () => import('./views/stream/view-stream/view-stream.component').then(c => c.ViewStreamComponent)},
-            { path: 'edit', loadComponent: () => import('./views/stream/edit-stream/edit-stream.component').then(c => c.EditStreamComponent)},
+            { 
+                path: 'edit',
+                loadComponent: () => import('./views/stream/edit-stream/edit-stream.component').then(c => c.EditStreamComponent),
+            },
             { path: 'plan', loadComponent: () => import('./views/stream/plan-stream/plan-stream.component').then(c => c.PlanStreamComponent)},
         ]
     },
