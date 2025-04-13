@@ -1,8 +1,8 @@
-import { Component, effect, inject, input, model, output, signal } from '@angular/core';
+import { Component, effect, inject, model, output, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms'
 import { BehaviorSubject, debounceTime, filter, map, share, startWith, tap } from 'rxjs'
 import { toSignal } from '@angular/core/rxjs-interop'
-import { v4 as uuid } from 'uuid'
+import { v7 as uuid } from 'uuid'
 import { TableModule } from 'primeng/table'
 import { AutoCompleteCompleteEvent, AutoCompleteModule } from 'primeng/autocomplete'
 import { ButtonModule } from 'primeng/button'

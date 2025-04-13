@@ -1,0 +1,26 @@
+:host #consent{
+    position: fixed;
+    right: 1rem;
+    bottom: 1rem;
+    z-index: 10000;
+    max-width: 25rem;
+    font-size: 0.8rem;
+    transition: transform 1s;
+
+    &:not(.show):not(:hover){
+        transform: translateY(90%);
+    }
+
+    #consent{
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+    #consent-actions{
+        display: flex;
+        flex-direction: row;
+        justify-content: end;
+        align-items: center;
+        margin-top: 1rem;
+    }
+}

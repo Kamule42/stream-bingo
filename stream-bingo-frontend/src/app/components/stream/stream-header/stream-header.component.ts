@@ -17,10 +17,10 @@ export class StreamHeaderComponent {
 
   private readonly router = inject(Router)
   private readonly sessionService = inject(SessionService)
-  private _webhandle: string = ''
 
   readonly session$ = this.sessionService.session$
 
+  private _webhandle: string = ''
   @Input()
   set webhandle(webhandle: string) {
     this._webhandle = webhandle

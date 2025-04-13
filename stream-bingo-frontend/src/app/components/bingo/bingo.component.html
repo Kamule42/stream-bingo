@@ -1,9 +1,33 @@
 @if(grid$(); as grid){
-
+  <div id="grid">
+    <div id="cells">
+      @for(cells of cells$(); track $index){
+        <div class="cells-row">
+          @for(cell of cells; track cell.cellId){
+            <div class="cell">
+              @if(cell.cellDescription){
+                <div class="cell-info">
+                  <p-button 
+                    icon="pi pi-info-circle" variant="text"
+                    severity="info"
+                    (onClick)="showDescription($event, cell.cellDescription)"
+                    rounded />
+                </div>
+              }
+              <div>{{ cell.cellName}}</div>
+            </div>
+          }
+        </div>
+      }
+    </div>
+  </div>
 }
 @else {
-    <div>
-        <div>Vous n'avez pas encore de grille</div>
-        <p-button label="Générez en une" (onClick)="generateGrid()"/>
-    </div>
+  <div id="no-grid">
+    <div>Vous n'avez pas encore de grille</div>
+    <p-button label="Générez en une" (onClick)="generateGrid()" />
+  </div>
 }
+<p-popover #op appendTo="body" (onHide)="selectedCellDescr.set(null)">
+  {{ selectedCellDescr() }}
+</p-popover>

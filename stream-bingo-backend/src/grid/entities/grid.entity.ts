@@ -1,6 +1,7 @@
 import { RoundEntity } from 'src/stream/entities/round.entity'
 import { UserEntity } from 'src/user/entities/user.entity'
-import { Entity, Column, PrimaryColumn, ManyToOne, JoinColumn } from 'typeorm'
+import { Entity, Column, PrimaryColumn, ManyToOne, JoinColumn, OneToMany } from 'typeorm'
+import { GridCellEntity } from './grid-cell.entity'
 
 @Entity({ name: 'grids', schema: 'bingo' })
 export class GridEntity {
@@ -10,13 +11,17 @@ export class GridEntity {
     @Column()
     locked: boolean
 
-    @ManyToOne(() => RoundEntity)
+    @ManyToOne(() => RoundEntity,)
     @JoinColumn({name: 'round_id'})
     round: RoundEntity
-  
+    
     @ManyToOne(() => UserEntity)
     @JoinColumn({name: 'user_id'})
-    user: UserEntity
+    user?: UserEntity
+
+    @OneToMany(() => GridCellEntity, (cell) => cell.grid, { cascade: true, })
+    @JoinColumn({name: 'grid_id'})
+    cells: Array<GridCellEntity>
 
     @Column({ name: 'created_at' })
     createdAt: Date

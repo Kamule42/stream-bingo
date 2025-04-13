@@ -3,13 +3,11 @@ import { provideRouter, withComponentInputBinding, withRouterConfig } from '@ang
 import { provideHttpClient, withInterceptors } from '@angular/common/http'
 import { provideAnimationsAsync } from '@angular/platform-browser/animations/async'
 import { providePrimeNG } from 'primeng/config'
-import Aura from '@primeng/themes/aura'
-import { provideNgcCookieConsent } from 'ngx-cookieconsent'
 
 import { routes } from './app.routes'
 import { httpInterceptor } from './interceptors/http/http.interceptor'
-import { cookieConfig } from './config/cookieconsent.config'
 import { MessageService } from 'primeng/api'
+import { primeNgConfig } from './config/primeng.config'
 
 
 export const appConfig: ApplicationConfig = {
@@ -17,19 +15,14 @@ export const appConfig: ApplicationConfig = {
     provideRouter(
       routes,
       withRouterConfig({
-        paramsInheritanceStrategy: 'always'
+        paramsInheritanceStrategy: 'always',
       }),
       withComponentInputBinding()),
     provideAnimationsAsync(),
-    providePrimeNG({
-        theme: {
-            preset: Aura
-        }
-    }),
+    providePrimeNG(primeNgConfig),
     provideHttpClient(
       withInterceptors([httpInterceptor])
     ),
-    provideNgcCookieConsent(cookieConfig),
     MessageService,
   ]
 };

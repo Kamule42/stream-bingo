@@ -23,7 +23,10 @@ export class GridService extends WebsocketService{
 
   public readonly gridForStream$ = fromEvent<IGrid | null>(this.socket, 'gridForStream')
 
-  public getGridForStream(streamId: string) {
-    this.sendMessage('getGridForStream', {streamId})
+  public getGridForStream(streamId: string, bingoId?: string) {
+    this.sendMessage('getGridForStream', { streamId, bingoId })
+  }
+  public createGrid(streamId: string) {
+    this.sendMessage('createGridForStream', { streamId })
   }
 }

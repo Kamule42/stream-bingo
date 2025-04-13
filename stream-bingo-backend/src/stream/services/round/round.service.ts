@@ -12,6 +12,16 @@ export class RoundService {
         private readonly roundRepository: Repository<RoundEntity>,
     ) { }
 
+    getStreamCurrentRound(streamId: string): Promise<RoundEntity | null> {
+        return this.roundRepository.findOne({
+            where: {
+                stream: { id: streamId },
+                streamStartAt: MoreThanOrEqual(DateTime.now().plus({hours: 3}).toJSDate())
+            },
+            relations: [ 'stream' ]
+        })
+    }
+
     getStreamRounds(streamId: string): Promise<Array<RoundEntity>> {
         return this.roundRepository.find({
             where: {
@@ -21,6 +31,7 @@ export class RoundService {
             relations: [ 'stream' ]
         })
     }
+
     updateStreamRounds(streamId: string, rounds: IRoundEdit[]) {
         this.roundRepository.upsert(
             rounds

@@ -14,10 +14,11 @@ import { RoundGateway } from './gateways/round/round.gateway'
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([StreamEntity, RoundEntity, NextStreamEntity, CellEntity,]),
+    TypeOrmModule.forFeature([ StreamEntity, RoundEntity, NextStreamEntity, CellEntity, ]),
     UserModule,
   ],
-  controllers: [StreamController],
-  providers: [StreamGateway, StreamService, CellService, RoundService, RoundGateway]
+  controllers: [ StreamController, ],
+  providers: [ StreamGateway, StreamService, CellService, RoundService, RoundGateway, ],
+  exports: [ StreamService, CellService, RoundService ]
 })
 export class StreamModule {}

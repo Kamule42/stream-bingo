@@ -1,4 +1,4 @@
-import { Component, computed, inject } from '@angular/core'
+import { Component, computed, inject, signal } from '@angular/core'
 import { toSignal } from '@angular/core/rxjs-interop'
 import { MenubarModule } from 'primeng/menubar'
 import { AvatarModule } from 'primeng/avatar'
@@ -10,13 +10,19 @@ import { RouterLink } from '@angular/router';
 import { MenuItem } from 'primeng/api';
 import { SessionService } from '../../services/session/session.service';
 import { CommonModule } from '@angular/common';
+import { DialogModule } from 'primeng/dialog';
+import { Ripple } from 'primeng/ripple';
+import { SettingsComponent } from "../settings/settings.component";
 
 @Component({
   selector: 'app-top-menu',
-  imports: [ 
+  imports: [
     CommonModule,
     DiscordAuthComponent, MenubarModule,
-    AvatarModule, MenuModule, ButtonModule, RouterLink ],
+    AvatarModule, MenuModule, ButtonModule, RouterLink,
+    DialogModule, Ripple,
+    SettingsComponent
+],
   templateUrl: './top-menu.component.html',
   styleUrl: './top-menu.component.scss',
 })
@@ -28,6 +34,8 @@ export class TopMenuComponent {
   readonly isConnected = computed(() => this.session() != null) // not null nor undefined
   readonly isDisconnected = computed(() => this.session() === null) // only null
   readonly favs = this.sessionService.favs
+
+  readonly showSettingDialog = signal(false)
 
 
   readonly items = computed(() => {

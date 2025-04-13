@@ -1,0 +1,10 @@
+<div id="settings-root">
+    <div class="row">
+        Marqueur
+        <app-strokes [color]="color()"/>
+    </div>
+    <div class="row">
+        Couleur du marqueur
+        <p-color-picker [(ngModel)]="color" appendTo="body" />
+    </div>
+</div>

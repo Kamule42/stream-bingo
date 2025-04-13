@@ -1,4 +1,4 @@
-import { v4 as uuid } from 'uuid'
+import { v7 as uuid } from 'uuid'
 import { Component, computed, effect, inject, Input, signal } from '@angular/core'
 import { StreamsService } from '../../../services/streams/streams.service'
 import { toSignal } from '@angular/core/rxjs-interop'

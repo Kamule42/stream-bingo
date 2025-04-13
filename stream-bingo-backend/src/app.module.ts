@@ -5,7 +5,7 @@ import { UserModule } from './user/user.module'
 import configuration from './config/configuration'
 import { TypeOrmModule } from '@nestjs/typeorm'
 import { StreamModule } from './stream/stream.module'
-import { APP_GUARD, APP_INTERCEPTOR } from '@nestjs/core'
+import { APP_GUARD } from '@nestjs/core'
 import { AuthGuard } from './shared/guards/auth/auth.guard'
 import { GridModule } from './grid/grid.module';
 

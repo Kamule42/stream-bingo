@@ -80,13 +80,11 @@ export class StreamGateway {
     {id: 'man', 'streamKey': 'id'}
   ])
   @SubscribeMessage('getStreamCells')
-  getStreamCells(@MessageBody('id') id: string): Observable<WsResponse<Array<ICell>>>{
-    return this.cellService.getStreamCells(id).pipe(
-      map(cells => ({
-        event: 'streamCells',
-        data: cellsMapper(cells)
-      } ))
-    )
+  getStreamCells(@MessageBody('id') id: string): Promise<WsResponse<Array<ICell>>>{
+    return this.cellService.getStreamCells(id).then(cells => ({
+      event: 'streamCells',
+      data: cellsMapper(cells)
+    }))
   }
 
   @Roles([

@@ -1,0 +1,17 @@
+import { GridEntity } from "src/grid/entities/grid.entity";
+import { IGrid } from "./grid.interface";
+
+export const gridMapper = (grid: GridEntity): IGrid => ({
+    id: grid.id,
+    streamId: grid.round.stream.id,
+    streamName: grid.round.stream.name,
+    roundId: grid.round.id,
+    roundName: grid.round.name,
+    streamStartAt: grid.round.streamStartAt,
+    cells: grid.cells.map(cell => ({
+        index: cell.index,
+        cellName: cell.cell.name,
+        cellDescription: cell.cell.description,
+        cellId: cell.cell.id,
+    }))
+})

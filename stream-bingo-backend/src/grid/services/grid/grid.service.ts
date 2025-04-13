@@ -1,33 +1,69 @@
 import { Injectable } from '@nestjs/common'
 import { InjectRepository } from '@nestjs/typeorm'
+import { GridCellEntity } from 'src/grid/entities/grid-cell.entity'
 import { GridEntity } from 'src/grid/entities/grid.entity'
-import { MoreThanOrEqual, Repository } from 'typeorm'
+import { CellService } from 'src/stream/services/cell/cell.service'
+import { RoundService } from 'src/stream/services/round/round.service'
+import { DeepPartial, IsNull, MoreThanOrEqual, Repository } from 'typeorm'
+import { v7 as uuid } from 'uuid'
 
 @Injectable()
 export class GridService {
-
     constructor(
         @InjectRepository(GridEntity)
         private readonly gridRepository: Repository<GridEntity>,
+        private readonly cellService: CellService,
+        private readonly roundService: RoundService,
     ){}
 
-    getGridForStream(streamId: string, userId: string): Promise<GridEntity | null> {
+    getGridForStream(streamId: string, userId?: string, bingoId?: string): Promise<GridEntity | null> {
         return this.gridRepository.findOne({
-            where: {
+            where:  {
                 round: {
                     stream: { id: streamId },
                     streamStartAt: MoreThanOrEqual(new Date())
                 },
-                user: {
-                    id: userId,
-                },
+                user: userId ? {id: userId } : IsNull(),
+                ...userId == null && bingoId != null ? {id: bingoId} : {}
             },
-            relations: ['round', 'round.stream'],
+            relations: ['round', 'round.stream', 'cells', 'cells.cell'],
             order: {
                 round: {
                     streamStartAt: 'ASC'
                 }
             },
         })
+    }
+
+    async createGrid(streamId: string, userId?: string): Promise<GridEntity> {
+        const availableCells = await this.cellService.getStreamCells(streamId)
+        let cellIds = availableCells.map(({id}) => id)
+        const round = await this.roundService.getStreamCurrentRound(streamId)
+        if(round == null){
+            throw new Error('No active round')
+        }
+        const gridId = uuid()
+        const cells: Array<DeepPartial<GridCellEntity>> = Array.from(Array(16).keys()).map(index => {
+            const cellId = cellIds.at(Math.floor(Math.random()*cellIds.length))!
+            cellIds = cellIds.filter(id => id != cellId)
+            return {
+                index,
+                cellId,
+                gridId,
+            }
+        })
+        await  this.gridRepository.save({
+            id: gridId,
+            locked: false,
+            round: {id: round.id },
+            cells,
+            ...userId ? { user: { id: userId }}: {}
+        }, {
+            transaction: true
+        })
+        return this.gridRepository.findOne({
+            where: { id: gridId},
+            relations: ['round', 'round.stream', 'cells', 'cells.cell']
+        }) as Promise<GridEntity>
     }
 }

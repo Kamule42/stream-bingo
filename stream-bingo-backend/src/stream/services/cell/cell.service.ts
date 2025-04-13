@@ -1,9 +1,8 @@
-import { Injectable } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
-import { from, map, Observable } from 'rxjs';
-import { ICell } from 'src/stream/gateways/stream/stream.interface';
-import { CellEntity } from 'src/user/entities/cell.entity';
-import { Repository } from 'typeorm';
+import { Injectable } from '@nestjs/common'
+import { InjectRepository } from '@nestjs/typeorm'
+import { ICell } from 'src/stream/gateways/stream/stream.interface'
+import { CellEntity } from 'src/user/entities/cell.entity'
+import { Repository } from 'typeorm'
 
 @Injectable()
 export class CellService {
@@ -12,10 +11,10 @@ export class CellService {
         private readonly cellRepository: Repository<CellEntity>,
     ){}
 
-    getStreamCells(id: string): Observable<Array<CellEntity>> {
-        return from(this.cellRepository.find({
+    getStreamCells(id: string): Promise<Array<CellEntity>> {
+        return this.cellRepository.find({
             where: { stream: { id} }
-        }))
+        })
     }
 
     async updateCells(id: string, cells: Array<ICell>){

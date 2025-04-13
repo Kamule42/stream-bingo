@@ -3,6 +3,12 @@ import { hasRightGuard } from './guards/has-right.guard';
 
 export const routes: Routes = [
     {path: '', loadComponent: () =>  import('./views/main/home/home.component').then(c => c.HomeComponent)},
+    
+    // General
+    {path: 'cgu', loadComponent: () =>  import('./views/cgu/cgu.component').then(c => c.CGUComponent)},
+   
+    
+    // Auth
     {path: 'auth/redirect/discord', loadComponent: () =>  import('./views/auth/discord-redirect/discord-redirect.component').then(c => c.DiscordRedirectComponent)},
 
     // Stream
@@ -10,6 +16,7 @@ export const routes: Routes = [
         path: 's/:webhandle',
         loadComponent: () =>  import('./views/stream/stream/stream.component').then(c => c.StreamComponent),
         children: [
+            { path: 'b/:bingoId', loadComponent: () => import('./views/stream/view-stream/view-stream.component').then(c => c.ViewStreamComponent) },
             { path: '', loadComponent: () => import('./views/stream/view-stream/view-stream.component').then(c => c.ViewStreamComponent)},
             { 
                 path: 'edit',
@@ -20,7 +27,6 @@ export const routes: Routes = [
     },
 
     // @Me
-
     {
         path: '@me',
         canActivate: [hasRightGuard],

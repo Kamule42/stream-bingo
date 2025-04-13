@@ -6,10 +6,16 @@
         justify-content: center;
         > *{
             flex: 1;
-            &:first-child{
-                display: flex;
-                justify-content: flex-end;
-            }
         }
+    }
+    #twitch-embed{
+        display: flex;
+        justify-content: flex-end;
+    }
+    #view-stream-bingo{
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
     }
 }

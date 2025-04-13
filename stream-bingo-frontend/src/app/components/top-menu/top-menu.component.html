@@ -37,7 +37,11 @@
                 }
             </ng-template>
             <ng-template #end>
-                <div class="flex items-center gap-2">
+                <div class="is-flex is-flex-row">
+                    <a pRipple  (click)="showSettingDialog.set(true)" class="p-menubar-item-link">
+                        <span class="mdi mdi-cog-outline"></span>
+                        <span>Paramètres</span>
+                    </a>
                     @if (isConnected()) {
                         @let _session = session();
                         <a pRipple  (click)="loggedinMenu.toggle($event)" class="flex items-center p-menubar-item-link">
@@ -62,3 +66,7 @@
         </p-menubar>
     </div>
 </nav>
+
+<p-dialog header="Préférences" [modal]="true" [(visible)]="showSettingDialog" [style]="{ width: '55rem' }">
+    <app-settings />
+</p-dialog>
