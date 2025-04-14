@@ -56,7 +56,6 @@ CREATE TABLE IF NOT EXISTS bingo.cells(
     id UUID PRIMARY KEY,
     stream_id UUID NOT NULL REFERENCES bingo.streams(id)
         ON DELETE CASCADE 
-        ON UPDATE CASCADE
     ,
     name text NOT NULL,
     description text,
@@ -80,11 +79,9 @@ CREATE TABLE IF NOT EXISTS bingo.grids(
     id UUID PRIMARY KEY,
     round_id UUID NOT NULL REFERENCES bingo.rounds(id)
         ON DELETE CASCADE 
-        ON UPDATE CASCADE
     ,
     user_id UUID NULL REFERENCES bingo.users(id)
         ON DELETE CASCADE 
-        ON UPDATE CASCADE
     ,
     locked boolean DEFAULT false,
 
@@ -106,11 +103,9 @@ GRANT select, update, insert, delete ON bingo.grids TO role_bingo_app;
 CREATE TABLE IF NOT EXISTS bingo.grid_cells(
     grid_id UUID NOT NULL REFERENCES bingo.grids(id)
         ON DELETE CASCADE 
-        ON UPDATE CASCADE
     ,
     cell_id UUID NOT NULL REFERENCES bingo.cells(id)
         ON DELETE CASCADE 
-        ON UPDATE CASCADE
     ,
     index int NOT NULL,
 
@@ -132,11 +127,9 @@ GRANT select, update, insert, delete ON bingo.grid_cells TO role_bingo_app;
 CREATE TABLE IF NOT EXISTS bingo.validated_cells(
     round_id UUID NOT NULL REFERENCES bingo.rounds(id)
         ON DELETE CASCADE 
-        ON UPDATE CASCADE
     ,
     cell_id UUID NOT NULL REFERENCES bingo.cells(id)
         ON DELETE CASCADE 
-        ON UPDATE CASCADE
     ,
     valide boolean NOT NULL default false,
 

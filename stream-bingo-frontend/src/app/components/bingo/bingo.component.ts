@@ -7,7 +7,7 @@ import { SessionService } from '../../services/session/session.service'
 import { toChunk } from '../../shared/helpers/array.helper'
 import { Popover, PopoverModule } from 'primeng/popover'
 import { filter, map, tap } from 'rxjs'
-import { ActivatedRoute } from '@angular/router'
+import { ActivatedRoute, Router } from '@angular/router'
 import { SettingsService } from '../../services/settings/settings.service'
 import { StrokesComponent } from '../strokes/strokes.component'
 import { CheckType } from '../../services/settings/setting.types'
@@ -24,6 +24,7 @@ export class BingoComponent {
   private readonly gridService = inject(GridService)
   private readonly sessionService = inject(SessionService)
   private readonly settingsService = inject(SettingsService)
+  private readonly router = inject(Router)
   private readonly route = inject(ActivatedRoute)
 
   private readonly bingoId = toSignal(this.route.paramMap.pipe(
@@ -54,8 +55,8 @@ export class BingoComponent {
   readonly grid$ = toSignal(this.gridService.gridForStream$.pipe(
     tap(grid => {
       const session = this.session$()
-      if(grid && session == null){
-        console.log('no session')
+      if(grid && session == null &&  this.bingoId() == null){
+        this.router.navigate(['./b', grid.id], {relativeTo: this.route })
       }
     })
   ))
