@@ -1,14 +1,16 @@
 :host #consent{
     position: fixed;
-    right: 1rem;
-    bottom: 1rem;
+    right: 0;
+    bottom: -1rem;
     z-index: 10000;
     max-width: 25rem;
     font-size: 0.8rem;
     transition: transform 1s;
+    padding: 1rem;
+    padding-bottom: 2rem;
 
     &:not(.show):not(:hover){
-        transform: translateY(90%);
+        transform: translateY(calc(100% - 3rem));
     }
 
     #consent{

@@ -1,3 +1,1 @@
-<app-check [color]="color()" />
-<app-circle [color]="color()" />
-<app-scratch [color]="color()" />
+<ng-container *ngComponentOutlet="strokeComponent$(); inputs: params$()" />

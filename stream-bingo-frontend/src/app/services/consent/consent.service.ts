@@ -1,17 +1,17 @@
 import { Injectable } from '@angular/core'
 import { ConsentType, IConsent } from './consent.types'
 import { enumFromStringValue } from '../../shared/helpers/enum.helper'
-import { BehaviorSubject, map, tap } from 'rxjs'
+import { BehaviorSubject, map, share, tap } from 'rxjs'
 
 const CONSENT_BASE_KEY = '@CONSENT_' 
-const CONSENT_STATUS = CONSENT_BASE_KEY + 'status'
-const CONSENT_DATA = CONSENT_BASE_KEY + 'data'
+const CONSENT_STATUS = CONSENT_BASE_KEY + 'STATUS'
+const CONSENT_DATA = CONSENT_BASE_KEY + 'DATA'
 
 @Injectable({
   providedIn: 'root'
 })
 export class ConsentService {
-  private readonly _status$  = new BehaviorSubject<ConsentType | null | undefined>(null)
+  private readonly _status$  = new BehaviorSubject<ConsentType | null | undefined>(undefined)
   public readonly status$ = this._status$.asObservable().pipe(
     tap(status => {
       if(status === null){
@@ -22,10 +22,12 @@ export class ConsentService {
       }
     }),
     map(status => status ?? null),
+    share(),
   )
-  private readonly _data$    = new BehaviorSubject<IConsent | null| undefined>(null)
+  private readonly _data$    = new BehaviorSubject<IConsent | null| undefined>(undefined)
   public readonly data$ = this._data$.asObservable().pipe(
     map(val => val ?? null),
+    share(),
   )
   
   constructor(){

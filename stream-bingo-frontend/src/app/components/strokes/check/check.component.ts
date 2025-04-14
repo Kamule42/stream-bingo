@@ -8,4 +8,5 @@ import { Component, input } from '@angular/core';
 })
 export class CheckComponent {
   readonly color = input<string>('#14a723')
+  readonly size = input(150)
 }

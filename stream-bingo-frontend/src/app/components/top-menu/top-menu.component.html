@@ -68,5 +68,7 @@
 </nav>
 
 <p-dialog header="Préférences" [modal]="true" [(visible)]="showSettingDialog" [style]="{ width: '55rem' }">
-    <app-settings />
+    @if(showSettingDialog()){
+        <app-settings (done)="showSettingDialog.set(false)" />
+    }
 </p-dialog>

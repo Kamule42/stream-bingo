@@ -1,10 +1,24 @@
 <div id="settings-root">
-    <div class="row">
-        Marqueur
-        <app-strokes [color]="color()"/>
+    <div id="settings-strokes" class="row">
+        Marqueur : 
+        @for(check of checks; track check){
+            <div
+                [class.selected]="check === stroke()"
+                (click)="stroke.set(check)"
+            >
+                <app-strokes
+                    [color]="color()"
+                    [stroke]="check"
+                    [size]="40"/>
+            </div>
+        }
     </div>
     <div class="row">
         Couleur du marqueur
         <p-color-picker [(ngModel)]="color" appendTo="body" />
+    </div>
+    <div id="settings-actions">
+        <p-button label="Annuler" (onClick)="done.emit()" severity="secondary" />
+        <p-button label="Save" (onClick)="save()" severity="primary" />
     </div>
 </div>

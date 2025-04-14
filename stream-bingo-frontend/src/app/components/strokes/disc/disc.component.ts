@@ -1,12 +1,12 @@
 import { Component, input } from '@angular/core';
 
 @Component({
-  selector: 'app-circle',
+  selector: 'app-disc',
   imports: [],
-  templateUrl: './circle.component.html',
-  styleUrl: './circle.component.scss'
+  templateUrl: './disc.component.html',
+  styleUrl: './disc.component.scss'
 })
-export class CircleComponent {
+export class DiscComponent {
   readonly color = input<string>('#14a723')
   readonly size = input(150)
 }
