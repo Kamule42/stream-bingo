@@ -5,24 +5,28 @@ on:
       - dev
 
 jobs:
-  setup:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-      - name: Use Node.js ${{ matrix.node-version }}
-        uses: actions/setup-node@v3
-        with:
-          node-version: 22
   front:
     runs-on: ubuntu-latest
     steps:
-      - run: cd stream-bingo-frontend
+      - name: Use Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - uses: actions/checkout@v4
       - run: yarn install
+        working-directory: stream-bingo-frontend
       - run: yarn build
+        working-directory: stream-bingo-frontend
   back:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-latest  
     steps:
-      - run: cd stream-bingo-frontend
+      - name: Use Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - uses: actions/checkout@v4
       - run: yarn install
+        working-directory: stream-bingo-backend
       - run: yarn build
+        working-directory: stream-bingo-backend
   
