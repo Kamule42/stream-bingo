@@ -37,7 +37,7 @@ export class EditStreamComponent {
     this._webhandle = webhandle
   }
 
-  readonly toEdit = signal<Partial<IStream> & { cells?: Array<Partial<ICell>> }>({})
+  readonly toEdit = signal<Partial<Omit<IStream, 'cells'>> & { cells?: Array<Partial<ICell>> }>({})
 
   readonly stream$ = toSignal<IStream>(this.streamService.streamDetail$.pipe(
     tap(stream => this.toEdit.set({

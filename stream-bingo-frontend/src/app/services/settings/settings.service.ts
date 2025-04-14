@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { BehaviorSubject, map, share, tap } from 'rxjs';
+import { BehaviorSubject, map, share, shareReplay, tap } from 'rxjs';
 import { CheckType, ISaveParams } from './setting.types';
 import { enumFromStringValue } from '../../shared/helpers/enum.helper';
 
@@ -27,7 +27,7 @@ export class SettingsService {
     tap(val => val ? 
       localStorage.setItem(SETTINGS_CHECK, `${val}`) :
       localStorage.removeItem(SETTINGS_CHECK)),
-    share(),
+    shareReplay(1),
   )
   public set check(val: CheckType | null){
     this._check$.next(val)
@@ -38,7 +38,7 @@ export class SettingsService {
     tap(val => val ? 
       localStorage.setItem(SETTINGSCHECK_COLOR, `${val}`) :
       localStorage.removeItem(SETTINGSCHECK_COLOR)),
-    share(),
+    shareReplay(1),
   )
   public set checkColor(val: string | null){
     this._checkColor$.next(val)

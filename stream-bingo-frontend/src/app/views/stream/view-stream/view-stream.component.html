@@ -1,10 +1,17 @@
-@if (stream$(); as stream) {
-    <div id="stream-body" class="container is-fluid">
-        @if(displayStream()){
-            <div id="twitch-embed"></div>
-        }
-        <div id="view-stream-bingo">
-            <app-bingo [stream]="stream" />
+<div id="stream-body">
+    @if (stream$(); as stream) {
+        <div  id="stream-bingo-and-stream" class="container is-fluid">
+            @if(displayStream()){
+                <div id="twitch-embed"></div>
+            }
+            <div id="view-stream-bingo">
+                <app-bingo [stream]="stream" />
+            </div>
         </div>
-    </div>
-}
+        @if(isModerator$()){
+            <div id="stream-moderation" class="container is-fluid">
+                <app-stream-mod [streamId]="stream.id"/>
+            </div>
+        }
+    }
+</div>

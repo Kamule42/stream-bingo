@@ -14,7 +14,15 @@
                     rounded />
                 </div>
               }
-              <div>{{ cell.cellName}}</div>
+              <div class="cell-txt">{{ cell.cellName}}</div>
+              @if( cell.valide ){
+                <div class="cell-stroke">
+                  <app-strokes
+                      [size]="120"
+                      [stroke]="stroke$()"
+                      [color]="strokeColor$()" />
+              </div>
+              }
             </div>
           }
         </div>

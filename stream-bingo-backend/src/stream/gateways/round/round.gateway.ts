@@ -33,7 +33,6 @@ export class RoundGateway {
   }
 
   @Roles([
-    'a',
     {id: 'plan', streamKey: 'streamId'}
   ])
   @SubscribeMessage('updateStreamRounds')

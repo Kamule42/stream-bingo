@@ -31,4 +31,10 @@ export class CellService {
             })
             .execute()
     }
+    findOne(id: string): Promise<CellEntity | null> {
+        return this.cellRepository.findOne({
+            where: {id},
+            relations: ['stream']
+        })
+    }
 }

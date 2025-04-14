@@ -16,7 +16,8 @@ export interface IStream<T = IRight>{
     startAt?: DateTime
     startAtTxt?: string
     startAtIso?: string
-    isFav?: boolean
+    isFav?: boolean,
+    cells?: Array<ICell>
 }
 
 

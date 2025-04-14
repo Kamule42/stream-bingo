@@ -5,9 +5,8 @@ body{
     background: var(--main-color);
     background: radial-gradient(circle at 100% -10%, var(--main-color) 40%, var(--secondary-color) 110%);
     background-attachment: fixed;
-    // background-size: 150% 100%;
 
-    // animation: gradient 10s ease infinite;
+    padding-bottom: 2rem;
 }
 
 @keyframes gradient { 

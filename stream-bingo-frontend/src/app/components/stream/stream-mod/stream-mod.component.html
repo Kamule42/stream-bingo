@@ -1,0 +1,31 @@
+<div id="stream-mod-root">
+    <h5 class="title is-5">Gestion du stream</h5>
+    <div id="stream-mod-search">
+        <p-inputgroup>
+            <p-inputgroup-addon>
+                <i class="pi pi-search"></i>
+            </p-inputgroup-addon>
+            <input type="text" pInputText [(ngModel)]="searchText$" />
+            <p-inputgroup-addon>
+                <p-button
+                    (onClick)="searchText$.set('')"
+                    icon="pi pi-times" severity="secondary" />
+            </p-inputgroup-addon>
+        </p-inputgroup>
+    </div>
+    <div id="stream-mod-cells">
+        @for(cell of toDisplayCells$(); track cell.id){
+            <div class="stream-cell" (click)="flipCell(cell.id)">
+                <div class="cell-text">{{ cell.name }}</div>
+                @if(cell.checked){
+                    <div class="cell-stroke">
+                        <app-strokes
+                            [size]="75"
+                            [stroke]="stroke$()"
+                            [color]="strokeColor$()" />
+                    </div>
+                }
+            </div>
+        }
+    </div>
+</div>

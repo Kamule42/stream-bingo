@@ -1,16 +1,17 @@
-import { Component, inject, Input, OnInit, signal } from '@angular/core'
+import { Component, computed, inject, Input, OnInit, signal } from '@angular/core'
 import { BingoComponent } from '../../../components/bingo/bingo.component'
 import { StreamsService } from '../../../services/streams/streams.service'
 import { SessionService } from '../../../services/session/session.service'
 import { delay, filter, map, zip } from 'rxjs'
 import { toSignal } from '@angular/core/rxjs-interop'
 import { IStream } from '../../../services/streams/stream.interface'
+import { StreamModComponent } from "../../../components/stream/stream-mod/stream-mod.component";
 
 declare const Twitch: any
 
 @Component({
   selector: 'app-view-stream',
-  imports: [ BingoComponent ],
+  imports: [BingoComponent, StreamModComponent],
   templateUrl: './view-stream.component.html',
   styleUrl: './view-stream.component.scss'
 })
@@ -46,6 +47,14 @@ export class ViewStreamComponent implements OnInit{
     })),
   )
   readonly stream$ =  toSignal<IStream>(this._stream$)
+
+  readonly isModerator$ = computed(() => {
+    const stream = this.stream$()
+    if(stream == null){
+      return false
+    }
+    return this.sessionService.isStreamModerator(stream.id)
+  })
 
   ngOnInit(): void {
     // this._stream$.pipe(

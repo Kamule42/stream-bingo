@@ -14,3 +14,8 @@ export interface IGrid{
     streamStartAt: Date
     cells: Array<IGridCell>
 }
+
+export interface IValidatedCell{
+    cellId: string
+    valide: boolean
+}

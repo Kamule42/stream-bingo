@@ -1,6 +1,9 @@
-:host svg{
-    stroke: none;
-    stroke-linejoin:bevel;
-    stroke-dashoffset:18.8976;
-    paint-order:markers fill stroke
+:host{
+    display: flex;
+    svg{
+        stroke: none;
+        stroke-linejoin:bevel;
+        stroke-dashoffset:18.8976;
+        paint-order:markers fill stroke
+    }
 }

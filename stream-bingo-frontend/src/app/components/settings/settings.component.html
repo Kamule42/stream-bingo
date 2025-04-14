@@ -7,15 +7,21 @@
                 (click)="stroke.set(check)"
             >
                 <app-strokes
-                    [color]="color()"
+                    [color]="alphaColor()"
                     [stroke]="check"
                     [size]="40"/>
             </div>
         }
     </div>
     <div class="row">
-        Couleur du marqueur
+        <div>Couleur du marqueur</div>
         <p-color-picker [(ngModel)]="color" appendTo="body" />
+        <div>Transparence</div>
+        <p-slider
+            id="settings-transparency"
+            [(ngModel)]="alpha"
+            [min]="42"
+            [max]="255"/>
     </div>
     <div id="settings-actions">
         <p-button label="Annuler" (onClick)="done.emit()" severity="secondary" />

@@ -53,4 +53,20 @@
             }
         }
     }
+    .cell-txt{
+        position: absolute;
+        z-index: 5;
+        text-shadow: 0 0 3px white;
+    }
+    .cell-stroke{
+        position: absolute;
+        z-index: 1;
+        width: 150px;
+        height: 150px;
+        top: 0px;
+        left: 0px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
 }

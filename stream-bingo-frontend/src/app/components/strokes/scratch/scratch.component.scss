@@ -1,9 +1,12 @@
-:host svg {
-    fill: #14a723;
-    stroke: #14a723;
-    fill-opacity: 1;
-    stroke-width: 0.999999px;
-    stroke-linecap: butt;
-    stroke-linejoin: miter;
-    stroke-opacity: 1
+:host{
+    display: flex;
+    svg {
+        fill: #14a723;
+        stroke: #14a723;
+        fill-opacity: 1;
+        stroke-width: 0.999999px;
+        stroke-linecap: butt;
+        stroke-linejoin: miter;
+        stroke-opacity: 1
+    }
 }

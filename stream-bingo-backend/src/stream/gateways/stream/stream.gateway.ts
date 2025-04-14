@@ -76,7 +76,6 @@ export class StreamGateway {
   }
 
   @Roles([
-    'a',
     {id: 'man', 'streamKey': 'id'}
   ])
   @SubscribeMessage('getStreamCells')
@@ -88,7 +87,6 @@ export class StreamGateway {
   }
 
   @Roles([
-    'a',
     {id: 'man', 'streamKey': 'id'}
   ])
   @SubscribeMessage('updateCellsFormStream')

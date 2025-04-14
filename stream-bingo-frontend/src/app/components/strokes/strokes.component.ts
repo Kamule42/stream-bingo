@@ -8,7 +8,7 @@ import { DiscComponent } from './disc/disc.component';
 
 @Component({
   selector: 'app-strokes',
-  imports: [ NgComponentOutlet ],
+  imports: [ NgComponentOutlet, ],
   templateUrl: './strokes.component.html',
   styleUrl: './strokes.component.scss'
 })

@@ -51,7 +51,7 @@ export class SessionService {
     return this.hasRight('a')
   }
   public isStreamModerator(streamId: string): any {
-    return this.isAdmin || this.hasRight('mod', streamId)
+    return this.isAdmin || this.hasRight(['mod', 'man'], streamId)
   }
   public isStreamManager(streamId: string): any {
     return this.isAdmin || this.hasRight('man', streamId)
