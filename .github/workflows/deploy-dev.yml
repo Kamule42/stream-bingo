@@ -38,6 +38,9 @@ jobs:
       - run: yarn build
         name: build backend
         working-directory: stream-bingo-backend
+      - name: Add package.json to output
+        run: cp package.json ./dist
+        working-directory: stream-bingo-backend
       - uses: actions/upload-artifact@v4
         with:
           name: backend
@@ -55,37 +58,30 @@ jobs:
         with:
           name: backend
           path: backend/
-      - uses: burnett01/rsync-deployments@7.0.2
-        name: Deploy front
+      - name: Install SSH Key
+        uses: webfactory/ssh-agent@v0.9.0
         with:
-          switches: -avzr --delete
-          path: ./frontend/
-          remote_path: /apps/stream-bingo-dev/frontend
-          remote_host: ${{ secrets.VPS_IP }}
-          remote_user: ${{ secrets.VPS_USER }}
-          remote_key: ${{ secrets.DEPLOY_SSH_PRIVATE_KEY }}
-     
-      - uses: burnett01/rsync-deployments@7.0.2
-        name: Deploy backend
-        with:
-          switches: -avzr --delete
-          path:  ./backend/
-          remote_path: /apps/stream-bingo-dev/backend
-          remote_host: ${{ secrets.VPS_IP }}
-          remote_user: ${{ secrets.VPS_USER }}
-          remote_key: ${{ secrets.DEPLOY_SSH_PRIVATE_KEY }}
-      # - uses: webfactory/ssh-agent@v0.9.0
-      #   with:
-      #     ssh-private-key: ${{ secrets.DEPLOY_SSH_PRIVATE_KEY }}
-      # - run: apt-get install rsync
-      # - name: Copy files to VPS
-      #   env:
-      #     VPS_IP: ${{ secrets.VPS_IP }}
-      #     VPS_USER: ${{ secrets.VPS_USER }}
-      #   run: |
-      #     echo $VPS_IP
-      #     echo $VPS_USER
-      #     mkdir -p ~/.ssh
-      #     ssh-keyscan -H $VPS_IP >> ~/.ssh/known_hosts
-      #     rsync -avz --delete ./stream-bingo-frontend/dist/stream-bingo-frontend/browser/ $VPS_USER@$VPS_IP:/apps/stream-bingo-dev/frontend
-      #     rsync -avz --delete ./stream-bingo-backend/dist/ $VPS_USER@$VPS_IP:/apps/stream-bingo-dev/backend
+          ssh-private-key: ${{ secrets.DEPLOY_SSH_PRIVATE_KEY }}
+      - name: Adding Known Hosts
+        run: ssh-keyscan -H $SSH_HOST >> ~/.ssh/known_hosts
+        env:
+          SSH_HOST: ${{ secrets.VPS_IP }}
+      - name: Deploy Backend and frontend
+        env:
+          SSH_KEY: ${{ secrets.DEPLOY_SSH_PRIVATE_KEY }}
+          SSH_HOST: ${{ secrets.VPS_IP }}
+          SSH_USER: ${{ secrets.VPS_USER }}
+        run: |
+          rsync -avz ./frontend/ $SSH_USER@$SSH_HOST:/apps/stream-bingo-dev/frontend
+          rsync -avz ./backend/ $SSH_USER@$SSH_HOST:/apps/stream-bingo-dev/backend
+      - name: Install deps
+        run: ssh $SSH_USER@$SSH_HOST 'yarn install --production=true --cwd /apps/stream-bingo-dev/backend'
+        env:
+          SSH_HOST: ${{ secrets.VPS_IP }}
+          SSH_USER: ${{ secrets.VPS_USER }}
+      - name: Setup config
+        run: ssh $SSH_USER@$SSH_HOST 'cp /apps/stream-bingo-dev/config.yaml /apps/stream-bingo-dev/backend/config'
+        env:
+          SSH_HOST: ${{ secrets.VPS_IP }}
+          SSH_USER: ${{ secrets.VPS_USER }}
+
