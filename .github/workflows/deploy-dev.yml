@@ -84,4 +84,11 @@ jobs:
         env:
           SSH_HOST: ${{ secrets.VPS_IP }}
           SSH_USER: ${{ secrets.VPS_USER }}
+      - name: reload backend
+        run: |
+          ssh $SSH_USER@$SSH_HOST 'pm2 reload /apps/ecosystem.config.js'
+          ssh $SSH_USER@$SSH_HOST 'pm2 restart /apps/ecosystem.config.js'
+        env:
+          SSH_HOST: ${{ secrets.VPS_IP }}
+          SSH_USER: ${{ secrets.VPS_USER }}
 
