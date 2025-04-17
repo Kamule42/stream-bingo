@@ -19,8 +19,7 @@
                 <div class="cell-text">{{ cell.name }}</div>
                 @if(cell.checked){
                     <div class="cell-stroke">
-                        <app-strokes
-                            [size]="75"
+                        <app-stroke
                             [stroke]="stroke$()"
                             [color]="strokeColor$()" />
                     </div>

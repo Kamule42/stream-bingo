@@ -1,30 +1,32 @@
 <div id="settings-root">
-    <div id="settings-strokes" class="row">
-        Marqueur : 
+  <div id="settings-strokes">
+    <div class="field">
+      <div class="label">Marqueur</div>
+      <div class="control row">
         @for(check of checks; track check){
-            <div
-                [class.selected]="check === stroke()"
-                (click)="stroke.set(check)"
-            >
-                <app-strokes
-                    [color]="alphaColor()"
-                    [stroke]="check"
-                    [size]="40"/>
-            </div>
-        }
+          <div class="stroke" [class.selected]="check === stroke()" (click)="stroke.set(check)">
+            <app-stroke [color]="alphaColor()" [stroke]="check" />
+          </div>
+          }
+      </div>
     </div>
-    <div class="row">
-        <div>Couleur du marqueur</div>
+  </div>
+  <div id="settings-color" class="row">
+    <div class="field">
+      <div class="label">Couleur du marqueur</div>
+      <div class="control">
         <p-color-picker [(ngModel)]="color" appendTo="body" />
-        <div>Transparence</div>
-        <p-slider
-            id="settings-transparency"
-            [(ngModel)]="alpha"
-            [min]="42"
-            [max]="255"/>
+      </div>
     </div>
-    <div id="settings-actions">
-        <p-button label="Annuler" (onClick)="done.emit()" severity="secondary" />
-        <p-button label="Save" (onClick)="save()" severity="primary" />
+    <div class="field">
+      <div class="label">Transparence</div>
+      <div class="control">
+        <p-slider id="settings-transparency" [(ngModel)]="alpha" [min]="42" [max]="255" />
+      </div>
     </div>
+  </div>
+  <div id="settings-actions">
+    <p-button label="Annuler" (onClick)="done.emit()" severity="secondary" />
+    <p-button label="Save" (onClick)="save()" severity="primary" />
+  </div>
 </div>

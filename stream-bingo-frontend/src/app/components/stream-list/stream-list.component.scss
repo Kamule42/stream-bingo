@@ -1,13 +1,14 @@
 :host{
-    #next-streams{
-        gap: 2rem;
+    ::ng-deep .p-carousel-item-list{
+        gap: 1rem;
     }
     .card{    
-        width: 300px;
-        height: 100%;
+        max-width: 300px;
+        max-height: 100%;
+        margin: auto;
         img{
-            width: 300px;
-            height: 300px;
+            max-width: 300px;
+            max-height: 300px;
         }
     }
 }

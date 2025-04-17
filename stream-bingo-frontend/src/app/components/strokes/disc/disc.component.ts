@@ -8,5 +8,4 @@ import { Component, input } from '@angular/core';
 })
 export class DiscComponent {
   readonly color = input<string>('#14a723')
-  readonly size = input(150)
 }

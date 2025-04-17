@@ -9,12 +9,12 @@ import { Popover, PopoverModule } from 'primeng/popover'
 import { filter, map, tap } from 'rxjs'
 import { ActivatedRoute, Router } from '@angular/router'
 import { SettingsService } from '../../services/settings/settings.service'
-import { StrokesComponent } from '../strokes/strokes.component'
+import { StrokeComponent } from '../strokes/stroke.component'
 import { CheckType } from '../../services/settings/setting.types'
 
 @Component({
   selector: 'app-bingo',
-  imports: [ ButtonModule, PopoverModule, StrokesComponent, ],
+  imports: [ ButtonModule, PopoverModule, StrokeComponent, ],
   templateUrl: './bingo.component.html',
   styleUrl: './bingo.component.scss'
 })

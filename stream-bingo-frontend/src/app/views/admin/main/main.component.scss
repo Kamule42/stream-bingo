@@ -1,6 +1,12 @@
+@use "bulma/sass/utilities/mixins";
+
 :host{
     #admin-root{
         padding: 3rem;
         gap: 1rem;
+        
+        @include mixins.mobile {
+            padding: 0.5rem;
+        }
     }
 }

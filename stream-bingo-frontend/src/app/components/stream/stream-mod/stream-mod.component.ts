@@ -9,15 +9,14 @@ import { ButtonModule } from 'primeng/button'
 import { InputGroupModule } from 'primeng/inputgroup'
 import { SettingsService } from '../../../services/settings/settings.service'
 import { CheckType } from '../../../services/settings/setting.types'
-import { StrokesComponent } from '../../strokes/strokes.component'
+import { StrokeComponent } from '../../strokes/stroke.component'
 import { GridService } from '../../../services/grids/grid.service'
-import { IValidatedCell } from '../../../services/grids/grid.interface'
 
 @Component({
   selector: 'app-stream-mod',
   imports: [ 
     FormsModule, InputTextModule, InputGroupModule,
-    InputGroupAddonModule, ButtonModule, StrokesComponent
+    InputGroupAddonModule, ButtonModule, StrokeComponent
   ],
   templateUrl: './stream-mod.component.html',
   styleUrl: './stream-mod.component.scss'

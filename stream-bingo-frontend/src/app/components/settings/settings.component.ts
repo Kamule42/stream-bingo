@@ -1,6 +1,6 @@
 import { Component, computed, effect, inject, output, signal } from '@angular/core'
 import { ColorPickerModule } from 'primeng/colorpicker'
-import { StrokesComponent } from '../strokes/strokes.component'
+import { StrokeComponent } from '../strokes/stroke.component'
 import { FormsModule } from '@angular/forms'
 import { SettingsService } from '../../services/settings/settings.service'
 import { CheckType } from '../../services/settings/setting.types'
@@ -13,7 +13,7 @@ const defaultColor = '#14a723'
 @Component({
   selector: 'app-settings',
   imports: [
-    ColorPickerModule, StrokesComponent, FormsModule, ButtonModule,
+    ColorPickerModule, StrokeComponent, FormsModule, ButtonModule,
     SliderModule, 
   ],
   templateUrl: './settings.component.html',

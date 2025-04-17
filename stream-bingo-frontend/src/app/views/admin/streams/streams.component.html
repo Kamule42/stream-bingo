@@ -2,7 +2,8 @@
     @let streams = streams$() ?? [];
     <p-table
         [value]="streams"
-        [tableStyle]="{ 'min-width': '50rem' }"
+        id="admin-streams"
+        responsiveLayout="scroll | stack"
         
     >
         <ng-template #caption>

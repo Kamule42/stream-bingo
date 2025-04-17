@@ -17,8 +17,7 @@
               <div class="cell-txt">{{ cell.cellName}}</div>
               @if( cell.valide ){
                 <div class="cell-stroke">
-                  <app-strokes
-                      [size]="120"
+                  <app-stroke
                       [stroke]="stroke$()"
                       [color]="strokeColor$()" />
               </div>

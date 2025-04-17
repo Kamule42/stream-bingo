@@ -44,7 +44,8 @@ export const routes: Routes = [
             rights: ['a'],
         },
         children:[
-            {path: 'streams', loadComponent: () => import('./views/admin/streams/streams.component').then(c => c.StreamsComponent)}
+            { path: 'streams', loadComponent: () => import('./views/admin/streams/streams.component').then(c => c.StreamsComponent) },
+            { path: '', redirectTo: 'streams', pathMatch: 'full', },
         ]
     }
 ];

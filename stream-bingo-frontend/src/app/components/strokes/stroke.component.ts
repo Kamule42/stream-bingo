@@ -7,15 +7,14 @@ import { NgComponentOutlet } from '@angular/common';
 import { DiscComponent } from './disc/disc.component';
 
 @Component({
-  selector: 'app-strokes',
+  selector: 'app-stroke',
   imports: [ NgComponentOutlet, ],
-  templateUrl: './strokes.component.html',
-  styleUrl: './strokes.component.scss'
+  templateUrl: './stroke.component.html',
+  styleUrl: './stroke.component.scss'
 })
-export class StrokesComponent {
+export class StrokeComponent {
   readonly color = input<string>('#14a723')
   readonly stroke = input.required<CheckType>()
-  readonly size = input(150)
 
   readonly strokeComponent$ = computed(() => {
     switch( this.stroke() ){
@@ -25,8 +24,9 @@ export class StrokesComponent {
       case CheckType.SCRATCH: return ScratchComponent
     }
   })
-  readonly params$ = computed(() => ({
-    color: this.color(),
-    size: this.size(),
-  }))
+  readonly params$ = computed(() => {
+    return {
+      color: this.color(),
+    }
+  })
 }

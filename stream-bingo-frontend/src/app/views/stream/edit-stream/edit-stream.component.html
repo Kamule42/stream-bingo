@@ -51,8 +51,7 @@
             [paginator]="true"
             stripedRows
             [rows]="10"
-            [rowsPerPageOptions]="[10, 20, 50]"
-            [tableStyle]="{'min-width': '50rem'}">
+            [rowsPerPageOptions]="[10, 20, 50]">
             <ng-template #emptymessage>
               Aucune case
             </ng-template>
@@ -65,7 +64,7 @@
               <tr>
                 <th pSortableColumn="name">Nom <p-sortIcon field="name" /></th>
                 <th pSortableColumn="description">Description <p-sortIcon field="description" /></th>
-                <th pSortableColumn="active" style="width: 7rem;">Activée <p-sortIcon field="active" /></th>
+                <th pSortableColumn="active" style="max-width: 7rem;">Activée <p-sortIcon field="active" /></th>
               </tr>
             </ng-template>
             <ng-template #body let-cell>

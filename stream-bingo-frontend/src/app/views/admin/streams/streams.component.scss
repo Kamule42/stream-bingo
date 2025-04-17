@@ -1,4 +1,13 @@
+@use "bulma/sass/utilities/mixins";
+
 :host{
+    
+    @include mixins.mobile {
+        &, ::ng-deep{
+            font-size: 0.75rem;
+        }
+    }
+
     #edit-stream-root{
         gap: 2rem;
     }
