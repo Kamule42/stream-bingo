@@ -19,7 +19,6 @@ export class StripeComponent {
   readonly stripe= input.required<'diag_up' | 'diag_down' | 'row' | 'col'>()
 
   readonly stripeComponent$ = computed(() => {
-    console.log(this.stripe())
     switch(this.stripe()){
       case 'diag_up': return DiagUpComponent
       case 'diag_down': return DiagDownComponent

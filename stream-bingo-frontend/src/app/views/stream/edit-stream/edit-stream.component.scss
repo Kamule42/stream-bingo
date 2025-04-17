@@ -1,3 +1,5 @@
+@use "bulma/sass/utilities/mixins";
+
 :host{
   #stream-edit-root{
     display: flex;
@@ -19,14 +21,29 @@
     justify-content: end;
   }
   #stream-edit-cells{
-    max-width: 70rem;
-    width: 100%;
-    ::ng-deep table tr {
-      td, th{
-        overflow: hidden;
-        text-overflow: ellipsis;
-        &:first-of-type{  
-          max-width: 250px;
+    @include mixins.mobile {
+      width: 100%;
+    }
+    @include mixins.tablet-only {
+      width: 100%;
+    }
+    @include mixins.desktop-only {
+      width: 800px;
+    }
+    @include mixins.widescreen-only {
+      width: 900px;
+    }
+    @include mixins.fullhd  {
+      width: 1000px;
+    }
+    ::ng-deep table {
+      tr {
+        td, th{
+          overflow: hidden;
+          text-overflow: ellipsis;
+          &:first-of-type{  
+            max-width: 250px;
+          }
         }
       }
     }
