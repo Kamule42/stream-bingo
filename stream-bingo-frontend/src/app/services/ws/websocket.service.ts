@@ -1,11 +1,18 @@
-import { inject } from "@angular/core";
-import { AuthService } from "../auth";
-import { Socket } from "socket.io-client";
-import { toSignal } from "@angular/core/rxjs-interop";
+import { inject } from "@angular/core"
+import { AuthService } from "../auth"
+import { Socket } from "socket.io-client"
+import { toSignal } from "@angular/core/rxjs-interop"
+import { tap } from "rxjs"
 
 export abstract class WebsocketService {
   private readonly authService = inject(AuthService)
-  private readonly authorization = toSignal(this.authService.authorization$)
+  private readonly authorization = toSignal(this.authService.authorization$.pipe(
+    tap(() => {
+      if(this.socket != null){
+        this.socket.disconnect().connect()
+      }
+    }),
+  ))
 
   abstract get socket() : Socket
 
@@ -15,7 +22,6 @@ export abstract class WebsocketService {
 
   protected get auth(): ((cb: (data: object) => void) => void){
     return (cb) => {
-      console.log(this.authorization())
       cb({
         token: this.authorization()
       })

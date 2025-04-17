@@ -21,9 +21,7 @@ export class AuthController {
   
   @UseGuards(AuthGuard('discord'))
   @Get('discord')
-  public loginWithDiscord(params){
-    console.log(params)
-  }
+  public loginWithDiscord(){ }
 
   @Post('discord-validate')
   public discordRedirect(
