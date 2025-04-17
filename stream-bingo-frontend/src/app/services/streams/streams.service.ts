@@ -5,7 +5,7 @@ import { DateTime } from'luxon'
 import { IPaginated, IPagination } from '../../shared/models/pagination.interface'
 import { ICell, IRight, IStream } from './stream.interface'
 import { WebsocketService } from '../ws/websocket.service'
-import { IFav, ISeachResult } from '../users/users.interface'
+import { IFav } from '../users/users.interface'
 import { toSignal } from '@angular/core/rxjs-interop'
 
 @Injectable({

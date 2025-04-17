@@ -1,8 +1,9 @@
-import { Body, Controller, Get, Post, Res } from '@nestjs/common'
+import { Body, Controller, Get, Post, Res, UseGuards } from '@nestjs/common'
 import { AuthService } from '../../services/auth/auth.service'
 import { map, Observable, tap } from 'rxjs'
 import { FastifyReply } from 'fastify'
 import { DateTime } from 'luxon'
+import { AuthGuard } from '@nestjs/passport'
 
 @Controller('auth')
 export class AuthController {
@@ -15,6 +16,13 @@ export class AuthController {
     return {
       url: this.authService.getAuthUrl(),
     };
+  }
+
+  
+  @UseGuards(AuthGuard('discord'))
+  @Get('discord')
+  public loginWithDiscord(params){
+    console.log(params)
   }
 
   @Post('discord-validate')

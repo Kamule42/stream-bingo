@@ -7,7 +7,7 @@ import { TypeOrmModule } from '@nestjs/typeorm'
 import { StreamModule } from './stream/stream.module'
 import { APP_GUARD } from '@nestjs/core'
 import { AuthGuard } from './shared/guards/auth/auth.guard'
-import { GridModule } from './grid/grid.module';
+import { GridModule } from './grid/grid.module'
 
 @Module({
   imports: [

@@ -31,6 +31,7 @@ export class AuthService {
   public get authorization$(): Observable<string | null>{
     return this.authorization$$.pipe(
       tap(val => {
+        console.log('auth', val)
         if(val){
           localStorage.setItem(AUTHORIZATION_KEY, val)
         }
@@ -44,12 +45,6 @@ export class AuthService {
 
   private set authorization$(authorization: string | null){
     this.authorization$$.next(authorization)
-    if(authorization){
-      localStorage.setItem(AUTHORIZATION_KEY, authorization)
-    }
-    else{
-      localStorage.removeItem(AUTHORIZATION_KEY)
-    }
   }
 
   public getDiscordUrl(): Observable<string>{

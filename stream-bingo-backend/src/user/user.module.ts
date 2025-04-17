@@ -4,25 +4,30 @@ import { AuthService } from './services/auth/auth.service'
 import { AuthController } from './controllers/auth/auth.controller'
 import { HttpModule } from '@nestjs/axios'
 import { UserEntity } from './entities/user.entity'
-import { JwtModule } from '@nestjs/jwt'
-import { ConfigService } from '@nestjs/config'
 import { RightEntity } from './entities/right.entity'
 import { UserGateway } from './gateways/user/user.gateway'
 import { UserService } from './services/user/user/user.service'
+import { JwtModule } from '@nestjs/jwt'
+import { ConfigService } from '@nestjs/config'
+import { PassportModule } from '@nestjs/passport'
+import { DiscordStrategy } from './services/passport/discord-strategy/discord-strategy.service'
+import { JwtStrategy } from './services/passport/jwt-strategy/jwt-strategy.service'
 
 @Module({
   imports: [
     HttpModule,
     TypeOrmModule.forFeature([ UserEntity, RightEntity, ]),
+    PassportModule,
     JwtModule.registerAsync({
-    inject: [ConfigService],
-    useFactory: (configService: ConfigService) => ({
-      global: true,
-      secret: configService.get<string>('jwt.secret') ?? 'secret',
-      signOptions: { expiresIn: '7d' },
-    })
-  }),],
-  providers: [AuthService, UserGateway, UserService],
+      inject: [ConfigService],
+      useFactory: (configService: ConfigService) => ({
+        global: true,
+        secret: configService.get<string>('jwt.secret') ?? 'secret',
+        signOptions: { expiresIn: '7d' },
+      })
+    }),
+  ],
+  providers: [AuthService, UserGateway, UserService, DiscordStrategy, JwtStrategy],
   exports: [ AuthService ],
   controllers: [AuthController],
 })

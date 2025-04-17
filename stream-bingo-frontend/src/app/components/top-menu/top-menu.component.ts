@@ -1,5 +1,4 @@
 import { Component, computed, inject, signal } from '@angular/core'
-import { toSignal } from '@angular/core/rxjs-interop'
 import { MenubarModule } from 'primeng/menubar'
 import { AvatarModule } from 'primeng/avatar'
 import { MenuModule } from 'primeng/menu';
