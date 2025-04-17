@@ -6,15 +6,17 @@ import { ButtonModule } from 'primeng/button'
 import { SessionService } from '../../services/session/session.service'
 import { toChunk } from '../../shared/helpers/array.helper'
 import { Popover, PopoverModule } from 'primeng/popover'
-import { filter, map, tap } from 'rxjs'
+import { filter, map, switchMap, tap } from 'rxjs'
 import { ActivatedRoute, Router } from '@angular/router'
 import { SettingsService } from '../../services/settings/settings.service'
 import { StrokeComponent } from '../strokes/stroke.component'
 import { CheckType } from '../../services/settings/setting.types'
+import { VisibilityService } from '../../services/visibility/visibility.service'
+import { StripeComponent } from '../stripe/stripe.component'
 
 @Component({
   selector: 'app-bingo',
-  imports: [ ButtonModule, PopoverModule, StrokeComponent, ],
+  imports: [ ButtonModule, PopoverModule, StrokeComponent, StripeComponent ],
   templateUrl: './bingo.component.html',
   styleUrl: './bingo.component.scss'
 })
@@ -24,6 +26,7 @@ export class BingoComponent {
   private readonly gridService = inject(GridService)
   private readonly sessionService = inject(SessionService)
   private readonly settingsService = inject(SettingsService)
+  private readonly visibilityService = inject(VisibilityService)
   private readonly router = inject(Router)
   private readonly route = inject(ActivatedRoute)
 
@@ -78,7 +81,55 @@ export class BingoComponent {
     map(val => val!.cells
       .filter(({valide}) => valide === true)
       .map(cell => cell.cellId)),
+    // Wait for the tab to be active to trigger the update
+    switchMap(cells => this.visibilityService.isVisible$.pipe(
+      filter(val => val),
+      map(() => cells),
+    )),
   ))
+  readonly bingos$ = computed<Array<{type: 'row' | 'col' | 'diag_down' | 'diag_up', index?: number, class: string}>>(() => {
+    const cells = this.cells$()
+    return [
+      // Rows
+      ...cells
+        .filter(row => row.every(({valide}) => valide === true))
+        .map((row) => ({
+          type: 'row',
+          index: Math.floor(row[0].index/4),
+          class: `row is-${Math.floor(row[0].index/4)}`
+        })),
+      // Cols
+      ...[0,1,2,3]
+        .filter(col => cells.every(row => row[col].valide === true))
+        .map((index) => ({
+          type: 'col',
+          index: index,
+          class: `col is-${index}`
+        })),
+      // Diagonal Down
+      ...[
+         [0,1,2,3].every(index => cells[index][index].valide)
+      ]
+        .filter(val => val)
+        .map(() => ({
+          type: 'diag_down',
+          class: 'diag_down',
+        })),
+      // Diagonal Up
+      ...[
+        [0,1,2,3].every(index => cells[3-index][index].valide)
+      ]
+       .filter(val => val)
+       .map(() => ({
+         type: 'diag_up',
+         class: 'diag_up',
+       })),
+    ] as Array<{type: 'row' | 'col' | 'diag_down' | 'diag_up', index?: number, class: string}>
+  })
+
+  readonly score$ = computed(() => this.bingos$()?.length)
+
+
 
   public generateGrid(){
     this.gridService.createGrid(this.stream().id)

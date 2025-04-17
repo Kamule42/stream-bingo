@@ -27,6 +27,14 @@
         </div>
       }
     </div>
+    @for(stripe of bingos$(); track stripe){
+      <div class="stripe" [class]="stripe.class">
+        <app-stripe [stripe]="stripe.type" />
+      </div>
+    }
+  </div>
+  <div id="bingo-score">
+    Score&nbsp;:&nbsp;{{ score$() }}
   </div>
 }
 @else {
