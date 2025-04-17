@@ -6,7 +6,7 @@ import { ButtonModule } from 'primeng/button'
 import { SessionService } from '../../services/session/session.service'
 import { toChunk } from '../../shared/helpers/array.helper'
 import { Popover, PopoverModule } from 'primeng/popover'
-import { filter, map, switchMap, tap } from 'rxjs'
+import { delay, filter, map, switchMap, tap } from 'rxjs'
 import { ActivatedRoute, Router } from '@angular/router'
 import { SettingsService } from '../../services/settings/settings.service'
 import { StrokeComponent } from '../strokes/stroke.component'
@@ -85,6 +85,7 @@ export class BingoComponent {
     switchMap(cells => this.visibilityService.isVisible$.pipe(
       filter(val => val),
       map(() => cells),
+      delay(500),
     )),
   ))
   readonly bingos$ = computed<Array<{type: 'row' | 'col' | 'diag_down' | 'diag_up', index?: number, class: string}>>(() => {
