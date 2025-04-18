@@ -5,7 +5,6 @@ import { ICell, INextStream, IRight, IStream } from './stream.interface'
 import { cellsMapper, nextStreamMapper, streamMapper } from './stream.mappers'
 import { Paginate, PaginateQuery } from 'nestjs-paginate'
 import { UseGuards } from '@nestjs/common'
-import { AuthGuard } from 'src/shared/guards/auth/auth.guard'
 import { Roles } from 'src/shared/decorators/auth/roles.decorator'
 import { IPaginatedResponse } from 'src/shared/interfaces/paginated.interface'
 import { toPaginationMetal } from 'src/shared/functions/paginated'
@@ -13,12 +12,14 @@ import { CellService } from 'src/stream/services/cell/cell.service'
 import { ISession } from 'src/user/interfaces/session.interface'
 import { IFav } from 'src/user/gateways/user/user.responses'
 import { Session } from 'src/shared/decorators/auth/session.decorator'
+import { JwtAuthGuard } from 'src/shared/guards/jwt-auth/jwt-auth.guard'
+import { RefreshGuard } from 'src/shared/guards/refresh/refresh.guard'
 
 @WebSocketGateway({
   namespace: 'streams',
   transports: ['websocket', 'polling']
 })
-@UseGuards(AuthGuard)
+@UseGuards(JwtAuthGuard, RefreshGuard, )
 export class StreamGateway {
   constructor(
     private readonly streamService: StreamService,

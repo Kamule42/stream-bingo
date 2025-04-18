@@ -1,7 +1,6 @@
 import { UseGuards } from '@nestjs/common'
 import { ConnectedSocket, MessageBody, SubscribeMessage, WebSocketGateway, WebSocketServer, WsResponse } from '@nestjs/websockets'
 import { GridService } from 'src/grid/services/grid/grid.service'
-import { AuthGuard } from 'src/shared/guards/auth/auth.guard'
 import { IGrid, IValidatedCell } from './grid.interface'
 import { Roles } from 'src/shared/decorators/auth/roles.decorator'
 import { Session } from 'src/shared/decorators/auth/session.decorator'
@@ -9,12 +8,14 @@ import { ISession } from 'src/user/interfaces/session.interface'
 import { gridMapper } from './grid.mapper'
 import { ValidatedCellsService } from 'src/grid/services/validated-cells/validated-cells.service'
 import { Namespace, Socket } from 'socket.io'
+import { JwtAuthGuard } from 'src/shared/guards/jwt-auth/jwt-auth.guard'
+import { RefreshGuard } from 'src/shared/guards/refresh/refresh.guard'
 
 @WebSocketGateway({
   namespace: 'grids',
   transports: ['websocket', 'polling']
 })
-@UseGuards(AuthGuard)
+@UseGuards(JwtAuthGuard, RefreshGuard, )
 export class GridGateway {
   @WebSocketServer()
   private readonly server: Namespace

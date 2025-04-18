@@ -37,7 +37,7 @@ export class SessionService {
   }
 
   public hasRight(r: string | Array<string>, s?:string): boolean{
-    return this.session$()?.rights.some(({right, streamId}) =>  (
+    return this.session$()?.rights?.some(({right, streamId}) =>  (
         typeof r === 'string' && r === right ||
         Array.isArray(r) && r.some(val => val === right)
       ) &&

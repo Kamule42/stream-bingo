@@ -4,6 +4,7 @@ import { PassportStrategy } from '@nestjs/passport'
 import { InjectRepository } from '@nestjs/typeorm'
 import Strategy from 'passport-discord'
 import { UserEntity } from 'src/user/entities/user.entity'
+import { ISession } from 'src/user/interfaces/session.interface'
 import { Repository } from 'typeorm'
 import { v7 as uuid } from 'uuid'
 
@@ -23,7 +24,7 @@ export class DiscordStrategy extends PassportStrategy(Strategy){
     })
   }
 
-  async validate(data): Promise<unknown> {
+  async validate(data): Promise<ISession> {
     let existingUser = await this.usersRepository.findOne({
       where: {discordId: data.id,},
       relations: ['rights', 'rights.stream'],
@@ -35,13 +36,11 @@ export class DiscordStrategy extends PassportStrategy(Strategy){
     })
 
     return {
-      user_id: existingUser.id,
+      sub: existingUser.id,
       username: existingUser.discordUsername,
       discord: {
         id: existingUser.discordId,
         avatarId: existingUser.discordAvatar,
-        access_token: `${data.token_type} ${data.access_token}`,
-        expires_in: data.expires_in,
       },
       rights: existingUser.rights?.map(val => {
         return val

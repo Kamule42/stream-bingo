@@ -16,9 +16,12 @@ export class RoundService {
         return this.roundRepository.findOne({
             where: {
                 stream: { id: streamId },
-                streamStartAt: MoreThanOrEqual(DateTime.now().plus({hours: 3}).toJSDate())
+                streamStartAt: MoreThanOrEqual(DateTime.now().minus({hours: 3}).toJSDate())
             },
-            relations: [ 'stream' ]
+            relations: [ 'stream' ],
+            order:{
+                streamStartAt: 'asc'
+            },
         })
     }
 
@@ -26,9 +29,12 @@ export class RoundService {
         return this.roundRepository.find({
             where: {
                 stream: { id: streamId },
-                streamStartAt: MoreThanOrEqual(DateTime.now().plus({hours: 3}).toJSDate())
+                streamStartAt: MoreThanOrEqual(DateTime.now().minus({hours: 3}).toJSDate())
             },
-            relations: [ 'stream' ]
+            relations: [ 'stream' ],
+            order:{
+                streamStartAt: 'asc'
+            }
         })
     }
 

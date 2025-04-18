@@ -11,6 +11,12 @@ export class AuthController {
     private readonly authService: AuthService,
   ) {}
 
+
+  @Get('logout')
+  public logout(@Res({ passthrough: true }) response: FastifyReply) {
+    response.clearCookie('refresh_token')
+  }
+
   @Get('discord-url')
   public getDiscordUrl(): { url: string } {
     return {
@@ -18,10 +24,11 @@ export class AuthController {
     };
   }
 
-  
-  @UseGuards(AuthGuard('discord'))
+  @UseGuards(
+    AuthGuard('discord')
+  )
   @Get('discord')
-  public loginWithDiscord(){ }
+  public loginWithDiscord(){}
 
   @Post('discord-validate')
   public discordRedirect(
@@ -29,14 +36,23 @@ export class AuthController {
     @Res({ passthrough: true }) response: FastifyReply
   ): Observable<{access_token: string}> {
     return this.authService.validateDiscord(code).pipe(
-      tap(result => response.setCookie('identity', result.user_id, {
-        path: '/',
-        signed: true,
-        httpOnly: true,
-        secure: true,
-        sameSite: true,
-        expires: DateTime.now().plus({week: 1}).endOf('day').toJSDate()
-      })),
+      tap(result => {
+        const expires = DateTime.now().plus({week: 4}).endOf('day').toJSDate()
+        response.setCookie(
+          'refresh_token',
+          JSON.stringify({
+            sub: result.user_id,
+            expires
+          }),
+          {
+            path: '/',
+            signed: true,
+            httpOnly: true,
+            secure: true,
+            sameSite: true,
+            expires
+          })
+      }),
       map(({access_token}) => ({access_token})),
     )
   }

@@ -78,32 +78,15 @@ export class AuthService {
             where: {discordId: data.id,},
             relations: ['rights', 'rights.stream'],
           });
-          if (!existingUser) {
-            existingUser = await this.usersRepository.save({
+          existingUser ??= await this.usersRepository.save({
               id: uuid(),
               discordId: data.id,
               discordUsername: data.username,
               discordAvatar: data.avatar,
-            });
-          }
+            })
           return {
             user_id: existingUser.id,
-            access_token: await this.jwtService.signAsync({
-              sub: existingUser.id,
-              username: existingUser.discordUsername,
-              discord: {
-                id: existingUser.discordId,
-                avatarId: existingUser.discordAvatar,
-                access_token: `${data.token_type} ${data.access_token}`,
-                expires_in: data.expires_in,
-              },
-              rights: existingUser.rights?.map(val => {
-                return val
-              })?.map(({rightKey, stream}) => ({
-                right: rightKey,
-                streamId: stream?.id
-              }))
-            })
+            access_token: await this.signSession(existingUser)
           }
         }),
         catchError((error: AxiosError) => {
@@ -117,7 +100,33 @@ export class AuthService {
       );
   }
 
+  public async signSession(param: string | UserEntity): Promise<string>{
+    const existingUser = typeof param === 'string' ?
+      await this.usersRepository.findOne({
+        where: {id: param,},
+        relations: ['rights', 'rights.stream'],
+      }) :
+      param;
+    if(existingUser == null){
+      throw new Error('unknown user')
+    }
+    return this.jwtService.signAsync({
+      sub: existingUser.id,
+      username: existingUser.discordUsername,
+      discord: {
+        id: existingUser.discordId,
+        avatarId: existingUser.discordAvatar,
+      },
+      rights: existingUser.rights?.map(val => {
+        return val
+      })?.map(({rightKey, stream}) => ({
+        right: rightKey,
+        streamId: stream?.id
+      }))
+    })
+  }
+
   validateToken(token: string): ISession {
-    return this.jwtService.verify(token?.replace('Bearer ', ''))
+    return this.jwtService.decode(token?.replace('Bearer ', ''))
   }
 }

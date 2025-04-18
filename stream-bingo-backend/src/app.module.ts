@@ -8,6 +8,8 @@ import { StreamModule } from './stream/stream.module'
 import { APP_GUARD } from '@nestjs/core'
 import { AuthGuard } from './shared/guards/auth/auth.guard'
 import { GridModule } from './grid/grid.module'
+import { JwtAuthGuard } from './shared/guards/jwt-auth/jwt-auth.guard'
+import { RefreshGuard } from './shared/guards/refresh/refresh.guard'
 
 @Module({
   imports: [
@@ -38,7 +40,11 @@ import { GridModule } from './grid/grid.module'
   providers: [
     {
       provide: APP_GUARD,
-      useClass: AuthGuard,
+      useClass: RefreshGuard,
+    },
+    {
+      provide: APP_GUARD,
+      useClass: JwtAuthGuard,
     },
   ],
 })

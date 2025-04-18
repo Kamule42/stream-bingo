@@ -1,21 +1,37 @@
 import { ExtractJwt, Strategy } from 'passport-jwt'
 import { PassportStrategy } from '@nestjs/passport'
 import { Injectable } from '@nestjs/common'
-import { ConfigService } from '@nestjs/config';
+import { ConfigService } from '@nestjs/config'
+import { Reflector } from '@nestjs/core'
+import { Socket } from 'socket.io'
+import { ISession } from 'src/user/interfaces/session.interface'
+
+const extractToken = (request) => {
+  const requestType = request?.constructor?.name
+  switch(requestType){
+    case 'Socket': {
+      const client = request as Socket
+      return client.handshake.auth.token?.substring(7)
+    }
+    default: return null
+  }
+}
 
 @Injectable()
-export class JwtStrategy extends PassportStrategy(Strategy) {
+export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
   constructor(
-    configService: ConfigService
+    private readonly configService: ConfigService,
+    private readonly reflector: Reflector,
   ) {
     super({
-      jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
-      ignoreExpiration: false,
+      jwtFromRequest: ExtractJwt.fromExtractors([extractToken]),
+      ignoreExpiration: true,
       secretOrKey: configService.get('jwt.secret') ?? 'secret',
+
     });
   }
 
-  async validate(payload: any) {
-    return { userId: payload.sub, username: payload.username };
+  async validate(payload: ISession) {
+    return payload;
   }
 }

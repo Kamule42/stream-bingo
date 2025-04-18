@@ -14,7 +14,7 @@ async function bootstrap() {
   await app.register(fastifyCookie, {
     secret: config.get('cookie.secret') as string, // for cookies signature
   })
-  await app.register(fastifyCsrf)
+  await app.register(fastifyCsrf, { cookieOpts: { signed: true } })
   await app.register(helmet, {
     contentSecurityPolicy: cspPolicy
   })

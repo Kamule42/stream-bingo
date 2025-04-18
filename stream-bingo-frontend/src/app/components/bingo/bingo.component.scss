@@ -87,7 +87,7 @@
 		align-items: center;
 
 		::ng-deep svg {
-			animation: wiggle 0.1s linear;
+			animation: wiggle 0.1s ease-in-out;
 			animation-iteration-count: 3;
 
 			@keyframes wiggle {
@@ -128,7 +128,7 @@
 				mask-image: linear-gradient(90deg, #fff, #fff, #0000, #0000);
 				mask-size: 300% 100%;
 				mask-position: left;
-				animation: clip-fade 1s ease;
+				animation: clip-fade 1s ease-in-out;
 
 				@keyframes clip-fade {
 					0% {
@@ -174,7 +174,7 @@
 				mask-image: linear-gradient(90deg, #fff, #fff, #0000, #0000);
 				mask-size: 300% 100%;
 				mask-position: left;
-				animation: clip-fade 1s ease;
+				animation: clip-fade 1s ease-in-out;
 
 				@keyframes clip-fade {
 					0% {

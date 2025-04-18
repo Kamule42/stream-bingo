@@ -19,7 +19,7 @@ export class AuthService {
     map(authorization => authorization ? jwtDecode<ISession>(authorization) : null),
     tap(session => {
       if(session && session.exp < new Date().getTime()/1000){
-       this.logout()
+        this.authorization$ = null
       }
     })
   )
@@ -42,7 +42,7 @@ export class AuthService {
     );
   }
 
-  private set authorization$(authorization: string | null){
+  public set authorization$(authorization: string | null){
     this.authorization$$.next(authorization)
   }
 
@@ -62,6 +62,7 @@ export class AuthService {
 
   public logout(){
     this.authorization$ = null
+    this.http.get('/api/auth/logout').subscribe()
     const url = this.router.url
     this.router.navigate(['/']).then(() => {
       this.router.navigate([url])

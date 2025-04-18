@@ -4,6 +4,7 @@ import { TopMenuComponent } from './components/top-menu/top-menu.component'
 import { ToastModule } from 'primeng/toast'
 import { ConsentComponent } from './components/consent/consent.component'
 import { VisibilityService } from './services/visibility/visibility.service'
+import { AuthWsService } from './services/auth/auth-ws.service'
 
 @Component({
     selector: 'app-root',
@@ -13,9 +14,10 @@ import { VisibilityService } from './services/visibility/visibility.service'
 })
 export class AppComponent {
   private readonly visibilityService = inject(VisibilityService)
+  private readonly authWsService = inject(AuthWsService)
 
-    @HostListener('document:visibilitychange', ['$event'])
-    visibilitychange() {
-      this.visibilityService.isVisible$ = !document.hidden
-    }
+  @HostListener('document:visibilitychange', ['$event'])
+  visibilitychange() {
+    this.visibilityService.isVisible$ = !document.hidden
+  }
 }

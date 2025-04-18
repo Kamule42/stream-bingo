@@ -16,22 +16,20 @@ export class GridService {
         private readonly roundService: RoundService,
     ){}
 
-    getGridForStream(streamId: string, userId?: string, bingoId?: string): Promise<GridEntity | null> {
+    async getGridForStream(streamId: string, userId?: string, bingoId?: string): Promise<GridEntity | null> {
+        const round = await this.roundService.getStreamCurrentRound(streamId)
+        if(round?.id == null){
+            return null
+        }
         return this.gridRepository.findOne({
             where:  {
                 round: {
-                    stream: { id: streamId },
-                    streamStartAt: MoreThanOrEqual(new Date())
+                   id: round.id
                 },
                 user: userId ? {id: userId } : IsNull(),
-                ...userId == null && bingoId != null ? {id: bingoId} : {}
+                ...(userId == null && bingoId != null ? {id: bingoId} : {})
             },
             relations: ['round', 'round.stream', 'cells', 'cells.cell'],
-            order: {
-                round: {
-                    streamStartAt: 'ASC'
-                }
-            },
         })
     }
 

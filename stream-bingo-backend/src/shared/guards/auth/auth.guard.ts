@@ -48,16 +48,15 @@ export class AuthGuard implements CanActivate {
     const roles = this.reflector.get<Array<IRole> | Object>(Roles, context.getHandler())
     const result = roles == null ||
       session != null && Array.isArray(roles) && [...roles, 'a'].some((role: IRole) => 
-        session.rights.some(({ right , streamId}) => {
+        session.rights?.some(({ right , streamId}) => {
           if(typeof role === 'string'){
             return right === role
           }
           const { id, streamKey } = role
           const s = streamKey.split('.').reduce((o, i) => o[i], data)
           return id === right && streamId === s && streamId !== undefined
-        })
-      ) || 
-      session != null && !Array.isArray(roles)
+        }) ?? false
+      ) || session != null && !Array.isArray(roles)
       return result
   }
 }

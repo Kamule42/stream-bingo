@@ -8,12 +8,12 @@ export const hasRightGuard: CanActivateFn = (route) => {
 
   return inject(AuthService).session$.pipe(
     map(session => session != undefined && (
-      rights.length === 0 || 
-      rights.some(r => {
+      rights?.length === 0 || 
+      rights?.some(r => {
         if(typeof r === 'string'){
-          return session?.rights.some(({right}) => right === r)
+          return session?.rights?.some(({right}) => right === r)
         }
-        return session?.rights.some(({right, streamId}) => right === r.right && streamId === r.streamId)
+        return session?.rights?.some(({right, streamId}) => right === r.right && streamId === r.streamId)
       })
     )),
   )

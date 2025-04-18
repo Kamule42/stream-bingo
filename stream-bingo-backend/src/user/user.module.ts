@@ -12,6 +12,7 @@ import { ConfigService } from '@nestjs/config'
 import { PassportModule } from '@nestjs/passport'
 import { DiscordStrategy } from './services/passport/discord-strategy/discord-strategy.service'
 import { JwtStrategy } from './services/passport/jwt-strategy/jwt-strategy.service'
+import { AuthGateway } from './gateways/auth/auth.gateway';
 
 @Module({
   imports: [
@@ -23,11 +24,11 @@ import { JwtStrategy } from './services/passport/jwt-strategy/jwt-strategy.servi
       useFactory: (configService: ConfigService) => ({
         global: true,
         secret: configService.get<string>('jwt.secret') ?? 'secret',
-        signOptions: { expiresIn: '7d' },
-      })
+        signOptions: { expiresIn: 70 },
+      }),
     }),
   ],
-  providers: [AuthService, UserGateway, UserService, DiscordStrategy, JwtStrategy],
+  providers: [AuthService, UserGateway, UserService, DiscordStrategy, JwtStrategy, AuthGateway, ],
   exports: [ AuthService ],
   controllers: [AuthController],
 })
