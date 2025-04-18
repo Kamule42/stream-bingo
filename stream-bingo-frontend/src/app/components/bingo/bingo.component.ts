@@ -38,9 +38,8 @@ export class BingoComponent {
   readonly stroke$ = toSignal(this.settingsService.check$.pipe(
     map(val => val ?? CheckType.CIRCLE)
   ), { initialValue: CheckType.CIRCLE})
-  readonly strokeColor$ = toSignal(this.settingsService.checkColor$.pipe(
-    map(val => val ?? 'green')
-  ), {initialValue: 'green'})
+  readonly strokeColor$ = toSignal(this.settingsService.checkColor$, {initialValue: ''})
+  readonly stripeColor$ = toSignal(this.settingsService.stripeColor$, {initialValue: ''})
 
   public readonly stream = input.required<IStream>()
   public readonly session$ = this.sessionService.session$

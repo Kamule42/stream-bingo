@@ -8,7 +8,6 @@ import { toSignal } from '@angular/core/rxjs-interop'
 import { ButtonModule } from 'primeng/button'
 import { SliderModule } from 'primeng/slider'
 
-const defaultColor = '#14a723'
 
 @Component({
   selector: 'app-settings',
@@ -22,11 +21,11 @@ const defaultColor = '#14a723'
 export class SettingsComponent {
   private readonly settingsService = inject(SettingsService)
   private readonly _check$ = toSignal(this.settingsService.check$, {initialValue: CheckType.CIRCLE})
-  private readonly _color$ = toSignal(this.settingsService.checkColor$, {initialValue: defaultColor})
+  private readonly _color$ = toSignal(this.settingsService.checkColor$)
   
   readonly checks = Object.values(CheckType)
   readonly stroke = signal(CheckType.CIRCLE)
-  readonly color = signal<string>(defaultColor)
+  readonly color = signal<string>('white')
   readonly alpha = signal<number>(255)
   readonly alphaColor = computed(() => `${this.color()}${this.alpha().toString(16).padStart(2, '0')}`)
 
@@ -37,7 +36,7 @@ export class SettingsComponent {
   })
   private _settingColorEffect = effect(() => {
     const color = this._color$()
-    this.color.set(color?.slice(0,7) ?? defaultColor)
+    this.color.set(color?.slice(0,7) ?? 'white')
     if(color != null && color?.length > 7){
       this.alpha.set(parseInt(color.slice(7), 16))
     }

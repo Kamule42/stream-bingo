@@ -29,7 +29,7 @@
     </div>
     @for(stripe of bingos$(); track stripe.class){
       <div class="stripe" [class]="stripe.class">
-        <app-stripe [stripe]="stripe.type" />
+        <app-stripe [stripe]="stripe.type" [color]="stripeColor$()"/>
       </div>
     }
   </div>
