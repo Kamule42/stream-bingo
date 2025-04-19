@@ -5,13 +5,16 @@
         gap: 1rem;
     }
     
-    #stream-mod-search{
+    #stream-mod-actions{
         display: flex;
         flex-direction: row;
         gap: 0.5rem;
-        justify-content: end;
+        justify-content: start;
         p-inputgroup{
             width: 25rem;
+        }
+        div.right{
+            margin-left: auto;
         }
     }
     #stream-mod-cells{

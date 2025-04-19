@@ -1,12 +1,12 @@
-import { Component, computed, inject, OnInit } from '@angular/core'
+import { Component, OnInit, computed, inject } from '@angular/core'
 import { ActivatedRoute, Router, RouterLink } from '@angular/router'
 import { toSignal } from '@angular/core/rxjs-interop'
-import { catchError, delay, filter, map, of, share, startWith, Subject, switchMap, takeWhile, tap, timer } from 'rxjs'
+import { Subject, catchError, delay, filter, map, of, share, startWith, switchMap, takeWhile, tap, timer } from 'rxjs'
 import { ProgressSpinnerModule } from 'primeng/progressspinner'
-import { HttpRequestStatus } from '../../../shared/models/http-request.status'
-import { AuthService } from '../../../services/auth/auth.service'
 import { AsyncPipe } from '@angular/common'
 import { CardModule } from 'primeng/card'
+import { HttpRequestStatus } from '../../../shared/models/http-request.status'
+import { AuthService } from '../../../services/auth/auth.service'
 
 @Component({
   selector: 'app-discord-redirect',

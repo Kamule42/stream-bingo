@@ -1,7 +1,7 @@
 import { Component, HostListener, inject, } from '@angular/core'
 import { RouterOutlet } from '@angular/router'
-import { TopMenuComponent } from './components/top-menu/top-menu.component'
 import { ToastModule } from 'primeng/toast'
+import { TopMenuComponent } from './components/top-menu/top-menu.component'
 import { ConsentComponent } from './components/consent/consent.component'
 import { VisibilityService } from './services/visibility/visibility.service'
 import { AuthWsService } from './services/auth/auth-ws.service'

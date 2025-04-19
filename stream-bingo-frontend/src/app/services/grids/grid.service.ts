@@ -1,8 +1,8 @@
-import { Injectable } from '@angular/core';
-import { WebsocketService } from '../ws/websocket.service';
-import { io, Socket } from 'socket.io-client';
-import { fromEvent, map, pairwise, startWith, tap, } from 'rxjs';
+import { Injectable, signal } from '@angular/core';
+import { Socket, io } from 'socket.io-client';
+import { filter, fromEvent, map, pairwise, startWith,  } from 'rxjs';
 import { IGrid, IValidatedCell } from './grid.interface';
+import { WebsocketService } from '../ws/websocket.service';
 
 @Injectable({
   providedIn: 'root'
@@ -21,7 +21,10 @@ export class GridService extends WebsocketService{
     return this._socket
   }
 
+  private readonly currentStream$ = signal<string | null>(null)
+
   public readonly gridForStream$ = fromEvent<IGrid | null>(this.socket, 'gridForStream').pipe(
+    filter(grid => grid == null || grid?.streamId === this.currentStream$()),
     startWith(null),
     pairwise(),
     map(([oldGrid, newGrid]) => {
@@ -34,7 +37,7 @@ export class GridService extends WebsocketService{
       return newGrid
     }),
   )
-  public readonly validatedCells$ = fromEvent<{ streamId: string, cells: Array<IValidatedCell>} | null>(this.socket, 'validatedcells')
+  public readonly validatedCells$ = fromEvent<{ streamId: string, cells: IValidatedCell[]} | null>(this.socket, 'validatedcells')
 
   public subscribeForStream(streamId: string){
     this.sendMessage('subscribeForStream', { streamId })
@@ -44,9 +47,11 @@ export class GridService extends WebsocketService{
   }
 
   public getGridForStream(streamId: string, bingoId?: string) {
+    this.currentStream$.set(streamId)
     this.sendMessage('getGridForStream', { streamId, bingoId })
   }
   public createGrid(streamId: string) {
+    this.currentStream$.set(streamId)
     this.sendMessage('createGridForStream', { streamId })
   }
   public flipCell(streamId: string, cellId: string){

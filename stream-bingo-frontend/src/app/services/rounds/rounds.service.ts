@@ -1,9 +1,11 @@
 import { Injectable } from '@angular/core';
-import { WebsocketService } from '../ws/websocket.service';
-import { io, Socket } from 'socket.io-client';
+import { Socket, io } from 'socket.io-client';
 import { fromEvent, map, shareReplay } from 'rxjs';
-import { IRound } from './round.interface';
 import { DateTime } from 'luxon';
+import { IRound, RoundStatus } from './round.interface';
+import { WebsocketService } from '../ws/websocket.service';
+
+type RawRound = Omit<IRound, 'startAt'|'streamStartAt'> & {startAt: string, streamStartAt: string}
 
 @Injectable({
   providedIn: 'root'
@@ -22,21 +24,34 @@ export class RoundsService extends WebsocketService{
     return this._socket
   }
 
-  readonly streamNexRouds$ = fromEvent<Array<
-    Omit<IRound, 'startAt'|'streamStartAt'> & {startAt: string, streamStartAt: string}
-    >>(this.socket, 'streamRounds').pipe(
-    map(rounds => rounds.map(round => ({
-      ...round,
-      startAt: DateTime.fromISO(round.startAt).toJSDate(),
-      streamStartAt: DateTime.fromISO(round.streamStartAt).toJSDate(),
-    }))),
+  readonly currentRound$ = fromEvent<RawRound>(this.socket, 'roundDetail').pipe(
+    map(this.toRound),
     shareReplay(1),
   )
 
+  readonly streamNexRouds$ = fromEvent<RawRound[]>(this.socket, 'streamRounds').pipe(
+    map(rounds => rounds.map(this.toRound)),
+    shareReplay(1),
+  )
+
+  public fetchCurrentRoundForStream(streamId: string) {
+    this.sendMessage('getCurrentRoundForStream', {streamId})
+  }
   public fetchRoundsForStream(streamId: string) {
     this.sendMessage('getRoundsForStream', {streamId})
   }
-  public updateStreamRounds(streamId: string, rounds: Array<IRound>) {
+  public updateStreamRounds(streamId: string, rounds: Omit<IRound, 'status'>[]) {
     this.sendMessage('updateStreamRounds', { streamId, rounds})
+  }
+  public updateCurrentRoundStatus(streamId: string, status: RoundStatus){
+    this.sendMessage('updateStreamStatus', { streamId, status})
+  }
+
+  private toRound(raw: RawRound): IRound{
+    return {
+      ...raw,
+      startAt: DateTime.fromISO(raw.startAt).toJSDate(),
+      streamStartAt: DateTime.fromISO(raw.streamStartAt).toJSDate(),
+    }
   }
 }

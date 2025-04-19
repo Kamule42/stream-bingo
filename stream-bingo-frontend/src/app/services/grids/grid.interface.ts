@@ -12,7 +12,7 @@ export interface IGrid{
     roundId: string
     roundName: string
     streamStartAt: Date
-    cells: Array<IGridCell>
+    cells: IGridCell[]
 }
 
 export interface IValidatedCell{

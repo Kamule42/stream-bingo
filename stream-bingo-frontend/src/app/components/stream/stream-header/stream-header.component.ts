@@ -1,10 +1,10 @@
-import { Component, computed, inject, Input, input } from '@angular/core'
-import { IStream } from '../../../services/streams/stream.interface'
-import { SessionService } from '../../../services/session/session.service'
+import { Component, Input, computed, inject, input } from '@angular/core'
 import { ButtonModule } from 'primeng/button'
-import { NavigationEnd, Router, RouterModule } from '@angular/router'
+import { ActivatedRoute, NavigationEnd, Router, RouterModule } from '@angular/router'
 import { toSignal } from '@angular/core/rxjs-interop'
 import { filter, map, } from 'rxjs'
+import { SessionService } from '../../../services/session/session.service'
+import { IStream } from '../../../services/streams/stream.interface'
 
 @Component({
   selector: 'app-stream-header',
@@ -16,11 +16,12 @@ export class StreamHeaderComponent {
   readonly stream = input.required<IStream>()
 
   private readonly router = inject(Router)
+  private readonly route = inject(ActivatedRoute)
   private readonly sessionService = inject(SessionService)
 
   readonly session$ = this.sessionService.session$
 
-  private _webhandle: string = ''
+  private _webhandle = ''
   @Input()
   set webhandle(webhandle: string) {
     this._webhandle = webhandle
@@ -46,6 +47,15 @@ export class StreamHeaderComponent {
     filter(event => event instanceof NavigationEnd),
     map(event => event.url.endsWith('edit'))
   ), {initialValue: this.router.url.endsWith('edit')})
+  readonly isPlaning$ = toSignal(this.router.events.pipe(
+    filter(event => event instanceof NavigationEnd),
+    map(event => event.url.endsWith('plan'))
+  ), {initialValue: this.router.url.endsWith('plan')})
+
+  readonly isViewing$ = toSignal(this.router.events.pipe(
+    filter(event => event instanceof NavigationEnd),
+    map(event => event.url.split('/').length != 3)
+  ), {initialValue: this.router.url.split('/').length !== 3})
 
 
   flip() {
@@ -55,6 +65,10 @@ export class StreamHeaderComponent {
       streamTwitchHandle: stream.urlHandle,
       twitchId: stream.twitchId
     })
+  }
+
+  goBack(){
+    this.router.navigate(['./'], { relativeTo: this.route })
   }
 
 }

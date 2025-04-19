@@ -38,13 +38,19 @@
             </ng-template>
             <ng-template #end>
                 <div class="is-flex is-flex-row">
-                    <a pRipple  (click)="showSettingDialog.set(true)" class="p-menubar-item-link">
+                    <a pRipple 
+                    (click)="showSettingDialog.set(true)"
+                    aria-hidden="true"
+                     class="p-menubar-item-link">
                         <span class="mdi mdi-cog-outline"></span>
                         <span>Paramètres</span>
                     </a>
                     @if (isConnected()) {
                         @let _session = session();
-                        <a pRipple  (click)="loggedinMenu.toggle($event)" class="flex items-center p-menubar-item-link">
+                        <a pRipple
+                            (click)="loggedinMenu.toggle($event)"
+                            aria-hidden="true"
+                            class="flex items-center p-menubar-item-link">
                             <span>{{ _session?.username }}</span>
                             <p-avatar [image]="`//cdn.discordapp.com/avatars/${_session?.discord?.id}/${_session?.discord?.avatarId}`" shape="circle" />
                             <span class="mdi mdi-dots-vertical"></span>

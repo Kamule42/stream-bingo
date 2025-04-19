@@ -1,0 +1,175 @@
+@use "bulma/sass/utilities/mixins";
+
+:host{
+  $dotSize: 25;
+
+  .timeline-root{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 0 2rem;
+    width:100%;
+    gap: 1rem;
+    margin-bottom: 9em;
+    @include mixins.tablet {
+      flex-direction: column;
+      height: fit-content!important;
+    }
+    @include mixins.mobile {
+      flex-direction: row;
+      height: 100%;
+    }
+
+  }
+  .timeline-rounds{
+    position: relative;
+    display: flex;
+
+    @include mixins.tablet {
+      width:100%;
+      flex-direction: row;
+      height: fit-content!important;
+    }
+    @include mixins.mobile {
+      flex-direction: column;
+      height: 100%;
+    }
+    &::after{
+      content: '';
+      position: absolute;
+      height: 0.15*$dotSize + px;
+      width: 98%;
+      background-color: var(--main-color);
+      z-index: 1;
+      top: 5rem;
+      @include mixins.mobile {
+        height: 100%;
+        width: 0.15*$dotSize + px;
+      }
+    }
+  }
+  .timeline-block{
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  .timeline-round{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding-bottom: 0.5*$dotSize + px;
+
+    @include mixins.mobile {
+      padding-right: 0.5rem;
+    }
+
+    &::after{
+      content: '';
+      bottom: -0.2*$dotSize + px;
+      position: absolute;
+      $val: 1.5 * $dotSize + px;
+      height: 0.15*$dotSize + px;
+      width: calc(100% - $val);
+      background-color: var(--secondary-color);
+      z-index: 1;
+      border-radius: 0.755*$dotSize + px;
+      @include mixins.mobile {
+        width: 0.15*$dotSize + px;
+        height: calc(100% - $val);
+        bottom: unset;
+        right: -0.2*$dotSize + px;
+        top: 0.75*$dotSize + px;
+      }
+    }
+  }
+
+
+  
+  .timeline-date{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: absolute;
+
+    top: 6.5rem;
+    
+    .timeline-date-field{
+      position: absolute;
+      top: 0;
+      background-color: white;
+      z-index: 10;
+      font-size: 0.6em;
+      ::ng-deep {
+        input{
+          font-size: 0.6rem;
+          width: 11em;
+        }
+        .p-datepicker{
+          background-color: white;
+        }
+      }
+    }
+
+    &.start{
+      left:0;
+      .timeline-date-field{
+        margin-left: 1.5em;
+        left: calc(50% - 2em);
+        z-index: 100;
+        &:after{
+          content: '';
+          width: 0;
+          border-right: 1.5px solid var(--main-color);
+          height: 1.5em;
+          position: absolute;
+          left: 1.8em;
+          top: -1.2em;
+          z-index: -500;
+        }
+      }
+      &::after{
+        left: 0;
+      }
+    }
+    &.start-stream{
+      right:0;
+      .timeline-date-field{
+        margin-right: 1.5em;
+        right: calc(50% - 2em);
+        top: 5.5em;
+        z-index: 100;
+        &:before{
+          content: '';
+          width: 0;
+          border-right: 1.5px solid var(--main-color);
+          height: 7.5em;
+          position: absolute;
+          right: 1.72em;
+          top: -7.5em;
+          z-index: -500;
+        }
+      }
+      &::after{
+        right: 0;
+      }
+    }
+
+    &::after{
+      content: '';
+      position: absolute;
+      z-index: 100;
+      top: -2.15rem;
+      width: $dotSize + px;
+      height: $dotSize + px;
+      background-color: light-dark(white,  black);
+      border: 0.2*$dotSize + px solid var(--secondary-color);
+      border-radius: 0.5*$dotSize + px;
+      
+      @include mixins.mobile {
+        left: -0.39 * $dotSize + px;
+        top: auto;
+      }
+    }
+  }
+}

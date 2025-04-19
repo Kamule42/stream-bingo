@@ -6,7 +6,9 @@
     "start": "ng serve",
     "build": "ng build",
     "dev": "ng build --watch --configuration development",
-    "test": "ng test"
+    "test": "ng test",
+    "lint": "ng lint",
+    "lint:fix": "ng lint --fix"
   },
   "private": true,
   "dependencies": {
@@ -44,7 +46,11 @@
     "@types/jasmine": "~5.1.0",
     "@types/luxon": "^3.6.2",
     "@types/socket.io-client": "^3.0.0",
-    "eslint": "^9.24.0",
+    "angular-eslint": "19.3.0",
+    "eslint": "^9.23.0",
+    "eslint-import-resolver-alias": "^1.1.2",
+    "eslint-import-resolver-typescript": "^4.3.2",
+    "eslint-plugin-import": "^2.31.0",
     "jasmine-core": "~5.1.0",
     "karma": "~6.4.0",
     "karma-chrome-launcher": "~3.2.0",
@@ -52,7 +58,7 @@
     "karma-jasmine": "~5.1.0",
     "karma-jasmine-html-reporter": "~2.1.0",
     "typescript": "^5.8.3",
-    "typescript-eslint": "^8.29.0",
+    "typescript-eslint": "8.27.0",
     "yarn": "^1.22.22"
   }
 }

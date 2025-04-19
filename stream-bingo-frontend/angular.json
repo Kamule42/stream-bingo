@@ -30,11 +30,7 @@
               "src/assets"
             ],
             "styles": [
-              "src/styles.scss",
-              "node_modules/cookieconsent/build/cookieconsent.min.css"
-            ],
-            "scripts": [
-              "node_modules/cookieconsent/build/cookieconsent.min.js",
+              "src/styles.scss"
             ]
           },
           "configurations": {
@@ -100,8 +96,22 @@
             ],
             "scripts": []
           }
+        },
+        "lint": {
+          "builder": "@angular-eslint/builder:lint",
+          "options": {
+            "lintFilePatterns": [
+              "src/**/*.ts",
+              "src/**/*.html"
+            ]
+          }
         }
       }
     }
+  },
+  "cli": {
+    "schematicCollections": [
+      "angular-eslint"
+    ]
   }
 }

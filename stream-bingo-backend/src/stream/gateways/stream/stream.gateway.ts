@@ -14,6 +14,7 @@ import { IFav } from 'src/user/gateways/user/user.responses'
 import { Session } from 'src/shared/decorators/auth/session.decorator'
 import { JwtAuthGuard } from 'src/shared/guards/jwt-auth/jwt-auth.guard'
 import { RefreshGuard } from 'src/shared/guards/refresh/refresh.guard'
+import { UserRoles } from 'src/shared/roles'
 
 @WebSocketGateway({
   namespace: 'streams',
@@ -27,7 +28,7 @@ export class StreamGateway {
   ){}
 
   @SubscribeMessage('getList')
-  @Roles(['a'])
+  @Roles([UserRoles.admin])
   getStreams(
     @Paginate() query: PaginateQuery,
   ): Observable<WsResponse<IPaginatedResponse<IStream>>> {
@@ -44,7 +45,7 @@ export class StreamGateway {
 
   
   @SubscribeMessage('updateStream')
-  @Roles(['a'])
+  @Roles([UserRoles.admin])
   updateStream(
     @MessageBody() stream: IStream<Omit<IRight, 'username'>>,
   ): void {
@@ -88,7 +89,7 @@ export class StreamGateway {
   }
 
   @Roles([
-    {id: 'man', 'streamKey': 'id'}
+    {id: UserRoles.stream.manage, 'streamKey': 'id'}
   ])
   @SubscribeMessage('updateCellsFormStream')
   updateCellsFormStream(

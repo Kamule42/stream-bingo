@@ -18,12 +18,19 @@
         </div>
         <div id="stream-actions">
             @if(session$()){
+                @if(isViewing$()){
+                <p-button
+                    severity="secondary"
+                    label="Retour"
+                    icon="mdi mdi-arrow-u-left-top"
+                    (click)="goBack()"  />
+                }
                 <p-button
                     severity="secondary"
                     [label]="stream().isFav ? 'Suivi' : 'Suivre'"
                     [icon]="`mdi mdi-star${stream().isFav ? '' : '-outline'}`"
                     (click)="flip()" />
-                @if( isPlanificator$() ){
+                @if( isPlanificator$() && !isPlaning$()){
                     <p-button
                         severity="secondary"
                         label="Planifier"

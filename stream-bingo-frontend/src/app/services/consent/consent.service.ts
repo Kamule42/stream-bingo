@@ -1,11 +1,10 @@
 import { Injectable } from '@angular/core'
-import { ConsentType, IConsent } from './consent.types'
-import { enumFromStringValue } from '../../shared/helpers/enum.helper'
 import { BehaviorSubject, map, share, tap } from 'rxjs'
+import { ConsentType } from './consent.types'
+import { enumFromStringValue } from '../../shared/helpers/enum.helper'
 
 const CONSENT_BASE_KEY = '@CONSENT_' 
 const CONSENT_STATUS = CONSENT_BASE_KEY + 'STATUS'
-const CONSENT_DATA = CONSENT_BASE_KEY + 'DATA'
 
 @Injectable({
   providedIn: 'root'
@@ -24,23 +23,10 @@ export class ConsentService {
     map(status => status ?? null),
     share(),
   )
-  private readonly _data$    = new BehaviorSubject<IConsent | null| undefined>(undefined)
-  public readonly data$ = this._data$.asObservable().pipe(
-    map(val => val ?? null),
-    share(),
-  )
   
   constructor(){
     const typeStr = localStorage.getItem(CONSENT_STATUS)
     this._status$.next(typeStr != null ? enumFromStringValue(ConsentType, typeStr) : null)
-    if(this._status$.getValue() === ConsentType.PARTIAL){
-      try{
-        this._data$.next(JSON.parse(localStorage.getItem(CONSENT_DATA) ?? ''))
-      }
-      catch(err){
-        localStorage.removeItem(CONSENT_DATA)
-      }
-    }
   }
 
   consent() {
@@ -49,6 +35,5 @@ export class ConsentService {
   
   resetStatus(){
     this._status$.next(null)
-    this._data$.next(null)
   }
 }

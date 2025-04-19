@@ -1,9 +1,9 @@
 import { Component, inject, signal } from '@angular/core'
-import { ConsentService } from '../../services/consent/consent.service'
 import { toSignal } from '@angular/core/rxjs-interop'
 import { tap } from 'rxjs'
 import { RouterModule } from '@angular/router'
 import { ButtonModule } from 'primeng/button'
+import { ConsentService } from '../../services/consent/consent.service'
 
 @Component({
   selector: 'app-consent',

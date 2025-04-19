@@ -6,7 +6,7 @@ export interface IPaginated<T = unknown> {
 export interface IPaginationMeta {
     currentPage: number
     itemsPerPage : number
-    sortBy: Array<[string, string]>
+    sortBy: [string, string][]
     totalItems: number,
     totalPages: number,
 }
@@ -14,12 +14,10 @@ export interface IPaginationMeta {
 export interface IPagination{
     page?: number
     limit?: number
-    sortBy?: Array<[string, string]>
-    searchBy?: Array<string>
+    sortBy?: [string, string][]
+    searchBy?: string[]
     search?: string
-    filter?: {
-        [column: string]: string | Array<string>
-    }
-    select?: Array<string>
+    filter?: Record<string, string | string[]>
+    select?: string[]
     cursor?: string
 }

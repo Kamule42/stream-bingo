@@ -1,54 +1,110 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { DateTime } from 'luxon';
-import { RoundEntity } from 'src/stream/entities/round.entity';
+import { RoundEntity, RoundStatus } from 'src/stream/entities/round.entity';
 import { IRoundEdit } from 'src/stream/gateways/round/round.interface';
 import { MoreThanOrEqual, Repository } from 'typeorm';
 
+type NewStatus = null | {newStatus: RoundStatus, delay: boolean }
+
 @Injectable()
 export class RoundService {
-    constructor(
-        @InjectRepository(RoundEntity)
-        private readonly roundRepository: Repository<RoundEntity>,
-    ) { }
+  constructor(
+    @InjectRepository(RoundEntity)
+    private readonly roundRepository: Repository<RoundEntity>,
+  ) { }
 
-    getStreamCurrentRound(streamId: string): Promise<RoundEntity | null> {
-        return this.roundRepository.findOne({
-            where: {
-                stream: { id: streamId },
-                streamStartAt: MoreThanOrEqual(DateTime.now().minus({hours: 3}).toJSDate())
-            },
-            relations: [ 'stream' ],
-            order:{
-                streamStartAt: 'asc'
-            },
-        })
-    }
+  getStreamCurrentRound(streamId: string): Promise<RoundEntity | null> {
+    return this.roundRepository.createQueryBuilder('round')
+      .addSelect(`
+                CASE
+                    WHEN round.status='STARTED' THEN 0
+                    ELSE 1
+                END as statusOrder
+            `)
+      .leftJoinAndSelect('round.stream', 'stream')
+      .where('round.stream.id=:streamId', { streamId })
+      // .andWhere('round.status != \'FINISHED\'')
+      .andWhere('round.streamStartAt >= :date', { date: DateTime.now().minus({ hours: 3 }).toJSDate() })
+      .orderBy('statusOrder', 'ASC')
+      .addOrderBy('round.streamStartAt', 'ASC')
+      .getOne()
+  }
 
-    getStreamRounds(streamId: string): Promise<Array<RoundEntity>> {
-        return this.roundRepository.find({
-            where: {
-                stream: { id: streamId },
-                streamStartAt: MoreThanOrEqual(DateTime.now().minus({hours: 3}).toJSDate())
-            },
-            relations: [ 'stream' ],
-            order:{
-                streamStartAt: 'asc'
-            }
-        })
-    }
+  getStreamRounds(streamId: string): Promise<Array<RoundEntity>> {
+    return this.roundRepository.find({
+      where: {
+        stream: { id: streamId },
+        streamStartAt: MoreThanOrEqual(DateTime.now().minus({ hours: 3 }).toJSDate())
+      },
+      relations: ['stream'],
+      order: {
+        streamStartAt: 'asc'
+      }
+    })
+  }
 
-    updateStreamRounds(streamId: string, rounds: IRoundEdit[]) {
-        this.roundRepository.upsert(
-            rounds
-            .filter(({toBeDeleted}) => toBeDeleted !== true)
-            .map(round => ({
-                id: round.id,
-                name: round.name,
-                startAt: round.startAt,
-                streamStartAt: round.streamStartAt,
-                stream: {id: streamId },
-            })),
-        ['id'])
+  updateStreamRounds(streamId: string, rounds: IRoundEdit[]) {
+    this.roundRepository.upsert(
+      rounds
+        .filter(({ toBeDeleted }) => toBeDeleted !== true)
+        .map(round => ({
+          id: round.id,
+          name: round.name,
+          startAt: round.startAt,
+          streamStartAt: round.streamStartAt,
+          stream: { id: streamId },
+        })),
+      ['id'])
+  }
+
+  async streamRoundStatus(streamId: string, status: RoundStatus) {
+    const round = await this.getStreamCurrentRound(streamId)
+    if(round === null){
+      throw new Error('Unknown round')
     }
+    const roundStatus = round.status
+    const newStatus = this.getFilteredRoundStatus(roundStatus, status)
+    console.log(newStatus)
+    if(newStatus == null){ // Nothing to do
+      return null
+    }
+    this.roundRepository.update(
+      { id: round.id}, 
+      {status: newStatus.newStatus }
+    )
+    return round
+  }
+
+  private getFilteredRoundStatus(roundStatus: RoundStatus, newStatus: RoundStatus): NewStatus{
+    switch(roundStatus){
+      case RoundStatus.CREATED: return this.getCreatedRoundStatus(newStatus)
+      case RoundStatus.STARTED: return this.getStartedRoundStatus(newStatus)
+      case RoundStatus.FINISHED: return this.getFinishedRoundStatus(newStatus)
+    }
+    throw new Error('Unknown status')
+  }
+
+  private getCreatedRoundStatus(newStatus: RoundStatus): NewStatus{
+    switch(newStatus){
+      case RoundStatus.CREATED: return null
+      case RoundStatus.STARTED: return  { newStatus, delay: false}
+    }
+    throw new Error('Illegal status update')
+  }
+  private getStartedRoundStatus(newStatus: RoundStatus): NewStatus{
+    switch(newStatus){
+      case RoundStatus.CREATED: return { newStatus, delay: false}
+      case RoundStatus.STARTED: return null
+      case RoundStatus.FINISHED: return { newStatus, delay: true}
+    }
+    throw new Error('Illegal status update')
+  }
+  private getFinishedRoundStatus(newStatus: RoundStatus): NewStatus{
+    switch(newStatus){
+      case RoundStatus.STARTED: return { newStatus, delay: false}
+      case RoundStatus.FINISHED: return null
+    }
+    throw new Error('Illegal status update')
+  }
 }

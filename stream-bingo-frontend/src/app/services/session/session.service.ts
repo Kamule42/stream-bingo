@@ -1,7 +1,7 @@
-import { inject, Injectable, } from '@angular/core'
-import { AuthService } from '../auth'
+import { Injectable, inject, } from '@angular/core'
 import { toSignal } from '@angular/core/rxjs-interop'
-import { of, switchMap, tap } from 'rxjs'
+import { of, shareReplay, switchMap, tap } from 'rxjs'
+import { AuthService } from '../auth'
 import { IFav } from '../users/users.interface'
 import { StreamsService } from '../streams/streams.service'
 
@@ -11,7 +11,7 @@ import { StreamsService } from '../streams/streams.service'
 export class SessionService {
   private readonly authService = inject(AuthService)
   private readonly streamService = inject(StreamsService)
-  readonly favs = toSignal<Array<IFav>>(this.streamService.favs$)
+  readonly favs = toSignal<IFav[]>(this.streamService.favs$)
 
   private readonly _session$ = this.authService.session$.pipe(
     tap(session => {
@@ -28,7 +28,8 @@ export class SessionService {
         return this.streamService.favs$
       }
       return of([])
-    })
+    }),
+    shareReplay(1),
   )
 
   
@@ -36,7 +37,7 @@ export class SessionService {
     return this.session$() != undefined
   }
 
-  public hasRight(r: string | Array<string>, s?:string): boolean{
+  public hasRight(r: string | string[], s?:string): boolean{
     return this.session$()?.rights?.some(({right, streamId}) =>  (
         typeof r === 'string' && r === right ||
         Array.isArray(r) && r.some(val => val === right)
@@ -50,13 +51,13 @@ export class SessionService {
   public get isAdmin(): boolean{
     return this.hasRight('a')
   }
-  public isStreamModerator(streamId: string): any {
+  public isStreamModerator(streamId: string): boolean {
     return this.isAdmin || this.hasRight(['mod', 'man'], streamId)
   }
-  public isStreamManager(streamId: string): any {
+  public isStreamManager(streamId: string): boolean {
     return this.isAdmin || this.hasRight('man', streamId)
   }
-  public isStreamPlanificator(streamId: string): any {
+  public isStreamPlanificator(streamId: string): boolean {
     return this.isAdmin || this.hasRight(['plan', 'man'], streamId)
   }
   

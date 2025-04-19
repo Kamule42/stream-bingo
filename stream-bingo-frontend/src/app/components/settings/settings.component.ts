@@ -1,12 +1,12 @@
 import { Component, computed, effect, inject, output, signal } from '@angular/core'
 import { ColorPickerModule } from 'primeng/colorpicker'
-import { StrokeComponent } from '../strokes/stroke.component'
 import { FormsModule } from '@angular/forms'
-import { SettingsService } from '../../services/settings/settings.service'
-import { CheckType } from '../../services/settings/setting.types'
 import { toSignal } from '@angular/core/rxjs-interop'
 import { ButtonModule } from 'primeng/button'
 import { SliderModule } from 'primeng/slider'
+import { CheckType } from '../../services/settings/setting.types'
+import { SettingsService } from '../../services/settings/settings.service'
+import { StrokeComponent } from '../strokes/stroke.component'
 
 
 @Component({

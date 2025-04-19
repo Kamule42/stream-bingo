@@ -3,14 +3,14 @@ import { MenubarModule } from 'primeng/menubar'
 import { AvatarModule } from 'primeng/avatar'
 import { MenuModule } from 'primeng/menu';
 import { ButtonModule } from 'primeng/button'
-import { AuthService } from '../../services/auth'
-import { DiscordAuthComponent } from '../discord-auth/discord-auth.component'
 import { RouterLink } from '@angular/router';
 import { MenuItem } from 'primeng/api';
-import { SessionService } from '../../services/session/session.service';
 import { CommonModule } from '@angular/common';
 import { DialogModule } from 'primeng/dialog';
 import { Ripple } from 'primeng/ripple';
+import { SessionService } from '../../services/session/session.service';
+import { DiscordAuthComponent } from '../discord-auth/discord-auth.component'
+import { AuthService } from '../../services/auth'
 import { SettingsComponent } from "../settings/settings.component";
 
 @Component({
@@ -38,7 +38,7 @@ export class TopMenuComponent {
 
 
   readonly items = computed(() => {
-    const result: Array<MenuItem> = [
+    const result: MenuItem[] = [
       {
         label: 'BStreamgo',
         icon: 'mdi mdi-home-outline',

@@ -5,6 +5,9 @@ import { RoundService } from 'src/stream/services/round/round.service'
 import { Roles } from 'src/shared/decorators/auth/roles.decorator'
 import { JwtAuthGuard } from 'src/shared/guards/jwt-auth/jwt-auth.guard'
 import { RefreshGuard } from 'src/shared/guards/refresh/refresh.guard'
+import { roundMapper } from './round.mapper'
+import { UserRoles } from 'src/shared/roles'
+import { RoundStatus } from 'src/stream/entities/round.entity'
 
 @WebSocketGateway({
   namespace: 'rounds',
@@ -16,25 +19,29 @@ export class RoundGateway {
     private readonly roundService: RoundService
   ){}
 
+  @SubscribeMessage('getCurrentRoundForStream')
+  GetCurrentRoundForStream(
+    @MessageBody('streamId') streamId: string
+  ): Promise<WsResponse<IRound>> {
+    return this.roundService.getStreamCurrentRound(streamId)
+    .then(round => ({
+      event: 'roundDetail',
+      data: roundMapper(round)
+    }))
+  }
+
   @SubscribeMessage('getRoundsForStream')
   getRoundsForStream(
     @MessageBody('streamId') streamId: string
   ): Promise<WsResponse<Array<IRound>>> {
     return this.roundService.getStreamRounds(streamId).then( result => ({
       event: 'streamRounds',
-      data: result.map(round => ({
-        id: round.id,
-        name: round.name,
-        startAt: round.startAt,
-        streamStartAt: round.streamStartAt,
-        streamId: round.stream.id,
-        streamName: round.stream.name,
-      }))
+      data: result.map(roundMapper)
     }))
   }
 
   @Roles([
-    {id: 'plan', streamKey: 'streamId'}
+    {id: UserRoles.stream.plan, streamKey: 'streamId'}
   ])
   @SubscribeMessage('updateStreamRounds')
   updateStreamRounds(
@@ -42,5 +49,22 @@ export class RoundGateway {
     @MessageBody('rounds') rounds: Array<IRoundEdit>,
   ): void {
     this.roundService.updateStreamRounds(streamId, rounds)
+  }
+
+  @Roles([
+    {id: UserRoles.stream.manage, streamKey: 'streamId'}
+  ])
+  @SubscribeMessage('updateStreamStatus')
+  async updateStreamStatus(
+    @MessageBody('streamId') streamId: string,
+    @MessageBody('status') status: RoundStatus,
+  ) : Promise<WsResponse<IRound> | void> {
+    const updated = await this.roundService.streamRoundStatus(streamId, status)
+    if(updated != null){
+      return {
+        event: 'roundDetail',
+        data: roundMapper(updated)
+      }
+    }
   }
 }

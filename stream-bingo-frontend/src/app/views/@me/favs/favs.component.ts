@@ -1,6 +1,6 @@
 import { Component, inject } from '@angular/core';
-import { SessionService } from '../../../services/session/session.service';
 import { RouterLink } from '@angular/router';
+import { SessionService } from '../../../services/session/session.service';
 
 @Component({
   selector: 'app-favs',

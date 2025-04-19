@@ -1,10 +1,7 @@
 import { v7 as uuid } from 'uuid'
-import { Component, computed, effect, inject, Input, signal } from '@angular/core'
-import { StreamsService } from '../../../services/streams/streams.service'
+import { Component, Input, computed, effect, inject, signal } from '@angular/core'
 import { toSignal } from '@angular/core/rxjs-interop'
-import { ICell, IStream } from '../../../services/streams/stream.interface'
 import { Observable, tap } from 'rxjs'
-import { SessionService } from '../../../services/session/session.service'
 import { Router } from '@angular/router'
 import { FormsModule } from '@angular/forms'
 import { ProgressSpinnerModule } from 'primeng/progressspinner'
@@ -15,6 +12,9 @@ import { CheckboxModule } from 'primeng/checkbox'
 import { InputTextModule } from 'primeng/inputtext'
 import { TextareaModule } from 'primeng/textarea'
 import { MessageService } from 'primeng/api'
+import { SessionService } from '../../../services/session/session.service'
+import { ICell, IStream } from '../../../services/streams/stream.interface'
+import { StreamsService } from '../../../services/streams/streams.service'
 
 @Component({
   selector: 'app-edit-stream',
@@ -31,13 +31,13 @@ export class EditStreamComponent {
   private readonly router = inject(Router)
   private readonly messageService = inject(MessageService)
 
-  private _webhandle: string = ''
+  private _webhandle = ''
   @Input()
   set webhandle(webhandle: string) {
     this._webhandle = webhandle
   }
 
-  readonly toEdit = signal<Partial<Omit<IStream, 'cells'>> & { cells?: Array<Partial<ICell>> }>({})
+  readonly toEdit = signal<Partial<Omit<IStream, 'cells'>> & { cells?: Partial<ICell>[] }>({})
 
   readonly stream$ = toSignal<IStream>(this.streamService.streamDetail$.pipe(
     tap(stream => this.toEdit.set({

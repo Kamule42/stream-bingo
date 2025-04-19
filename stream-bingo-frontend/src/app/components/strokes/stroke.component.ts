@@ -1,10 +1,10 @@
 import { Component, computed, input } from '@angular/core';
+import { NgComponentOutlet } from '@angular/common';
 import { CheckComponent } from './check/check.component';
 import { CircleComponent } from './circle/circle.component';
 import { ScratchComponent } from './scratch/scratch.component';
-import { CheckType } from '../../services/settings/setting.types';
-import { NgComponentOutlet } from '@angular/common';
 import { DiscComponent } from './disc/disc.component';
+import { CheckType } from '../../services/settings/setting.types';
 
 @Component({
   selector: 'app-stroke',

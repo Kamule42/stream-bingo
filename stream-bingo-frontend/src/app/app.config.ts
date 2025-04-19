@@ -4,9 +4,9 @@ import { provideHttpClient, withInterceptors } from '@angular/common/http'
 import { provideAnimationsAsync } from '@angular/platform-browser/animations/async'
 import { providePrimeNG } from 'primeng/config'
 
+import { MessageService } from 'primeng/api'
 import { routes } from './app.routes'
 import { httpInterceptor } from './interceptors/http/http.interceptor'
-import { MessageService } from 'primeng/api'
 import { primeNgConfig } from './config/primeng.config'
 
 

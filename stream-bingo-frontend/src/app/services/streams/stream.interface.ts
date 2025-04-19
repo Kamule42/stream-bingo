@@ -12,12 +12,12 @@ export interface IStream<T = IRight>{
     twitchId: string
     urlHandle: string
     enabled?: boolean
-    rights?: Array<T>
+    rights?: T[]
     startAt?: DateTime
     startAtTxt?: string
     startAtIso?: string
     isFav?: boolean,
-    cells?: Array<ICell>
+    cells?: ICell[]
 }
 
 

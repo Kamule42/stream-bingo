@@ -1,13 +1,13 @@
-import { Component, computed, effect, inject, Input, input, OnInit, signal, ViewChild } from '@angular/core'
-import { IStream } from '../../services/streams/stream.interface'
-import { GridService } from '../../services/grids/grid.service'
+import { Component, ViewChild, computed, effect, inject, input, signal } from '@angular/core'
 import { toSignal } from '@angular/core/rxjs-interop'
 import { ButtonModule } from 'primeng/button'
-import { SessionService } from '../../services/session/session.service'
-import { toChunk } from '../../shared/helpers/array.helper'
 import { Popover, PopoverModule } from 'primeng/popover'
 import { delay, filter, map, of, pairwise, startWith, switchMap, tap } from 'rxjs'
 import { ActivatedRoute, Router } from '@angular/router'
+import { toChunk } from '../../shared/helpers/array.helper'
+import { SessionService } from '../../services/session/session.service'
+import { GridService } from '../../services/grids/grid.service'
+import { IStream } from '../../services/streams/stream.interface'
 import { SettingsService } from '../../services/settings/settings.service'
 import { StrokeComponent } from '../strokes/stroke.component'
 import { CheckType } from '../../services/settings/setting.types'
@@ -16,7 +16,7 @@ import { StripeComponent } from '../stripe/stripe.component'
 
 @Component({
   selector: 'app-bingo',
-  imports: [ ButtonModule, PopoverModule, StrokeComponent, StripeComponent ],
+  imports: [ButtonModule, PopoverModule, StrokeComponent, StripeComponent],
   templateUrl: './bingo.component.html',
   styleUrl: './bingo.component.scss'
 })
@@ -37,19 +37,19 @@ export class BingoComponent {
 
   readonly stroke$ = toSignal(this.settingsService.check$.pipe(
     map(val => val ?? CheckType.CIRCLE)
-  ), { initialValue: CheckType.CIRCLE})
-  readonly strokeColor$ = toSignal(this.settingsService.checkColor$, {initialValue: ''})
-  readonly stripeColor$ = toSignal(this.settingsService.stripeColor$, {initialValue: ''})
+  ), { initialValue: CheckType.CIRCLE })
+  readonly strokeColor$ = toSignal(this.settingsService.checkColor$, { initialValue: '' })
+  readonly stripeColor$ = toSignal(this.settingsService.stripeColor$, { initialValue: '' })
 
   public readonly stream = input.required<IStream>()
   public readonly session$ = this.sessionService.session$
   private readonly _streamEffect = effect(() => {
     const session = this.session$()
     const bingoId = this.bingoId()
-    if(session != null){
+    if (session != null) {
       this.gridService.getGridForStream(this.stream().id)
     }
-    else if(bingoId != null){
+    else if (bingoId != null) {
       this.gridService.getGridForStream(this.stream().id, bingoId)
     }
   })
@@ -57,8 +57,8 @@ export class BingoComponent {
   readonly grid$ = toSignal(this.gridService.gridForStream$.pipe(
     tap(grid => {
       const session = this.session$()
-      if(grid && session == null &&  this.bingoId() == null){
-        this.router.navigate(['./b', grid.id], {relativeTo: this.route })
+      if (grid && session == null && this.bingoId() == null) {
+        this.router.navigate(['./b', grid.id], { relativeTo: this.route })
       }
     })
   ))
@@ -69,7 +69,7 @@ export class BingoComponent {
         ...cell,
         valide: this.validatedCells$()?.includes(cell.cellId)
       }))
-      .toSorted((a,b) => a.index - b.index),
+      .toSorted((a, b) => a.index - b.index),
       4) : []
   })
 
@@ -78,14 +78,14 @@ export class BingoComponent {
   readonly validatedCells$ = toSignal(this.gridService.validatedCells$.pipe(
     filter(val => val != null && val.streamId === this.stream()?.id),
     map(val => val!.cells
-      .filter(({valide}) => valide === true)
+      .filter(({ valide }) => valide === true)
       .map(cell => cell.cellId)),
     // Wait for the tab to be active to trigger the update
     switchMap(cells => this.visibilityService.isVisible$.pipe(
       startWith(true),
       pairwise(),
       switchMap(([oldVisibility, newVisibility]) => {
-        if(!oldVisibility && newVisibility){
+        if (!oldVisibility && newVisibility) {
           return of(newVisibility).pipe(delay(500))
         }
         return of(newVisibility)
@@ -94,19 +94,19 @@ export class BingoComponent {
       map(() => cells),
     )),
   ))
-  readonly bingos$ = computed<Array<{type: 'row' | 'col' | 'diag_down' | 'diag_up', index?: number, class: string}>>(() => {
+  readonly bingos$ = computed<{ type: 'row' | 'col' | 'diag_down' | 'diag_up', index?: number, class: string }[]>(() => {
     const cells = this.cells$()
     return [
       // Rows
       ...cells
-        .filter(row => row.every(({valide}) => valide === true))
+        .filter(row => row.every(({ valide }) => valide === true))
         .map((row) => ({
           type: 'row',
-          index: Math.floor(row[0].index/4),
-          class: `row is-${Math.floor(row[0].index/4)}`
+          index: Math.floor(row[0].index / 4),
+          class: `row is-${Math.floor(row[0].index / 4)}`
         })),
       // Cols
-      ...[0,1,2,3]
+      ...[0, 1, 2, 3]
         .filter(col => cells.every(row => row[col].valide === true))
         .map((index) => ({
           type: 'col',
@@ -115,7 +115,7 @@ export class BingoComponent {
         })),
       // Diagonal Down
       ...[
-         [0,1,2,3].every(index => cells[index][index].valide)
+        [0, 1, 2, 3].every(index => cells[index][index].valide)
       ]
         .filter(val => val)
         .map(() => ({
@@ -124,29 +124,29 @@ export class BingoComponent {
         })),
       // Diagonal Up
       ...[
-        [0,1,2,3].every(index => cells[3-index][index].valide)
+        [0, 1, 2, 3].every(index => cells[3 - index][index].valide)
       ]
-       .filter(val => val)
-       .map(() => ({
-         type: 'diag_up',
-         class: 'diag_up',
-       })),
-    ] as Array<{type: 'row' | 'col' | 'diag_down' | 'diag_up', index?: number, class: string}>
+        .filter(val => val)
+        .map(() => ({
+          type: 'diag_up',
+          class: 'diag_up',
+        })),
+    ] as { type: 'row' | 'col' | 'diag_down' | 'diag_up', index?: number, class: string }[]
   })
 
   readonly score$ = computed(() => this.bingos$()?.length)
 
 
 
-  public generateGrid(){
+  public generateGrid() {
     this.gridService.createGrid(this.stream().id)
   }
-  public showDescription(event: MouseEvent, description: string){
+  public showDescription(event: MouseEvent, description: string) {
     if (this.selectedCellDescr() == description) {
       this.op.hide();
       this.selectedCellDescr.set(null);
     }
-    else{
+    else {
       this.selectedCellDescr.set(description)
       this.op.show(event)
       if (this.op.container) {

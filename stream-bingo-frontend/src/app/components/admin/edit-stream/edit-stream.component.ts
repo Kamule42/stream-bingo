@@ -9,12 +9,12 @@ import { ButtonModule } from 'primeng/button'
 import { InputGroupModule } from 'primeng/inputgroup'
 import { InputGroupAddonModule } from 'primeng/inputgroupaddon'
 import { MultiSelectModule } from 'primeng/multiselect'
+import { MessageService } from 'primeng/api'
 import { IRight, IStream } from '../../../services/streams/stream.interface'
 import { UsersService } from '../../../services/users/users.service'
 import { StreamsService } from '../../../services/streams/streams.service'
-import { MessageService } from 'primeng/api'
 
-type _IRights = {user_id: string, username: string, rights: Array<string>}
+interface _IRights {user_id: string, username: string, rights: string[]}
 
 @Component({
   selector: 'app-edit-stream',
@@ -53,8 +53,8 @@ export class EditStreamComponent {
     )
   ))
 
-  readonly streamRights = signal<Array<_IRights>>([])
-  private readonly streamEffect = effect(() => this.streamRights.set(this.stream()?.rights?.reduce((acc: Array<_IRights>, val) => {
+  readonly streamRights = signal<_IRights[]>([])
+  private readonly streamEffect = effect(() => this.streamRights.set(this.stream()?.rights?.reduce((acc: _IRights[], val) => {
     let index = acc.findIndex(({user_id}) => user_id === val.user_id)
     const result = [...acc]
     if(index === -1){
@@ -75,7 +75,7 @@ export class EditStreamComponent {
     return result
   }, []) ?? []))
   readonly searchField = signal<{id: string, name: string} | null>(null)
-  readonly userList = signal<Array<{id: string, name: string}> | null>(null)
+  readonly userList = signal<{id: string, name: string}[] | null>(null)
   readonly availableRights = [
     {
       code: 'man',

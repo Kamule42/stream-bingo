@@ -1,10 +1,10 @@
-import { Component, computed, inject, signal } from '@angular/core'
-import { StreamsService } from '../../../services/streams/streams.service'
+import { Component, OnInit, computed, inject, signal } from '@angular/core'
 import { map, share, switchMap, tap, timer, } from 'rxjs'
 import { DateTime, Interval } from 'luxon'
 import { toObservable, toSignal } from '@angular/core/rxjs-interop'
 import { ActivatedRoute, RouterOutlet } from '@angular/router'
 import { ProgressSpinnerModule } from 'primeng/progressspinner'
+import { StreamsService } from '../../../services/streams/streams.service'
 import { SessionService } from '../../../services/session/session.service'
 import { IStream } from '../../../services/streams/stream.interface'
 import { StreamHeaderComponent } from "../../../components/stream/stream-header/stream-header.component"
@@ -18,7 +18,7 @@ import { StreamHeaderComponent } from "../../../components/stream/stream-header/
   templateUrl: './stream.component.html',
   styleUrl: './stream.component.scss'
 })
-export class StreamComponent{
+export class StreamComponent implements OnInit{
   private readonly route = inject(ActivatedRoute)
   private readonly streamService = inject(StreamsService)
   private readonly sessionService = inject(SessionService)

@@ -4,7 +4,12 @@
       <div class="label">Marqueur</div>
       <div class="control row">
         @for(check of checks; track check){
-          <div class="stroke" [class.selected]="check === stroke()" (click)="stroke.set(check)">
+          <div class="stroke"
+            [class.selected]="check === stroke()"
+            (click)="stroke.set(check)"
+            (keydown)="stroke.set(check)"
+            aria-hidden="true"
+          >
             <app-stroke [color]="alphaColor()" [stroke]="check" />
           </div>
           }

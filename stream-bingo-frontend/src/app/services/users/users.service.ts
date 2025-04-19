@@ -1,8 +1,8 @@
 import { Injectable } from '@angular/core'
-import { io, Socket } from 'socket.io-client'
-import { WebsocketService } from '../ws/websocket.service'
+import { Socket, io } from 'socket.io-client'
 import { fromEvent, shareReplay,} from 'rxjs'
 import { ISeachResult } from './users.interface'
+import { WebsocketService } from '../ws/websocket.service'
 
 @Injectable({
   providedIn: 'root'
@@ -22,7 +22,7 @@ export class UsersService extends WebsocketService {
     return this._socket
   }
   
-  readonly userList$ = fromEvent<Array<ISeachResult>>(this.socket, 'userList').pipe(
+  readonly userList$ = fromEvent<ISeachResult[]>(this.socket, 'userList').pipe(
     shareReplay(1),
   )
 

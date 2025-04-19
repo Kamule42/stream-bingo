@@ -1,8 +1,11 @@
+import { RoundStatus } from "src/stream/entities/round.entity"
+
 export interface IRound{
     id: string
     name: string
-    startAt: Date,
-    streamStartAt: Date,
+    startAt: Date
+    streamStartAt: Date
+    status: RoundStatus
     streamId: string
     streamName: string
 }

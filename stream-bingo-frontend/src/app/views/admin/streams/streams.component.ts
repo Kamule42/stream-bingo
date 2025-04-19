@@ -1,6 +1,4 @@
-import { Component, computed, effect, inject, signal, WritableSignal } from '@angular/core';
-import { StreamsService } from '../../../services/streams/streams.service';
-import { IPagination } from '../../../shared/models/pagination.interface';
+import { Component, WritableSignal, computed, effect, inject, signal } from '@angular/core';
 import { map, tap } from 'rxjs';
 import { DateTime, Interval } from 'luxon';
 import { toSignal } from '@angular/core/rxjs-interop'
@@ -8,6 +6,8 @@ import { TableModule } from 'primeng/table'
 import { PaginatorModule, PaginatorState } from 'primeng/paginator'
 import { ButtonModule } from 'primeng/button'
 import { DialogModule } from 'primeng/dialog'
+import { IPagination } from '../../../shared/models/pagination.interface';
+import { StreamsService } from '../../../services/streams/streams.service';
 import { EditStreamComponent } from '../../../components/admin/edit-stream/edit-stream.component'
 import { IStream } from '../../../services/streams/stream.interface';
 
@@ -26,17 +26,17 @@ export class StreamsComponent{
   readonly modalTitle$ = computed(() => this.toEdit$()?.id === undefined ? 'Ajouter un stream' : 'Modifier le stream')
 
   private readonly _streams$ = this.streamService.streams$.pipe(
-    map(streams => streams.map((stream: any) => ({
+    map(streams => streams.map((stream: IStream) => ({
         ...stream,
-        nextStreamStartsAtTxt: stream.nextStreamStartsAt ?
-          Interval.fromDateTimes(DateTime.now(), stream.nextStreamStartsAt)
+        nextStreamStartsAtTxt: stream.startAt ?
+          Interval.fromDateTimes(DateTime.now(), stream.startAt)
           .toDuration(['days', 'hours', 'minutes', 'seconds'])
           .toHuman({
             listStyle: 'long',
             unitDisplay: 'short',
             maximumFractionDigits: 0
           }) : null,
-        nextStreamStartsAtIso:  stream.nextStreamStartsAt?.toISO(),
+        nextStreamStartsAtIso:  stream.startAt?.toISO(),
       })))
   )
   readonly streams$ = toSignal(this._streams$, {initialValue: undefined})

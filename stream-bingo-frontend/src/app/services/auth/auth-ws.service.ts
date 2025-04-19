@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core'
-import { WebsocketService } from '../ws/websocket.service'
-import { io, Socket } from 'socket.io-client'
+import { Socket, io } from 'socket.io-client'
 import { fromEvent } from 'rxjs'
+import { WebsocketService } from '../ws/websocket.service'
 
 @Injectable({
   providedIn: 'root'

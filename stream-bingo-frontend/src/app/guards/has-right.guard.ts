@@ -1,10 +1,10 @@
 import { inject } from '@angular/core';
 import { CanActivateFn } from '@angular/router';
-import { AuthService } from '../services/auth';
 import { map, } from 'rxjs';
+import { AuthService } from '../services/auth';
 
 export const hasRightGuard: CanActivateFn = (route) => {
-  const rights = route.data['rights'] as Array<string | {right: string, streamId: string}> ?? []
+  const rights = route.data['rights'] as (string | {right: string, streamId: string})[] ?? []
 
   return inject(AuthService).session$.pipe(
     map(session => session != undefined && (

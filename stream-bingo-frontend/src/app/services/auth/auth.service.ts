@@ -1,9 +1,9 @@
 import { HttpClient } from '@angular/common/http'
-import { inject, Injectable } from '@angular/core'
-import { BehaviorSubject, map, Observable, Subject, tap } from 'rxjs'
-import { ISession, IValidateCodeResponse } from './interfaces'
+import { Injectable, inject } from '@angular/core'
+import { BehaviorSubject, Observable, Subject, map, tap } from 'rxjs'
 import { jwtDecode, } from 'jwt-decode'
 import { Router } from '@angular/router'
+import { ISession, IValidateCodeResponse } from './interfaces'
 
 const AUTHORIZATION_KEY = 'authorization'
 

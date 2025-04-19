@@ -1,6 +1,4 @@
-import { Component, effect, inject, Input, signal } from '@angular/core'
-import { RoundsService } from '../../../services/rounds/rounds.service'
-import { IRound } from '../../../services/rounds/round.interface'
+import { Component, Input, effect, inject, signal } from '@angular/core'
 import { toSignal } from '@angular/core/rxjs-interop'
 import { map, tap } from 'rxjs'
 import { TableModule } from 'primeng/table'
@@ -12,14 +10,19 @@ import { DatePickerModule } from 'primeng/datepicker'
 import { DatePipe } from '@angular/common'
 import { v7 as uuid} from 'uuid'
 import { Router } from '@angular/router'
-import { StreamsService } from '../../../services/streams/streams.service'
 import { MessageService } from 'primeng/api'
+import { StreamsService } from '../../../services/streams/streams.service'
+import { IRound } from '../../../services/rounds/round.interface'
+import { RoundsService } from '../../../services/rounds/rounds.service'
+import { TimelineComponent } from "../../../components/timeline/timeline.component";
 
 @Component({
   selector: 'app-plan-stream',
   imports: [
     TableModule, ButtonModule, CardModule, FormsModule,
-    InputTextModule, DatePickerModule, DatePipe, ],
+    InputTextModule, DatePickerModule, DatePipe,
+    TimelineComponent
+],
   templateUrl: './plan-stream.component.html',
   styleUrl: './plan-stream.component.scss'
 })
@@ -29,7 +32,7 @@ export class PlanStreamComponent{
   private readonly router = inject(Router)
     private readonly messageService = inject(MessageService)
 
-  private _webhandle: string = ''
+  private _webhandle = ''
   @Input()
   set webhandle(webhandle: string) {
     this._webhandle = webhandle
@@ -39,9 +42,13 @@ export class PlanStreamComponent{
     map(stream => stream?.id)
   ))
 
-  readonly toEdit$ = signal<Array<IRound>>([])
+  readonly toEdit$ = signal<Omit<IRound, 'status'>[]>([])
+  readonly rounds$ = signal<IRound[]>([])
   readonly nextRounds$ = toSignal(this.roundService.streamNexRouds$.pipe(
-    tap(nextRounds => this.toEdit$.set(nextRounds))
+    tap(nextRounds => {
+      this.toEdit$.set(nextRounds)
+      this.rounds$.set(nextRounds)
+    })
   ))
 
   private readonly _handleEffect = effect(()=> {
@@ -63,6 +70,10 @@ export class PlanStreamComponent{
 
   save(){
     this.roundService.updateStreamRounds( this.streamId$()!, this.toEdit$())
+    this.messageService.add({ severity: 'info', summary: 'Sauvegardé'})
+  }
+  saveTimeline(){
+    this.roundService.updateStreamRounds( this.streamId$()!, this.rounds$())
     this.messageService.add({ severity: 'info', summary: 'Sauvegardé'})
   }
   cancel(){

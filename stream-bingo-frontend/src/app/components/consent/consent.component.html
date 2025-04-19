@@ -2,7 +2,7 @@
 @let show = show$();
 <div id="consent" [class.show]="show">
     <div class="box">
-        @if(status == null){
+        @if(status === null){
             <p>Ce site web enregistre certaines de vos données personnelles pour vous assurer la meilleure expérience.</p>
             <p>Pour plus d'informations, rendez-vous sur <a routerLink="/cgu" fragment="cookies">politique de confidentialité</a></p>
             <div id="consent-actions">
