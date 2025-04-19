@@ -47,7 +47,7 @@ export class RefreshGuard implements CanActivate {
       session = this.authService.validateToken(token)
       client.handshake.auth.user = session
       client.handshake.auth.token = `Bearer ${token}`
-      client.nsp.server._nsps.get('/auth')?.emit('refreshToken', token)
+      this.authService.newToken = token
     }
 
     if(session && !this.isValid(refreshTokenCookie, session)){

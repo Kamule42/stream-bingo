@@ -2,7 +2,7 @@ import { HttpService } from '@nestjs/axios'
 import { HttpException, HttpStatus, Injectable, Logger } from '@nestjs/common'
 import { ConfigService } from '@nestjs/config'
 import { AxiosError } from 'axios'
-import { catchError, map, mergeMap, Observable, } from 'rxjs'
+import { BehaviorSubject, catchError, filter, map, mergeMap, Observable, throttleTime, } from 'rxjs'
 import { v7 as uuid } from 'uuid'
 import { UserEntity } from '../../entities/user.entity'
 import { InjectRepository } from '@nestjs/typeorm'
@@ -19,7 +19,12 @@ interface ITokens {
 
 @Injectable()
 export class AuthService {
-  private readonly logger = new Logger(AuthService.name);
+  private readonly logger = new Logger(AuthService.name)
+  private readonly _newToken$$ = new BehaviorSubject<string | null>(null)
+  private readonly _newToken$ = this._newToken$$.asObservable().pipe(
+    filter(val => val != null),
+    throttleTime(10000)
+  )
 
   public constructor(
     private readonly httpService: HttpService,
@@ -28,6 +33,13 @@ export class AuthService {
     private readonly usersRepository: Repository<UserEntity>,
     private readonly configService: ConfigService,
   ) {}
+
+  public get newToken$(){
+    return this._newToken$
+  }
+  public set newToken(newToken: string){
+    this._newToken$$.next(newToken)
+  }
 
   public getAuthUrl(): string {
     const result = this.configService.get<string>('discord.validation_uri');
