@@ -99,6 +99,17 @@ export class StreamGateway {
     this.cellService.updateCells(id, cells)
   }
 
+
+  @Roles()
+  @SubscribeMessage('flipFav')
+  flipFav(
+    @MessageBody('id') streamId: string,
+    @Session() session: ISession
+   )
+  {
+    this.streamService.flipFav(session.sub, streamId)
+  }
+
   @Roles()
   @SubscribeMessage('getMyFavs')
   getMyFavs(

@@ -1,4 +1,4 @@
-import { Component, Input, effect, inject, signal } from '@angular/core'
+import { Component, Input, computed, effect, inject, signal } from '@angular/core'
 import { toSignal } from '@angular/core/rxjs-interop'
 import { map, tap } from 'rxjs'
 import { TableModule } from 'primeng/table'
@@ -15,6 +15,7 @@ import { StreamsService } from '../../../services/streams/streams.service'
 import { IEditRound } from '../../../services/rounds/round.interface'
 import { RoundsService } from '../../../services/rounds/rounds.service'
 import { TimelineComponent } from "../../../components/timeline/timeline.component";
+import { SessionService } from '../../../services/session/session.service'
 
 @Component({
   selector: 'app-plan-stream',
@@ -27,6 +28,7 @@ import { TimelineComponent } from "../../../components/timeline/timeline.compone
   styleUrl: './plan-stream.component.scss'
 })
 export class PlanStreamComponent{
+  private readonly sessionService = inject(SessionService)
   private readonly roundService = inject(RoundsService)
   private readonly streamService = inject(StreamsService)
   private readonly router = inject(Router)
@@ -38,12 +40,27 @@ export class PlanStreamComponent{
     this._webhandle = webhandle
   }
 
-  readonly isTimelineValid = signal<boolean>(true)
-  readonly roundsToDelete = signal<string[]>([])
-
   readonly streamId$ = toSignal(this.streamService.streamDetail$.pipe(
     map(stream => stream?.id)
   ))
+
+  readonly isStreamPlanificator$ = computed(() => {
+    const streamId = this.streamId$()
+    if (streamId == null) {
+      return false
+    }
+    return this.sessionService.isAdmin ||
+      this.sessionService.isStreamPlanificator(streamId)
+  })
+  private readonly accessEffect = effect(() => {
+    if (this.isStreamPlanificator$() === false && this.streamId$() !== undefined) {
+      this.router.navigateByUrl(this.router.url.replace('/plan', ''))
+    }
+  })
+
+  readonly isTimelineValid = signal<boolean>(true)
+  readonly roundsToDelete = signal<string[]>([])
+
 
   readonly toEdit$ = signal<IEditRound[]>([])
   readonly rounds$ = signal<IEditRound[]>([])

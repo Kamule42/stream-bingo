@@ -99,4 +99,23 @@ export class StreamService {
     })
   }
 
+  async flipFav(userId: string, streamId: string) {
+    const stream = await this.streamRepository.findOne({
+      where: {
+        id: streamId,
+        favBy: { id: userId }
+      },
+    })
+    console.log(userId, streamId, stream)
+    if(stream !== null){
+      this.dataSource.query(
+        'DELETE FROM bingo.favs WHERE stream_id=$1 AND user_id=$2',
+        [streamId, userId])
+    }
+    else{
+      this.dataSource.query(
+        'INSERT INTO bingo.favs(stream_id, user_id) VALUES ($1,$2)',
+        [streamId, userId])
+    }
+  }
 }

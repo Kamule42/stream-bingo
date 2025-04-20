@@ -13,9 +13,9 @@ export class AuthGateway implements OnGatewayInit {
     private readonly authService : AuthService
   ){}
 
-  afterInit(server: any) {
+  afterInit() {
     this.authService.newToken$.subscribe({
-      next: token => this.namespace.emit('refreshToken', token)
+      next: token => this.namespace.send('refreshToken', token)
     })
   }
 }

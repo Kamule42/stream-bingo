@@ -31,14 +31,4 @@ export class UserGateway {
         data: users?.map(({id, discordUsername}) => ({id, name: discordUsername}))
     }))
   }
-
-  @Roles()
-  @SubscribeMessage('flipFav')
-  flipFav(
-    @MessageBody('id') streamId: string,
-    @Session() session: ISession
-   )
-  {
-    this.userService.flipFav(session.sub, streamId)
-  }
 }

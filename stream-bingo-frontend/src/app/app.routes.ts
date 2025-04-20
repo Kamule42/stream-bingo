@@ -22,7 +22,10 @@ export const routes: Routes = [
                 path: 'edit',
                 loadComponent: () => import('./views/stream/edit-stream/edit-stream.component').then(c => c.EditStreamComponent),
             },
-            { path: 'plan', loadComponent: () => import('./views/stream/plan-stream/plan-stream.component').then(c => c.PlanStreamComponent)},
+            { 
+                path: 'plan',
+                loadComponent:  () => import('./views/stream/plan-stream/plan-stream.component').then(c => c.PlanStreamComponent)
+            },
         ]
     },
 
