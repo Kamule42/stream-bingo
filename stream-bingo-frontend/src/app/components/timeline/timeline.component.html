@@ -4,28 +4,75 @@
       @if(roundMap$(); as roundMap){
           @for(block of blocks$(); track block.id){
             <div 
-              [style.flex]="block.weight"
+              [style.flex-grow]="block.weight"
               [class.is-round]="block.type==='round'"
               class="timeline-block"
             >
               @if(block.type === 'round'){
-                @let round = roundMap.get(block.roundId!)!;
+                @let roundEntry = roundMap.get(block.roundId!)!;
+                @let round = roundEntry.round;
+                @let errors = roundEntry.errors;
                 <div class="timeline-round">
                   <span>
-                    <input class="input" type="text" [(ngModel)]="round.name" />
+                    <input class="input" type="text" 
+                      [(ngModel)]="round.name"/>
                   </span>
+                  @if((errors?.length ?? 0) > 0){
+                    <p-button 
+                      (click)="errorpop.toggle($event)"
+                      icon="mdi mdi-alert-circle-outline"
+                      severity="danger"
+                      [rounded]="true"
+                      [outlined]="true"
+                      [text]="true"
+                      class="error-button" />
+                    <p-popover #errorpop>
+                      <div class="content">
+                        <ul>
+                          @for(error of errors; track error){
+                            <li>{{ error.message }} </li>
+                          }
+                        </ul>
+                      </div>
+                    </p-popover>
+                  }
                   <div class="timeline-date start-stream">
                     <span class="timeline-date-field">
                       Début estimé du stream
-                      <p-datepicker [(ngModel)]="round.streamStartAt" [showTime]="true" appendTo="body" />
+                      <p-datepicker
+                        appendTo="body"
+                        dateFormat="dd/mm/yy"
+                        [(ngModel)]="round.streamStartAt"
+                        [showTime]="true"
+                        [class.ng-invalid]="roundEntry.hasStreamStartError"
+                        [class.ng-dirty]="roundEntry.hasStreamStartError"
+                        (ngModelChange)="triggerRecompute()"
+                      />
                     </span>
                   </div>
                   <div class="timeline-date start">
                     <span class="timeline-date-field">
                       Ouverture de la grille
-                      <p-datepicker [(ngModel)]="round.startAt" [showTime]="true" appendTo="body" />
+                      <p-datepicker
+                        appendTo="body"
+                        dateFormat="dd/mm/yy"
+                        [(ngModel)]="round.startAt"
+                        [showTime]="true"
+                        [class.ng-invalid]="roundEntry.hasStartError"
+                        [class.ng-dirty]="roundEntry.hasStartError"
+                        (ngModelChange)="triggerRecompute()"  />
                     </span>
                   </div>
+                </div>
+              }
+              @else if(block.type === 'space'){
+                <div class="timeline-add">
+                  <p-button 
+                    icon="mdi mdi-plus"
+                    [rounded]="true"
+                    severity="secondary"
+                    (onClick)="addRound(block.pos)"
+                  />
                 </div>
               }
             </div>

@@ -12,7 +12,7 @@ import { v7 as uuid} from 'uuid'
 import { Router } from '@angular/router'
 import { MessageService } from 'primeng/api'
 import { StreamsService } from '../../../services/streams/streams.service'
-import { IRound } from '../../../services/rounds/round.interface'
+import { IEditRound } from '../../../services/rounds/round.interface'
 import { RoundsService } from '../../../services/rounds/rounds.service'
 import { TimelineComponent } from "../../../components/timeline/timeline.component";
 
@@ -38,12 +38,14 @@ export class PlanStreamComponent{
     this._webhandle = webhandle
   }
 
+  readonly isTimelineValid = signal<boolean>(true)
+
   readonly streamId$ = toSignal(this.streamService.streamDetail$.pipe(
     map(stream => stream?.id)
   ))
 
-  readonly toEdit$ = signal<Omit<IRound, 'status'>[]>([])
-  readonly rounds$ = signal<IRound[]>([])
+  readonly toEdit$ = signal<IEditRound[]>([])
+  readonly rounds$ = signal<IEditRound[]>([])
   readonly nextRounds$ = toSignal(this.roundService.streamNexRouds$.pipe(
     tap(nextRounds => {
       this.toEdit$.set(nextRounds)

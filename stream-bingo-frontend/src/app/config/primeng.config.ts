@@ -1,5 +1,6 @@
 import { definePreset } from '@primeng/themes';
 import Aura from '@primeng/themes/aura';
+import { fr } from "primelocale/js/fr.js"
 
 export const BingoPreset = definePreset(Aura, {
     semantic: {
@@ -22,5 +23,6 @@ export const BingoPreset = definePreset(Aura, {
 export const primeNgConfig = {
     theme: {
         preset: BingoPreset
-    }
+    },
+    translation: fr,
 }

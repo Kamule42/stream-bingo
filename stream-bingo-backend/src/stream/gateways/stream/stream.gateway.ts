@@ -1,5 +1,5 @@
 import { MessageBody, SubscribeMessage, WebSocketGateway, WsResponse } from '@nestjs/websockets'
-import { map, Observable } from 'rxjs'
+import { map, Observable, tap } from 'rxjs'
 import { StreamService } from 'src/stream/services/stream/stream.service'
 import { ICell, INextStream, IRight, IStream } from './stream.interface' 
 import { cellsMapper, nextStreamMapper, streamMapper } from './stream.mappers'
@@ -56,7 +56,7 @@ export class StreamGateway {
   getNextStreams(
     @Paginate() query: PaginateQuery,
   ): Observable<WsResponse<IPaginatedResponse<INextStream>>> {
-    return this.streamService.listNextServices(query).pipe(
+    return this.streamService.listNextStreams(query).pipe(
       map(result => ({
         event: 'nextStreams',
         data: {

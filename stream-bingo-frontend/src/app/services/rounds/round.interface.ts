@@ -13,3 +13,5 @@ export interface IRound{
     streamName?: string
     status: RoundStatus
 }
+
+export type IEditRound = Omit<IRound, 'status' | 'streamId' | 'streamName'>

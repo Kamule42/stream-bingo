@@ -2,12 +2,21 @@
   <h4 class="title is-4">Planification</h4>
   <p-card>
     <div id="plan-content">
-      <app-timeline [(rounds)]="rounds$"/>
+      <app-timeline [(rounds)]="rounds$" (isValid)="isTimelineValid.set($event)"/>
       <div id="plan-actions">
-        <p-button label="Annuler" severity="secondary" (onClick)="cancel()" />
-        <p-button label="Sauvegarder" (onClick)="saveTimeline()" />
+        <p-button
+          label="Annuler"
+          severity="secondary"
+          icon="mdi mdi-cancel"
+          (onClick)="cancel()" />
+        <p-button
+          label="Sauvegarder"
+          icon="mdi mdi-content-save-outline"
+          [disabled]="!isTimelineValid()"
+          (onClick)="saveTimeline()"
+        />
       </div>
-
+    @if(false){
       <p-table [value]="toEdit$()" dataKey="id" stripedRows>
         <ng-template #emptymessage>
           Aucune partie de prévue
@@ -63,8 +72,9 @@
       </p-table>
       <div id="plan-actions">
         <p-button label="Annuler" severity="secondary" (onClick)="cancel()" />
-        <p-button label="Sauvegarder" (onClick)="save()" />
+        <p-button label="Sauvegarder" (onClick)="saveTimeline()" />
       </div>
+    }
     </div>
   </p-card>
 </div>

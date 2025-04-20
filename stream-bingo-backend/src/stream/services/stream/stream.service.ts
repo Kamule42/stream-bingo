@@ -30,7 +30,7 @@ export class StreamService {
     }))
   }
 
-  listNextServices( 
+  listNextStreams( 
     query: PaginateQuery,
   ): Observable<Paginated<NextStreamEntity>> {
     return from (paginate(

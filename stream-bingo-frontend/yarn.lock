@@ -6912,6 +6912,11 @@ primeicons@^7.0.0:
   resolved "https://registry.yarnpkg.com/primeicons/-/primeicons-7.0.0.tgz#6b25c3fdcb29bb745a3035bdc1ed5902f4a419cf"
   integrity sha512-jK3Et9UzwzTsd6tzl2RmwrVY/b8raJ3QZLzoDACj+oTJ0oX7L9Hy+XnVwgo4QVKlKpnP/Ur13SXV/pVh4LzaDw==
 
+primelocale@^2.1.2:
+  version "2.1.2"
+  resolved "https://registry.yarnpkg.com/primelocale/-/primelocale-2.1.2.tgz#431eab434f8d463205575079ee5491399bb439ff"
+  integrity sha512-sTDkqu/QBwpqzq86oZGXaU/QbPLKLZ3Qix2gbqHXr410B7tfQCx39HSWjM9Hsnpzqn9KVdXJzk1DH1yW1iNNPg==
+
 primeng@^19.0.10:
   version "19.0.10"
   resolved "https://registry.yarnpkg.com/primeng/-/primeng-19.0.10.tgz#6b22409e79e75de798621fee8eae4709404e8554"

@@ -1,27 +1,55 @@
-import { Component, computed, model } from '@angular/core';
-import { IRound } from '../../services/rounds/round.interface'
+import { Component, computed, effect, model, output } from '@angular/core'
+import { v7 as uuid } from 'uuid'
+import { IEditRound } from '../../services/rounds/round.interface'
 import { DateTime } from 'luxon'
 import { map, timer } from 'rxjs'
 import { toSignal } from '@angular/core/rxjs-interop'
 import { FormsModule } from '@angular/forms'
 import { InputTextModule } from 'primeng/inputtext'
 import { DatePickerModule } from 'primeng/datepicker'
+import { ButtonModule } from 'primeng/button'
+import { PopoverModule } from 'primeng/popover'
+
+type Iblock = {
+  type: 'round',
+  id: string,
+  weight: number,
+  roundId: string
+} | {
+  type: 'space',
+  id: string,
+  weight: number,
+  pos: number,
+}
+
+interface IError{
+  field: 'start' | 'streamStart' | 'both'
+  message: string
+}
+
 
 @Component({
   selector: 'app-timeline',
-  imports: [ FormsModule, InputTextModule, DatePickerModule, ],
+  imports: [ FormsModule, InputTextModule, DatePickerModule, ButtonModule, PopoverModule ],
   templateUrl: './timeline.component.html',
   styleUrl: './timeline.component.scss'
 })
 export class TimelineComponent {
-  readonly rounds = model.required<IRound[] | undefined>()
+  readonly rounds$ = model.required<IEditRound[] | undefined>({
+    alias: 'rounds'
+  })
+  readonly isValid = output<boolean>()
+  private readonly _isValidEffect = effect(() => {
+    this.isValid.emit(this.isValid$())
+  })
+
   private readonly _now$ = timer(0,1000).pipe(
     map(() => DateTime.now().toSeconds()*1000),
   )
   readonly now$ = toSignal(this._now$, {initialValue:  DateTime.now().toSeconds()*1000})
 
   readonly duration$ = computed(() => {
-    const rounds = this.rounds()
+    const rounds = this.rounds$()
     if(rounds === undefined || rounds.length === 0){
       return undefined
     }
@@ -33,14 +61,14 @@ export class TimelineComponent {
   })
 
   readonly blocks$ = computed(() => {
-    const rounds = this.rounds()
+    const rounds = this.rounds$()
     if(rounds === undefined || rounds.length === 0){
       return undefined
     }
     const now = this.now$()
-    const duration = this.duration$()!;
+    const duration = this.duration$()! * 0.9;
     const blocks = rounds.toSorted((a,b) => a.startAt.getTime() - b.startAt.getTime())
-    const result = new Array<{type: 'round' | 'space', weight: number, roundId?: string, id: string}>()
+    const result = new Array<Iblock>()
 
     const firstStart = blocks[0].startAt.getTime()
     if(firstStart > now){
@@ -48,6 +76,7 @@ export class TimelineComponent {
         type: 'space',
         weight: (firstStart - now) / duration,
         id: 'space-now',
+        pos: 0,
       })
     }
     blocks.forEach((round, index) => {
@@ -62,6 +91,15 @@ export class TimelineComponent {
           type: 'space',
           weight: (blocks[index+1].startAt.getTime() - round.streamStartAt.getTime()) / duration,
           id: `space-${round.id}`,
+          pos: index + 1
+        })
+      }
+      else{   
+        result.push({
+          type: 'space',
+          weight: 0.1,
+          id: 'space-end',
+          pos: index + 1
         })
       }
     })
@@ -96,7 +134,7 @@ export class TimelineComponent {
         })
       }
       else{
-        const round = this.roundMap$()!.get(block.roundId!)!
+        const round = this.roundMap$()!.get(block.roundId)!.round
         if(round.startAt.getTime() > now){
           result.push(
             {
@@ -126,7 +164,120 @@ export class TimelineComponent {
     })
     return result
   })
-  readonly roundMap$ = computed(() => this.rounds()
-    ?.reduce((map, round) => map.set(round.id, round), new Map<string, IRound>())
-  )
+
+  readonly roundErrors$ = computed(() => {
+    const result = new Map<string, IError[]>()
+    const rounds = this.rounds$()
+    if(rounds === undefined){
+      return result
+    }
+    rounds.forEach((round, index) => {
+      const errors: IError[] = []
+      if(round.startAt.getTime() > round.streamStartAt.getTime()){
+        errors.push({
+          field: 'both',
+          message: 'La date , doit être avant la date de début de stream estimée'
+        })
+      }
+      if(index > 0 && round.startAt.getTime() < rounds[index-1].streamStartAt.getTime()){
+        errors.push({
+          field: 'start',
+          message: 'La date d\'ouverture de la grille doit être après la date de début de stream estimée de la partie précédente'
+        })
+      }
+
+      if(
+        index < (rounds.length - 1) &&
+        round.streamStartAt.getTime() > rounds[index+1].startAt.getTime()
+      ){
+        errors.push({
+          field: 'streamStart',
+          message: 'La date d\'ouverture de la grille estimée doit être avant la date de début de stream estimée de la partie suivante'
+        })
+      }
+      result.set(round.id, errors)
+    })
+    return result
+  })
+  readonly roundMap$ = computed(() => {
+    const errors = this.roundErrors$()
+    const rounds = this.rounds$()
+    if(errors === undefined || rounds === undefined){
+      return undefined
+    }
+    return rounds
+      ?.reduce((map, round) => {
+        const err = errors.get(round.id) ?? []
+        return map.set(round.id, {
+          round,
+          errors: err,
+          hasStartError: err.find(({field}) => ['start', 'both'].includes(field)) !== undefined,
+          hasStreamStartError: err.find(({field}) => ['streamStart', 'both'].includes(field)) !== undefined,
+        })
+      },
+      new Map<string, {round: IEditRound, errors: IError[], hasStartError: boolean, hasStreamStartError: boolean }>())
+  })
+
+
+  readonly isValid$ = computed(() => [...this.roundErrors$().values()].every(errs => errs.length === 0))
+
+  readonly totalGrowths = computed(() => {
+    const blocks = this.blocks$()
+    if(!blocks){
+      return undefined
+    }
+    return blocks.reduce((acc, b) => acc + b.weight, 0)
+  })
+
+  public addRound(pos: number){
+    const rounds = this.rounds$() ?? []
+    const now = DateTime.now()
+    if(pos === 0){
+      this.rounds$.set([
+        {
+          id: uuid(),
+          name: 'Nouveau stream',
+          startAt: now.toJSDate(),
+          streamStartAt: now.plus({hour: 4}).toJSDate()
+        },
+        ...rounds
+      ])
+    }
+    else if(pos >= rounds.length){
+      const lastRoundStart = rounds
+        .map(({streamStartAt}) => DateTime.fromJSDate(streamStartAt))
+        .at(-1) ?? now
+      this.rounds$.set([
+        ...rounds, 
+        {
+          id: uuid(),
+          name: 'Nouveau stream',
+          startAt: lastRoundStart.plus({hour: 4}).toJSDate(),
+          streamStartAt:  lastRoundStart.plus({day: 1}).toJSDate(),
+        },
+      ])
+    }
+    else{
+      const lastRoundStart = rounds
+        .map(({streamStartAt}) => DateTime.fromJSDate(streamStartAt))
+        .at(pos-1) ?? now
+      this.rounds$.set([
+        ...rounds.slice(0, pos), 
+        {
+          id: uuid(),
+          name: 'Nouveau stream',
+          startAt: lastRoundStart.plus({minute: 5}).toJSDate(),
+          streamStartAt:  lastRoundStart.plus({minute: 10}).toJSDate(),
+        },
+        ...rounds.slice(pos)
+      ])
+    }
+  }
+
+  triggerRecompute(){
+    const rounds = this.rounds$()
+    this.rounds$.set(rounds ?
+      rounds.toSorted((a,b) => a.startAt.getTime() - b.startAt.getTime()) :
+      undefined)
+  }
 }
