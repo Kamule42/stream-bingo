@@ -106,7 +106,6 @@ export class StreamService {
         favBy: { id: userId }
       },
     })
-    console.log(userId, streamId, stream)
     if(stream !== null){
       this.dataSource.query(
         'DELETE FROM bingo.favs WHERE stream_id=$1 AND user_id=$2',

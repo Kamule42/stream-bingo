@@ -52,7 +52,12 @@
                             aria-hidden="true"
                             class="flex items-center p-menubar-item-link">
                             <span>{{ _session?.username }}</span>
-                            <p-avatar [image]="`//cdn.discordapp.com/avatars/${_session?.discord?.id}/${_session?.discord?.avatarId}`" shape="circle" />
+                            @if(_session?.discord?.avatarId){
+                                <p-avatar [image]="`//cdn.discordapp.com/avatars/${_session?.discord?.id}/${_session?.discord?.avatarId}`" shape="circle" />
+                            }
+                            @else {
+                                <p-avatar shape="circle" [label]="_session?.username?.slice(0,1)" [style]="{'background-color': 'var(--secondary-color)'}" />
+                            }
                             <span class="mdi mdi-dots-vertical"></span>
                         </a>
                         <p-menu

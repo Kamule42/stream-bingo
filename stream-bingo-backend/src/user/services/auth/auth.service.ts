@@ -2,7 +2,7 @@ import { HttpService } from '@nestjs/axios'
 import { HttpException, HttpStatus, Injectable, Logger } from '@nestjs/common'
 import { ConfigService } from '@nestjs/config'
 import { AxiosError } from 'axios'
-import { BehaviorSubject, catchError, filter, map, mergeMap, Observable, throttleTime, } from 'rxjs'
+import { BehaviorSubject, catchError, filter, map, mergeMap, Observable, tap, throttleTime, } from 'rxjs'
 import { v7 as uuid } from 'uuid'
 import { UserEntity } from '../../entities/user.entity'
 import { InjectRepository } from '@nestjs/typeorm'
@@ -20,10 +20,10 @@ interface ITokens {
 @Injectable()
 export class AuthService {
   private readonly logger = new Logger(AuthService.name)
-  private readonly _newToken$$ = new BehaviorSubject<string | null>(null)
+  private readonly _newToken$$ = new BehaviorSubject<{token: string; socketId} | null>(null)
   private readonly _newToken$ = this._newToken$$.asObservable().pipe(
     filter(val => val != null),
-    throttleTime(10000)
+    throttleTime(10000),
   )
 
   public constructor(
@@ -37,7 +37,7 @@ export class AuthService {
   public get newToken$(){
     return this._newToken$
   }
-  public set newToken(newToken: string){
+  public set newToken(newToken: {token: string; socketId}){
     this._newToken$$.next(newToken)
   }
 

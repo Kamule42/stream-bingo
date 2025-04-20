@@ -25,4 +25,7 @@ export const primeNgConfig = {
         preset: BingoPreset
     },
     translation: fr,
+    csp: {
+        nonce: '**CSP_NONCE**'
+    }
 }

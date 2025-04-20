@@ -6,10 +6,10 @@ import configuration from './config/configuration'
 import { TypeOrmModule } from '@nestjs/typeorm'
 import { StreamModule } from './stream/stream.module'
 import { APP_GUARD } from '@nestjs/core'
-import { AuthGuard } from './shared/guards/auth/auth.guard'
 import { GridModule } from './grid/grid.module'
 import { JwtAuthGuard } from './shared/guards/jwt-auth/jwt-auth.guard'
 import { RefreshGuard } from './shared/guards/refresh/refresh.guard'
+import { ScheduleModule } from '@nestjs/schedule'
 
 @Module({
   imports: [
@@ -32,6 +32,7 @@ import { RefreshGuard } from './shared/guards/refresh/refresh.guard'
         autoLoadEntities: true,
       }),
     }),
+    ScheduleModule.forRoot(),
     UserModule,
     StreamModule,
     GridModule,

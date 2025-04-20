@@ -14,8 +14,8 @@ import { ConfirmDialogModule } from 'primeng/confirmdialog'
     styleUrl: './app.component.scss',
 })
 export class AppComponent {
-  private readonly visibilityService = inject(VisibilityService)
   private readonly authWsService = inject(AuthWsService)
+  private readonly visibilityService = inject(VisibilityService)
 
   @HostListener('document:visibilitychange', ['$event'])
   visibilitychange() {
