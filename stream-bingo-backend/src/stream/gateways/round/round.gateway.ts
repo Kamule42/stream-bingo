@@ -47,8 +47,9 @@ export class RoundGateway {
   updateStreamRounds(
     @MessageBody('streamId') streamId: string,
     @MessageBody('rounds') rounds: Array<IRoundEdit>,
+    @MessageBody('toDelete') toDelete?: Array<string>,
   ): void {
-    this.roundService.updateStreamRounds(streamId, rounds)
+    this.roundService.updateStreamRounds(streamId, rounds, toDelete)
   }
 
   @Roles([

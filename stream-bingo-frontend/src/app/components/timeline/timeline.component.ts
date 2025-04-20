@@ -1,4 +1,4 @@
-import { Component, computed, effect, model, output } from '@angular/core'
+import { Component, computed, effect, inject, model, output, signal } from '@angular/core'
 import { v7 as uuid } from 'uuid'
 import { IEditRound } from '../../services/rounds/round.interface'
 import { DateTime } from 'luxon'
@@ -9,6 +9,9 @@ import { InputTextModule } from 'primeng/inputtext'
 import { DatePickerModule } from 'primeng/datepicker'
 import { ButtonModule } from 'primeng/button'
 import { PopoverModule } from 'primeng/popover'
+import { IconFieldModule } from 'primeng/iconfield'
+import { InputIconModule } from 'primeng/inputicon'
+import { ConfirmationService } from 'primeng/api'
 
 type Iblock = {
   type: 'round',
@@ -30,18 +33,28 @@ interface IError{
 
 @Component({
   selector: 'app-timeline',
-  imports: [ FormsModule, InputTextModule, DatePickerModule, ButtonModule, PopoverModule ],
+  imports: [ 
+    FormsModule, 
+    InputTextModule, DatePickerModule,
+    IconFieldModule, InputIconModule,
+    ButtonModule, PopoverModule,  ],
   templateUrl: './timeline.component.html',
   styleUrl: './timeline.component.scss'
 })
 export class TimelineComponent {
+  private readonly confirmService = inject(ConfirmationService)
+
   readonly rounds$ = model.required<IEditRound[] | undefined>({
     alias: 'rounds'
   })
   readonly isValid = output<boolean>()
+  readonly roundsToDelete = output<string[]>()
+  readonly _toDelete$ = signal<string[]>([])
+
   private readonly _isValidEffect = effect(() => {
     this.isValid.emit(this.isValid$())
   })
+  private readonly newIds = signal<string[]>([])
 
   private readonly _now$ = timer(0,1000).pipe(
     map(() => DateTime.now().toSeconds()*1000),
@@ -50,8 +63,11 @@ export class TimelineComponent {
 
   readonly duration$ = computed(() => {
     const rounds = this.rounds$()
-    if(rounds === undefined || rounds.length === 0){
+    if(rounds === undefined){
       return undefined
+    }
+    if( rounds.length === 0){
+      return 1;
     }
     const now = this.now$()
     const blocks = rounds.toSorted((a,b) => a.startAt.getTime() - b.startAt.getTime())
@@ -60,11 +76,22 @@ export class TimelineComponent {
      return max ? max  - now : undefined
   })
 
-  readonly blocks$ = computed(() => {
+  readonly blocks$ = computed<Iblock[] | undefined>(() => {
     const rounds = this.rounds$()
-    if(rounds === undefined || rounds.length === 0){
+    if(rounds === undefined){
       return undefined
     }
+    if(rounds.length === 0){
+      return [
+        {
+          type: 'space',
+          weight: 1,
+          id: 'space-now',
+          pos: 0,
+        }
+      ]
+    }
+
     const now = this.now$()
     const duration = this.duration$()! * 0.9;
     const blocks = rounds.toSorted((a,b) => a.startAt.getTime() - b.startAt.getTime())
@@ -232,10 +259,12 @@ export class TimelineComponent {
   public addRound(pos: number){
     const rounds = this.rounds$() ?? []
     const now = DateTime.now()
+    const id = uuid()
+    this.newIds.set([...this.newIds(), id])
     if(pos === 0){
       this.rounds$.set([
         {
-          id: uuid(),
+          id,
           name: 'Nouveau stream',
           startAt: now.toJSDate(),
           streamStartAt: now.plus({hour: 4}).toJSDate()
@@ -250,7 +279,7 @@ export class TimelineComponent {
       this.rounds$.set([
         ...rounds, 
         {
-          id: uuid(),
+          id,
           name: 'Nouveau stream',
           startAt: lastRoundStart.plus({hour: 4}).toJSDate(),
           streamStartAt:  lastRoundStart.plus({day: 1}).toJSDate(),
@@ -264,7 +293,7 @@ export class TimelineComponent {
       this.rounds$.set([
         ...rounds.slice(0, pos), 
         {
-          id: uuid(),
+          id,
           name: 'Nouveau stream',
           startAt: lastRoundStart.plus({minute: 5}).toJSDate(),
           streamStartAt:  lastRoundStart.plus({minute: 10}).toJSDate(),
@@ -272,6 +301,47 @@ export class TimelineComponent {
         ...rounds.slice(pos)
       ])
     }
+  }
+
+  deleteRound(roundId: string){
+    const rounds = this.rounds$()
+    if(rounds === undefined){
+      return
+    }
+    const isCurrentRound = rounds.find(({ id, startAt }) => id === roundId && startAt <= new Date()) !== undefined
+    if(isCurrentRound){
+      this.confirmService.confirm({
+        header: 'Attention',
+        message: 'Cette grille est déjà ouverte, voulez-vous vraiment la supprimer ?',
+        closable: true,
+        closeOnEscape: true,
+        icon: 'mdi mdi-alert-outline',
+        rejectButtonProps: {
+          label: 'Annuler',
+          severity: 'secondary',
+          outlined: true,
+        },
+        acceptButtonProps: {
+          icon: 'mdi mdi-delete-outline',
+          label: 'Supprimer',
+          severity: 'danger',
+        },
+        accept: () => this.doDeleteRound(roundId)
+      })
+    }
+  }
+
+  private doDeleteRound(roundId: string){
+    const rounds = this.rounds$()
+    if(rounds === undefined){
+      return
+    }
+    this.rounds$.set(rounds.filter(({id}) => id !== roundId))
+    if(!this.newIds().includes(roundId)){
+      this._toDelete$.set([...this._toDelete$(), roundId])
+      this.roundsToDelete.emit(this._toDelete$())
+    }
+    this.newIds.set(this.newIds().filter(val => val!== roundId))
   }
 
   triggerRecompute(){

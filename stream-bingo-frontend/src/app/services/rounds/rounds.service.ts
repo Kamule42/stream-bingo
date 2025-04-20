@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { Socket, io } from 'socket.io-client';
 import { fromEvent, map, shareReplay } from 'rxjs';
 import { DateTime } from 'luxon';
-import { IRound, RoundStatus } from './round.interface';
+import { IEditRound, IRound, RoundStatus } from './round.interface';
 import { WebsocketService } from '../ws/websocket.service';
 
 type RawRound = Omit<IRound, 'startAt'|'streamStartAt'> & {startAt: string, streamStartAt: string}
@@ -40,8 +40,8 @@ export class RoundsService extends WebsocketService{
   public fetchRoundsForStream(streamId: string) {
     this.sendMessage('getRoundsForStream', {streamId})
   }
-  public updateStreamRounds(streamId: string, rounds: Omit<IRound, 'status'>[]) {
-    this.sendMessage('updateStreamRounds', { streamId, rounds})
+  public updateStreamRounds(streamId: string, rounds: IEditRound[], toDelete?: string[]) {
+    this.sendMessage('updateStreamRounds', { streamId, rounds, toDelete})
   }
   public updateCurrentRoundStatus(streamId: string, status: RoundStatus){
     this.sendMessage('updateStreamStatus', { streamId, status})

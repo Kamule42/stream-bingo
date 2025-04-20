@@ -1,6 +1,6 @@
 <div class="timeline-root">
   @if(duration$(); as duration){
-    <div class="timeline-rounds" [style.height]="`${duration / 1000 / 60 / 10}px`">
+    <div class="timeline-rounds">
       @if(roundMap$(); as roundMap){
           @for(block of blocks$(); track block.id){
             <div 
@@ -12,30 +12,40 @@
                 @let roundEntry = roundMap.get(block.roundId!)!;
                 @let round = roundEntry.round;
                 @let errors = roundEntry.errors;
+                @let hasError = (errors?.length ?? 0) > 0;
                 <div class="timeline-round">
-                  <span>
-                    <input class="input" type="text" 
-                      [(ngModel)]="round.name"/>
-                  </span>
-                  @if((errors?.length ?? 0) > 0){
+                  <div class="timeline-round-name">
+                    <p-iconfield>
+                      <input class="input" type="text" 
+                        [(ngModel)]="round.name"
+                        [class.ng-dirty]="hasError"
+                        [class.ng-invalid]="hasError"
+                      />
+                        @if(hasError){
+                          <p-inputicon
+                            styleClass="mdi mdi-alert-circle-outline"
+                            (click)="errorpop.toggle($event)"
+                            />
+                        }
+                    </p-iconfield>
                     <p-button 
-                      (click)="errorpop.toggle($event)"
-                      icon="mdi mdi-alert-circle-outline"
+                      (click)="deleteRound(round.id)"
+                      icon="mdi mdi-delete-outline"
                       severity="danger"
                       [rounded]="true"
                       [outlined]="true"
                       [text]="true"
-                      class="error-button" />
-                    <p-popover #errorpop>
-                      <div class="content">
-                        <ul>
-                          @for(error of errors; track error){
-                            <li>{{ error.message }} </li>
-                          }
-                        </ul>
-                      </div>
-                    </p-popover>
-                  }
+                      class="delete-button" />
+                      <p-popover #errorpop>
+                        <div class="content">
+                          <ul>
+                            @for(error of errors; track error){
+                              <li>{{ error.message }} </li>
+                            }
+                          </ul>
+                        </div>
+                      </p-popover>
+                  </div>
                   <div class="timeline-date start-stream">
                     <span class="timeline-date-field">
                       Début estimé du stream

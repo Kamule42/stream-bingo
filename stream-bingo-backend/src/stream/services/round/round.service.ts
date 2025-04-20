@@ -44,7 +44,7 @@ export class RoundService {
     })
   }
 
-  updateStreamRounds(streamId: string, rounds: IRoundEdit[]) {
+  updateStreamRounds(streamId: string, rounds: IRoundEdit[], toDelete?: string[]) {
     this.roundRepository.upsert(
       rounds
         .filter(({ toBeDeleted }) => toBeDeleted !== true)
@@ -56,6 +56,15 @@ export class RoundService {
           stream: { id: streamId },
         })),
       ['id'])
+      if((toDelete?.length ?? 0) > 0){
+        this.roundRepository.createQueryBuilder()
+          .delete()
+          .where('id in (:...ids) and stream.id=:streamId', {
+            ids: toDelete,
+            streamId,
+          })
+          .execute()
+      }
   }
 
   async streamRoundStatus(streamId: string, status: RoundStatus) {
@@ -82,7 +91,6 @@ export class RoundService {
       case RoundStatus.STARTED: return this.getStartedRoundStatus(newStatus)
       case RoundStatus.FINISHED: return this.getFinishedRoundStatus(newStatus)
     }
-    throw new Error('Unknown status')
   }
 
   private getCreatedRoundStatus(newStatus: RoundStatus): NewStatus{
@@ -98,7 +106,6 @@ export class RoundService {
       case RoundStatus.STARTED: return null
       case RoundStatus.FINISHED: return { newStatus, delay: true}
     }
-    throw new Error('Illegal status update')
   }
   private getFinishedRoundStatus(newStatus: RoundStatus): NewStatus{
     switch(newStatus){

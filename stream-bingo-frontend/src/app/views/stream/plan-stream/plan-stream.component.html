@@ -2,7 +2,11 @@
   <h4 class="title is-4">Planification</h4>
   <p-card>
     <div id="plan-content">
-      <app-timeline [(rounds)]="rounds$" (isValid)="isTimelineValid.set($event)"/>
+      <app-timeline
+        [(rounds)]="rounds$"
+        (isValid)="isTimelineValid.set($event)"
+        (roundsToDelete)="roundsToDelete.set($event)"
+      />
       <div id="plan-actions">
         <p-button
           label="Annuler"

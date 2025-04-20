@@ -30,7 +30,7 @@ export class PlanStreamComponent{
   private readonly roundService = inject(RoundsService)
   private readonly streamService = inject(StreamsService)
   private readonly router = inject(Router)
-    private readonly messageService = inject(MessageService)
+  private readonly messageService = inject(MessageService)
 
   private _webhandle = ''
   @Input()
@@ -39,6 +39,7 @@ export class PlanStreamComponent{
   }
 
   readonly isTimelineValid = signal<boolean>(true)
+  readonly roundsToDelete = signal<string[]>([])
 
   readonly streamId$ = toSignal(this.streamService.streamDetail$.pipe(
     map(stream => stream?.id)
@@ -75,7 +76,7 @@ export class PlanStreamComponent{
     this.messageService.add({ severity: 'info', summary: 'Sauvegardé'})
   }
   saveTimeline(){
-    this.roundService.updateStreamRounds( this.streamId$()!, this.rounds$())
+    this.roundService.updateStreamRounds( this.streamId$()!, this.rounds$(), this.roundsToDelete())
     this.messageService.add({ severity: 'info', summary: 'Sauvegardé'})
   }
   cancel(){
