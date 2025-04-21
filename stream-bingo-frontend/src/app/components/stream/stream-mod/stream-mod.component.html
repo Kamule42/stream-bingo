@@ -3,19 +3,17 @@
   <h5 class="title is-5">Gestion du stream</h5>
   <div id="stream-mod-actions" class="container">
     @if(round.status === 'CREATED'){
-      <p-buttongroup>
         <p-button
           severity="primary"
           title="Début du stream"
           icon="mdi mdi-play-outline"
           (onClick)="updateStatus(RoundStatus.STARTED)" />
-      </p-buttongroup>
     }
     @else if(round.status === 'STARTED'){
-      <p-buttongroup>
+        <div>Stream en cours</div>
         <p-button
-          severity="danger"
-          label="terminer"
+          severity="primary"
+          label="Fin du stream"
           title="Fin du stream"
           icon="mdi mdi-close-outline"
           (onClick)="updateStatus(RoundStatus.FINISHED)" />
@@ -25,7 +23,15 @@
           title="Annuler le démarrage du stream"
           icon="mdi mdi-arrow-u-left-top"
           (onClick)="updateStatus(RoundStatus.CREATED)"  />
-      </p-buttongroup>
+    }
+    @else if(round.status === 'FINISHED'){
+      <div> Stream terminé </div>
+      <p-button
+        severity="warn"
+        label="annuler"
+        title="Annuler la fin du stream"
+        icon="mdi mdi-arrow-u-left-top"
+        (onClick)="updateStatus(RoundStatus.STARTED)"  />
     }
     <div class="right">
       <p-inputgroup>

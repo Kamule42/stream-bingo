@@ -12,7 +12,7 @@ import { JwtAuthGuard } from 'src/shared/guards/jwt-auth/jwt-auth.guard'
 import { RefreshGuard } from 'src/shared/guards/refresh/refresh.guard'
 import { Paginate, PaginateQuery } from 'nestjs-paginate'
 import { IPaginatedResponse } from 'src/shared/interfaces/paginated.interface'
-import { toPaginationMeta as toPaginationMeta } from 'src/shared/functions/paginated'
+import { toPaginationMeta } from 'src/shared/functions/paginated'
 
 @WebSocketGateway({
   namespace: 'grids',
@@ -28,18 +28,18 @@ export class GridGateway {
     private readonly validatedCellsService: ValidatedCellsService,
   ){}
 
-  @SubscribeMessage('subscribeForStream')
+  @SubscribeMessage('subscribeForRound')
   subscribeForStream(
     @ConnectedSocket() client: Socket,
-    @MessageBody('streamId') streamId: string,
-  ): Promise<WsResponse<{streamId: string, cells: Array<IValidatedCell>}>>{
-    client.join(`stream_${streamId}`)
+    @MessageBody('roundId') roundId: string,
+  ): Promise<WsResponse<{roundId: string, cells: Array<IValidatedCell>}>>{
+    client.join(`round_${roundId}`)
     return this.validatedCellsService
-      .getValidatedCellsForStream(streamId)
+      .getValidatedCellsForRound(roundId)
       .then(cells => ({
         event: 'validatedcells',
         data: {
-          streamId,
+          roundId,
           cells: cells.map(cell => ({
             cellId: cell.cellId,
             valide: cell.valide,
@@ -48,12 +48,12 @@ export class GridGateway {
       }))
   }
 
-  @SubscribeMessage('unsubscribeForStream')
+  @SubscribeMessage('unsubscribeForRound')
   unsubscribeForStream(
     @ConnectedSocket() client: Socket,
-    @MessageBody('streamId') streamId: string,
+    @MessageBody('roundId') roundId: string,
   ){
-    client.leave(`stream_${streamId}`)
+    client.leave(`round_${roundId}`)
   }
 
   @SubscribeMessage('getGridForStream')
@@ -104,18 +104,18 @@ export class GridGateway {
   ])
   @SubscribeMessage('flipCell')
   async flipCell(
-    @MessageBody('streamId') streamId: string,
+    @MessageBody('roundId') roundId: string,
     @MessageBody('cellId') cellId: string,
   ): Promise<void> {
     const cells: Array<IValidatedCell> = await this.validatedCellsService
-      .flipCell(streamId, cellId)
+      .flipCell(roundId, cellId)
       .then(cells => cells.map(cell => ({
         cellId: cell.cellId,
         valide: cell.valide,
       })))
     
-    this.server.to(`stream_${streamId}`).emit("validatedcells", {
-      streamId,
+    this.server.to(`round_${roundId}`).emit("validatedcells", {
+      roundId,
       cells
     })
   }

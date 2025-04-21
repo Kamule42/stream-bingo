@@ -46,18 +46,16 @@ export class BingoComponent {
   private readonly _streamEffect = effect(() => {
     const session = this.session$()
     const bingoId = this.bingoId()
-    if (session != null) {
-      this.gridService.getGridForStream(this.stream().id)
+    if (session == null && bingoId == null) {
+      return;
     }
-    else if (bingoId != null) {
-      this.gridService.getGridForStream(this.stream().id, bingoId)
-    }
+    this.gridService.getGridForStream(this.stream().id , bingoId ?? undefined)
   })
 
   readonly grid$ = toSignal(this.gridService.gridForStream$.pipe(
     tap(grid => {
-      const session = this.session$()
-      if (grid && session == null && this.bingoId() == null) {
+      // const session = this.session$()
+      if (grid &&  this.bingoId() == null) {
         this.router.navigate(['./b', grid.id], { relativeTo: this.route })
       }
     })
@@ -76,7 +74,7 @@ export class BingoComponent {
   readonly selectedCellDescr = signal<string | null>(null)
 
   readonly validatedCells$ = toSignal(this.gridService.validatedCells$.pipe(
-    filter(val => val != null && val.streamId === this.stream()?.id),
+    filter(val => val != null && val.roundId === this.grid$()?.roundId),
     map(val => val!.cells
       .filter(({ valide }) => valide === true)
       .map(cell => cell.cellId)),

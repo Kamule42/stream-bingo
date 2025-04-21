@@ -15,13 +15,14 @@ export class ValidatedCellsService {
         private readonly cellService: CellService
     ){}
 
-    async flipCell(streamId: string, cellId: string): Promise<Array<ValidatedCellEntity>> {
-        const round = await this.roundService.getStreamCurrentRound(streamId)
+    async flipCell(roundId: string, cellId: string): Promise<Array<ValidatedCellEntity>> {
+        console.log('flip cell', roundId)
+        const round = await this.roundService.getRound(roundId)
         if(!round){
-          throw new Error(`No active round for the stream ${streamId}`)
+          throw new Error(`No active round for the round ${roundId}`)
         }
         const cell = await this.cellService.findOne(cellId)
-        if(cell == null || cell.stream?.id !== streamId ){
+        if(cell == null || cell.stream?.id !== round.stream.id ){
             throw new Error('Cell not found')
         }
         const validated = (await this.validatedCellsRepository.findOne({

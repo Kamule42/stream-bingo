@@ -18,18 +18,30 @@ export class GridService {
     ){}
 
     async getGridForStream(streamId: string, userId?: string, bingoId?: string): Promise<GridEntity | null> {
-        const round = await this.roundService.getStreamCurrentRound(streamId)
-        if(round?.id == null){
-            return null
+      
+        let where = {}
+        if(userId != null && bingoId != null){
+            where = {
+                user: { id : userId },
+                id: bingoId,
+            }
+        }
+        else if(userId != null || bingoId != null){
+            const round = await this.roundService.getStreamCurrentRound(streamId)
+            if(round?.id == null){
+                return null
+            }
+            where = {
+                round: { id: round.id },
+                user: userId ? {id: userId } : IsNull(),
+                ...(bingoId != null ? {id: bingoId} : {})
+            }
+        }
+        else{
+            throw Error('No bingo to show')
         }
         return this.gridRepository.findOne({
-            where:  {
-                round: {
-                   id: round.id
-                },
-                user: userId ? {id: userId } : IsNull(),
-                ...(userId == null && bingoId != null ? {id: bingoId} : {})
-            },
+            where:  where,
             relations: ['round', 'round.stream', 'cells', 'cells.cell'],
         })
     }

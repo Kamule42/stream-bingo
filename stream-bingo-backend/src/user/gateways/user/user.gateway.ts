@@ -37,12 +37,10 @@ export class UserGateway {
   async deleteAccount(
     @Session() session: ISession,
   ): Promise<WsResponse<boolean>>{
-    console.log('session', session)
     const result = await this.userService.deleteUser(session.sub)
-    console.log('result', result)
     return {
       event: 'accountDeleted',
-      data: true
+      data: result.affected === 1
     }
   }
 }

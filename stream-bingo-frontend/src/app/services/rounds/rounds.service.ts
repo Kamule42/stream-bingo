@@ -37,6 +37,9 @@ export class RoundsService extends WebsocketService{
   public fetchCurrentRoundForStream(streamId: string) {
     this.sendMessage('getCurrentRoundForStream', {streamId})
   }
+  public fetchRoundForGrid(gridId: string) {
+    this.sendMessage('getRoundForGrid', {gridId})
+  }
   public fetchRoundsForStream(streamId: string) {
     this.sendMessage('getRoundsForStream', {streamId})
   }

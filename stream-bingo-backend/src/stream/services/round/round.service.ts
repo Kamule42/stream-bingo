@@ -3,7 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { DateTime } from 'luxon';
 import { RoundEntity, RoundStatus } from 'src/stream/entities/round.entity';
 import { IRoundEdit } from 'src/stream/gateways/round/round.interface';
-import { MoreThanOrEqual, Repository } from 'typeorm';
+import { Brackets, IsNull, MoreThanOrEqual, Repository } from 'typeorm';
 
 type NewStatus = null | {newStatus: RoundStatus, delay: boolean }
 
@@ -14,6 +14,12 @@ export class RoundService {
     private readonly roundRepository: Repository<RoundEntity>,
   ) { }
 
+  getRound(roundId: string) {
+    return this.roundRepository.findOne({
+      where: { id: roundId},
+      relations: ['stream']
+    })
+  }
   getStreamCurrentRound(streamId: string): Promise<RoundEntity | null> {
     return this.roundRepository.createQueryBuilder('round')
       .addSelect(`
@@ -24,19 +30,34 @@ export class RoundService {
             `)
       .leftJoinAndSelect('round.stream', 'stream')
       .where('round.stream.id=:streamId', { streamId })
-      // .andWhere('round.status != \'FINISHED\'')
-      .andWhere('round.streamStartAt >= :date', { date: DateTime.now().minus({ hours: 3 }).toJSDate() })
+      .andWhere(new Brackets((qb) => {
+        qb
+          .where('round.streamStartAt >= :date', { date: DateTime.now().minus({ hours: 3 }).toJSDate() })
+          .orWhere('round.status = :status', { status: RoundStatus.STARTED })
+      }))
       .orderBy('statusOrder', 'ASC')
       .addOrderBy('round.streamStartAt', 'ASC')
       .getOne()
   }
+  getRoundForGrid(gridId: string, userId: string | undefined) {
+    let where = {}
+    return this.roundRepository.findOne({
+      where: {
+        grids: { 
+          id: gridId,
+          user : userId ? { id : userId } : IsNull(),
+        }
+      },
+      relations: ['stream']
+    })
+  }
 
   getStreamRounds(streamId: string): Promise<Array<RoundEntity>> {
     return this.roundRepository.find({
-      where: {
-        stream: { id: streamId },
-        streamStartAt: MoreThanOrEqual(DateTime.now().minus({ hours: 3 }).toJSDate())
-      },
+      where: [
+          { stream: { id: streamId }, streamStartAt: MoreThanOrEqual(DateTime.now().minus({ hours: 3 }).toJSDate()) },
+          { stream: { id: streamId }, status: RoundStatus.STARTED }
+      ],
       relations: ['stream'],
       order: {
         streamStartAt: 'asc'
@@ -82,7 +103,7 @@ export class RoundService {
       { id: round.id}, 
       {status: newStatus.newStatus }
     )
-    return round
+    return { ...round, status: newStatus.newStatus }
   }
 
   private getFilteredRoundStatus(roundStatus: RoundStatus, newStatus: RoundStatus): NewStatus{

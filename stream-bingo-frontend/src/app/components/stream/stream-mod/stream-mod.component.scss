@@ -10,6 +10,8 @@
         flex-direction: row;
         gap: 0.5rem;
         justify-content: start;
+        align-items: center;
+        flex-wrap: wrap;
         p-inputgroup{
             width: 25rem;
         }

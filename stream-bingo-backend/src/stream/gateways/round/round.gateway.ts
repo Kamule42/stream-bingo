@@ -8,6 +8,8 @@ import { RefreshGuard } from 'src/shared/guards/refresh/refresh.guard'
 import { roundMapper } from './round.mapper'
 import { UserRoles } from 'src/shared/roles'
 import { RoundStatus } from 'src/stream/entities/round.entity'
+import { ISession } from 'src/user/interfaces/session.interface'
+import { Session } from 'src/shared/decorators/auth/session.decorator'
 
 @WebSocketGateway({
   namespace: 'rounds',
@@ -24,6 +26,18 @@ export class RoundGateway {
     @MessageBody('streamId') streamId: string
   ): Promise<WsResponse<IRound>> {
     return this.roundService.getStreamCurrentRound(streamId)
+    .then(round => ({
+      event: 'roundDetail',
+      data: roundMapper(round)
+    }))
+  }
+
+  @SubscribeMessage('getRoundForGrid')
+  getRoundForGrid(
+    @MessageBody('gridId') gridId: string,
+    @Session() session?: ISession
+  ): Promise<WsResponse<IRound>> {
+    return this.roundService.getRoundForGrid(gridId, session?.sub)
     .then(round => ({
       event: 'roundDetail',
       data: roundMapper(round)

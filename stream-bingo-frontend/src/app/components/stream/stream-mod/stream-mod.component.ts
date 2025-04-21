@@ -1,11 +1,10 @@
-import { Component, computed, inject, signal } from '@angular/core'
+import { Component, computed, effect, inject, input, Input, signal } from '@angular/core'
 import { toObservable, toSignal } from '@angular/core/rxjs-interop'
 import { InputTextModule } from 'primeng/inputtext'
 import { FormsModule } from '@angular/forms'
 import { debounceTime, filter, map, tap } from 'rxjs'
 import { InputGroupAddonModule } from 'primeng/inputgroupaddon'
 import { ButtonModule } from 'primeng/button'
-import { ButtonGroupModule } from 'primeng/buttongroup'
 import { InputGroupModule } from 'primeng/inputgroup'
 import { StreamsService } from '../../../services/streams/streams.service'
 import { SettingsService } from '../../../services/settings/settings.service'
@@ -14,12 +13,14 @@ import { StrokeComponent } from '../../strokes/stroke.component'
 import { GridService } from '../../../services/grids/grid.service'
 import { RoundsService } from '../../../services/rounds/rounds.service'
 import { RoundStatus } from '../../../services/rounds/round.interface'
+import { SessionService } from '../../../services/session/session.service'
+import { ActivatedRoute } from '@angular/router'
 
 @Component({
   selector: 'app-stream-mod',
   imports: [ 
     FormsModule, InputTextModule, InputGroupModule,
-    InputGroupAddonModule, ButtonGroupModule, ButtonModule, StrokeComponent
+    InputGroupAddonModule, ButtonModule, StrokeComponent
   ],
   templateUrl: './stream-mod.component.html',
   styleUrl: './stream-mod.component.scss'
@@ -29,6 +30,26 @@ export class StreamModComponent {
   private readonly roundService = inject(RoundsService)
   private readonly gridService = inject(GridService)
   private readonly settingsService = inject(SettingsService)
+  private readonly sessionService = inject(SessionService)
+  private readonly route = inject(ActivatedRoute)
+
+  public readonly streamId = input.required<string>()
+  
+  private readonly bingoId = toSignal(this.route.paramMap.pipe(
+    map(m => m.get('bingoId'))
+  ), { initialValue: null })
+  
+  public readonly session$ = this.sessionService.session$
+  private readonly _roundEffect = effect(() => {
+    const session = this.session$()
+    const bingoId = this.bingoId()
+    if (bingoId != null) {
+      this.roundService.fetchRoundForGrid(bingoId)
+    }
+    else if(session != null){
+      this.roundService.fetchCurrentRoundForStream(this.streamId())
+    }
+  })
 
   readonly RoundStatus = RoundStatus
 
@@ -72,7 +93,7 @@ export class StreamModComponent {
   ), {initialValue: 'green'})
 
   readonly _validatedCells$ = toSignal(this.gridService.validatedCells$.pipe(
-    filter(val => val != null && val.streamId === this.round$()!.streamId),
+    filter(val => val != null && val.roundId === this.round$()!.id),
     map(val => val!.cells
       .filter(({valide}) => valide === true)
       .map(cell => cell.cellId)),
@@ -90,7 +111,7 @@ export class StreamModComponent {
     else {
       this.validatedCells$.set([...checkCells, cellId])
     }
-    this.gridService.flipCell(this.round$()!.streamId!, cellId)
+    this.gridService.flipCell(this.round$()!.id, cellId)
   }
 
   updateStatus(status: RoundStatus){

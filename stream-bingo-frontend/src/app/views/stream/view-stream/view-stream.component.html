@@ -10,7 +10,7 @@
         </div>
         @if(isModerator$()){
             <div id="stream-moderation" class="container is-fluid">
-                <app-stream-mod />
+                <app-stream-mod [streamId]="stream.id"/>
             </div>
         }
     }

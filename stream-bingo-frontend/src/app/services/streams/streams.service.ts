@@ -1,5 +1,5 @@
-import { Injectable, inject, signal } from '@angular/core'
-import { Subject, filter, fromEvent, map, merge, share, shareReplay, tap, } from 'rxjs'
+import { Injectable, signal } from '@angular/core'
+import { Subject, filter, fromEvent, map, merge, share, shareReplay, } from 'rxjs'
 import { Socket, io } from 'socket.io-client'
 import { DateTime } from 'luxon'
 import { toSignal } from '@angular/core/rxjs-interop'
@@ -7,7 +7,6 @@ import { ICell, IRight, IStream } from './stream.interface'
 import { IPaginated, IPagination } from '../../shared/models/pagination.interface'
 import { WebsocketService } from '../ws/websocket.service'
 import { IFav } from '../users/users.interface'
-import { RoundsService } from '../rounds/rounds.service'
 
 
 type RawStream = Omit<IStream, 'startAt'|'streamStartAt'> & {startAt: string, streamStartAt: string}
@@ -16,7 +15,6 @@ type RawStream = Omit<IStream, 'startAt'|'streamStartAt'> & {startAt: string, st
   providedIn: 'root'
 })
 export class StreamsService extends WebsocketService {
-  private readonly roundService = inject(RoundsService)
 
 
   private readonly _socket = io('/streams', {
@@ -73,11 +71,6 @@ export class StreamsService extends WebsocketService {
         ...stream,
         startAt: startAt as DateTime | undefined,
       }
-    }),
-    tap(stream => {
-      if(stream != null){
-        this.roundService.fetchCurrentRoundForStream(stream.id)
-      } 
     }),
     shareReplay(1),
   )

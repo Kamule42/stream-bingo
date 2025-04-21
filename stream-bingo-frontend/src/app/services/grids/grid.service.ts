@@ -29,21 +29,21 @@ export class GridService extends WebsocketService{
     pairwise(),
     map(([oldGrid, newGrid]) => {
       if(oldGrid?.streamId != null){
-        this.unsubscribeForStream(oldGrid?.streamId)
+        this.unsubscribeForRound(oldGrid?.roundId)
       }
       if(newGrid?.streamId != null){
-        this.subscribeForStream(newGrid?.streamId)
+        this.subscribeForRound(newGrid?.roundId)
       }
       return newGrid
     }),
   )
-  public readonly validatedCells$ = fromEvent<{ streamId: string, cells: IValidatedCell[]} | null>(this.socket, 'validatedcells')
+  public readonly validatedCells$ = fromEvent<{ roundId: string, cells: IValidatedCell[]} | null>(this.socket, 'validatedcells')
 
-  public subscribeForStream(streamId: string){
-    this.sendMessage('subscribeForStream', { streamId })
+  public subscribeForRound(roundId: string){
+    this.sendMessage('subscribeForRound', { roundId })
   }
-  public unsubscribeForStream(streamId: string){
-    this.sendMessage('unsubscribeForStream', { streamId })
+  public unsubscribeForRound(roundId: string){
+    this.sendMessage('unsubscribeForRound', { roundId })
   }
 
   public getGridForStream(streamId: string, bingoId?: string) {
@@ -54,9 +54,9 @@ export class GridService extends WebsocketService{
     this.currentStream$.set(streamId)
     this.sendMessage('createGridForStream', { streamId })
   }
-  public flipCell(streamId: string, cellId: string){
+  public flipCell(roundId: string, cellId: string){
     this.sendMessage('flipCell', {
-      streamId, cellId
+      roundId, cellId
     })
   }
 }
