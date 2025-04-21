@@ -329,6 +329,9 @@ export class TimelineComponent {
         accept: () => this.doDeleteRound(roundId)
       })
     }
+    else{
+      this.doDeleteRound(roundId)
+    }
   }
 
   private doDeleteRound(roundId: string){
