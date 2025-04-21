@@ -1,5 +1,5 @@
 import { UseGuards } from '@nestjs/common'
-import { ConnectedSocket, MessageBody, SubscribeMessage, WebSocketGateway, WebSocketServer, WsResponse } from '@nestjs/websockets'
+import { ConnectedSocket, MessageBody, SubscribeMessage, WebSocketGateway, WebSocketServer, WsException, WsResponse } from '@nestjs/websockets'
 import { GridService } from 'src/grid/services/grid/grid.service'
 import { IGrid, IGridSummary, IValidatedCell } from './grid.interface'
 import { Roles } from 'src/shared/decorators/auth/roles.decorator'
@@ -63,10 +63,17 @@ export class GridGateway {
     @Session() session?: ISession,
   ): Promise<WsResponse<IGrid | null>> {
     return this.gridService.getGridForStream(streamId, session?.sub, bingoId)
-      .then(grid => ({
-        event: 'gridForStream',
-        data: grid != null ? gridMapper(grid) : null
-      }))
+      .then(grid => {
+        if(grid === null){
+          throw new WsException({
+            type: 'unkownGrid'
+          })
+        }
+        return {
+          event: 'gridForStream',
+          data: grid != null ? gridMapper(grid) : null
+        }
+    })
   }
 
   @Roles()

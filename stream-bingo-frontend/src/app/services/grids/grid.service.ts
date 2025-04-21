@@ -1,8 +1,10 @@
 import { Injectable, signal } from '@angular/core';
 import { Socket, io } from 'socket.io-client';
-import { filter, fromEvent, map, pairwise, startWith,  } from 'rxjs';
+import { BehaviorSubject, filter, fromEvent, map, pairwise, startWith, Subject, tap, throttleTime,  } from 'rxjs';
 import { IGrid, IValidatedCell } from './grid.interface';
 import { WebsocketService } from '../ws/websocket.service';
+import { IWsError } from '../../shared/models/ws-errors.interface'
+import { toSignal } from '@angular/core/rxjs-interop'
 
 @Injectable({
   providedIn: 'root'
@@ -23,6 +25,10 @@ export class GridService extends WebsocketService{
 
   private readonly currentStream$ = signal<string | null>(null)
 
+  public readonly gridNotFound$ = fromEvent<IWsError | string>(this.socket, 'exception').pipe(
+    filter(error => typeof error !== 'string' && error?.type === 'unkownGrid'),
+    throttleTime(1500),
+  )
   public readonly gridForStream$ = fromEvent<IGrid | null>(this.socket, 'gridForStream').pipe(
     filter(grid => grid == null || grid?.streamId === this.currentStream$()),
     startWith(null),
@@ -46,9 +52,15 @@ export class GridService extends WebsocketService{
     this.sendMessage('unsubscribeForRound', { roundId })
   }
 
+  private readonly getGridForStream$$ = new Subject<{ streamId: string, bingoId?: string }>()
+  private readonly _getGridForStream$ = toSignal(this.getGridForStream$$.asObservable().pipe(
+    throttleTime(250),
+    tap(body => 
+      this.sendMessage('getGridForStream', body))
+  ))
   public getGridForStream(streamId: string, bingoId?: string) {
     this.currentStream$.set(streamId)
-    this.sendMessage('getGridForStream', { streamId, bingoId })
+    this.getGridForStream$$.next({ streamId, bingoId })
   }
   public createGrid(streamId: string) {
     this.currentStream$.set(streamId)

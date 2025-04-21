@@ -1,5 +1,5 @@
 import { UseGuards } from '@nestjs/common'
-import { MessageBody, SubscribeMessage, WebSocketGateway, WsResponse } from '@nestjs/websockets'
+import { MessageBody, SubscribeMessage, WebSocketGateway, WsException, WsResponse } from '@nestjs/websockets'
 import { IRound, IRoundEdit } from './round.interface'
 import { RoundService } from 'src/stream/services/round/round.service'
 import { Roles } from 'src/shared/decorators/auth/roles.decorator'
@@ -38,10 +38,15 @@ export class RoundGateway {
     @Session() session?: ISession
   ): Promise<WsResponse<IRound>> {
     return this.roundService.getRoundForGrid(gridId, session?.sub)
-    .then(round => ({
-      event: 'roundDetail',
-      data: roundMapper(round)
-    }))
+    .then(round => {
+        if(round === null){
+          throw new WsException({ type: 'unknownRound'})
+        }
+        return {
+        event: 'roundDetail',
+        data: roundMapper(round)
+      }
+    })
   }
 
   @SubscribeMessage('getRoundsForStream')

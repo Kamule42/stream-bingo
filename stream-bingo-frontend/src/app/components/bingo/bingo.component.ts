@@ -13,6 +13,7 @@ import { StrokeComponent } from '../strokes/stroke.component'
 import { CheckType } from '../../services/settings/setting.types'
 import { VisibilityService } from '../../services/visibility/visibility.service'
 import { StripeComponent } from '../stripe/stripe.component'
+import { MessageService } from 'primeng/api'
 
 @Component({
   selector: 'app-bingo',
@@ -27,6 +28,7 @@ export class BingoComponent {
   private readonly sessionService = inject(SessionService)
   private readonly settingsService = inject(SettingsService)
   private readonly visibilityService = inject(VisibilityService)
+  private readonly messageService = inject(MessageService)
   private readonly router = inject(Router)
   private readonly route = inject(ActivatedRoute)
 
@@ -60,6 +62,14 @@ export class BingoComponent {
       }
     })
   ))
+  readonly gridError$ = toSignal(this.gridService.gridNotFound$.pipe(
+    tap(() => this.messageService.add({
+      summary: 'Grille non trouvée',
+      severity: 'warn'
+    })),
+    tap(() => this.router.navigate(['../../'], { relativeTo: this.route }) )
+  ))
+
   readonly cells$ = computed(() => {
     const grid = this.grid$()
     return grid != null ? toChunk(grid.cells
