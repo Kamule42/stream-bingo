@@ -1,15 +1,18 @@
 import { UseGuards } from '@nestjs/common'
 import { ConnectedSocket, MessageBody, SubscribeMessage, WebSocketGateway, WebSocketServer, WsResponse } from '@nestjs/websockets'
 import { GridService } from 'src/grid/services/grid/grid.service'
-import { IGrid, IValidatedCell } from './grid.interface'
+import { IGrid, IGridSummary, IValidatedCell } from './grid.interface'
 import { Roles } from 'src/shared/decorators/auth/roles.decorator'
 import { Session } from 'src/shared/decorators/auth/session.decorator'
 import { ISession } from 'src/user/interfaces/session.interface'
-import { gridMapper } from './grid.mapper'
+import { gridMapper, gridSummaryMapper } from './grid.mapper'
 import { ValidatedCellsService } from 'src/grid/services/validated-cells/validated-cells.service'
 import { Namespace, Socket } from 'socket.io'
 import { JwtAuthGuard } from 'src/shared/guards/jwt-auth/jwt-auth.guard'
 import { RefreshGuard } from 'src/shared/guards/refresh/refresh.guard'
+import { Paginate, PaginateQuery } from 'nestjs-paginate'
+import { IPaginatedResponse } from 'src/shared/interfaces/paginated.interface'
+import { toPaginationMeta as toPaginationMeta } from 'src/shared/functions/paginated'
 
 @WebSocketGateway({
   namespace: 'grids',
@@ -63,6 +66,22 @@ export class GridGateway {
       .then(grid => ({
         event: 'gridForStream',
         data: grid != null ? gridMapper(grid) : null
+      }))
+  }
+
+  @Roles()
+  @SubscribeMessage('getMyGrids')
+  getMyGrids(
+    @Session() session: ISession,
+    @Paginate() query: PaginateQuery,
+  ): Promise<IPaginatedResponse<IGridSummary>> {
+    return this.gridService.getUserGrids(session?.sub, query)
+      .then(result => ({
+        event: 'myGrids',
+        data: {
+          data: result.data.map(gridSummaryMapper),
+          meta: toPaginationMeta(result.meta),
+        }
       }))
   }
   

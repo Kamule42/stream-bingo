@@ -11,11 +11,11 @@ export class GridEntity {
     @Column()
     locked: boolean
 
-    @ManyToOne(() => RoundEntity,)
+    @ManyToOne(() => RoundEntity, { onDelete: 'CASCADE' })
     @JoinColumn({name: 'round_id'})
     round: RoundEntity
     
-    @ManyToOne(() => UserEntity)
+    @ManyToOne(() => UserEntity, { onDelete: 'CASCADE' })
     @JoinColumn({name: 'user_id'})
     user?: UserEntity
 

@@ -17,7 +17,7 @@ export class UserEntity {
   @Column({ name: 'discord_avatar' })
   discordAvatar: string
 
-  @OneToMany(() => RightEntity, (right) => right.user)
+  @OneToMany(() => RightEntity, (right) => right.user,)
   @JoinColumn({name: 'user_id'})
   rights: Array<RightEntity>
 

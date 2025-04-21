@@ -26,7 +26,13 @@ export class UsersService extends WebsocketService {
     shareReplay(1),
   )
 
+  readonly accountDeleted$ = fromEvent<boolean>(this.socket, 'accountDeleted')
+
   public searchByName(name: string) {
     this.sendMessage('searchByName', {name})
+  }
+
+  public delete(){
+    this.sendMessage('deleteAccount')
   }
 }

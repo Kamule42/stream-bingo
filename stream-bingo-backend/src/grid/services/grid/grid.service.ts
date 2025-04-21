@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common'
 import { InjectRepository } from '@nestjs/typeorm'
+import { paginate, Paginated, PaginateQuery } from 'nestjs-paginate'
 import { GridCellEntity } from 'src/grid/entities/grid-cell.entity'
 import { GridEntity } from 'src/grid/entities/grid.entity'
 import { CellService } from 'src/stream/services/cell/cell.service'
@@ -63,5 +64,18 @@ export class GridService {
             where: { id: gridId},
             relations: ['round', 'round.stream', 'cells', 'cells.cell']
         }) as Promise<GridEntity>
+    }
+
+    getUserGrids(userId: string, query: PaginateQuery): Promise<Paginated<GridEntity>> {
+      return paginate(
+        query, 
+        this.gridRepository,
+        {
+            where: {
+                user: { id : userId}
+            },
+            relations: ['round', 'round.stream'],
+            sortableColumns: ['round.name', 'round.stream.name']
+        })
     }
 }

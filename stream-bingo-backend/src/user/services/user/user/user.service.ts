@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common'
 import { InjectRepository } from '@nestjs/typeorm'
 import { StreamEntity } from 'src/stream/entities/stream.entity'
 import { UserEntity } from 'src/user/entities/user.entity'
-import { ILike, Repository } from 'typeorm'
+import { DeleteResult, ILike, Repository } from 'typeorm'
 @Injectable()
 export class UserService {
  public constructor(
@@ -34,5 +34,9 @@ export class UserService {
     }
     this.usersRepository.save(user)
     return user
+  }
+
+  deleteUser(id: string) : Promise<DeleteResult>{
+    return this.usersRepository.delete({ id })
   }
 }

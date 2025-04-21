@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common'
 import { InjectRepository } from '@nestjs/typeorm'
 import { ICell } from 'src/stream/gateways/stream/stream.interface'
-import { CellEntity } from 'src/user/entities/cell.entity'
+import { CellEntity } from 'src/stream/entities/cell.entity'
 import { Repository } from 'typeorm'
 
 @Injectable()

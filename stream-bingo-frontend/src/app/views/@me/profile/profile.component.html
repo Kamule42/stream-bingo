@@ -1,0 +1,32 @@
+<div class="container">
+  <div class="box">
+    <h4 class="title is-4">Gestion</h4>
+    <p-button
+      label="Supprimer mon compte"
+      severity="danger"
+      icon="mdi mdi-trash-can-outline"
+      (click)="op.toggle($event)"
+      />
+  </div>
+</div>
+<p-popover #op>
+  <div id="delete-account-op">
+    <strong>Attention</strong>
+    <p>
+      Supprimer votre compte entrainera aussi la suppression de vos grilles.<br />
+      Vous pourrez toujour continuer à jouer en mode anonyme
+    </p>
+    <div id="delete-account-action">
+      <input pInputText
+        [(ngModel)]="check"
+        [placeholder]="`Tapez '${valueToDelete}' pour supprimer`"/>
+      <p-button
+        label="Valider la suppression"
+        severity="danger"
+        icon="mdi mdi-alert-outline"
+        [disabled]="check().toLocaleLowerCase() !== valueToDelete.toLocaleLowerCase()"
+        (onClick)="deleteAccount()"
+      />
+    </div>
+  </div>
+</p-popover>

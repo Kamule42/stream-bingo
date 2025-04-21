@@ -1,5 +1,5 @@
 import { Entity, Column, ManyToOne, JoinColumn, PrimaryColumn } from 'typeorm'
-import { CellEntity } from 'src/user/entities/cell.entity'
+import { CellEntity } from 'src/stream/entities/cell.entity'
 import { RoundEntity } from 'src/stream/entities/round.entity'
 
 @Entity({ name: 'validated_cells', schema: 'bingo' })

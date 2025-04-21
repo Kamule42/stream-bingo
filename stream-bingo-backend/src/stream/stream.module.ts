@@ -8,7 +8,7 @@ import { RoundEntity } from './entities/round.entity'
 import { UserModule } from 'src/user/user.module'
 import { NextStreamEntity } from './entities/next-stream.entity'
 import { CellService } from './services/cell/cell.service'
-import { CellEntity } from 'src/user/entities/cell.entity'
+import { CellEntity } from 'src/stream/entities/cell.entity'
 import { RoundService } from './services/round/round.service'
 import { RoundGateway } from './gateways/round/round.gateway'
 

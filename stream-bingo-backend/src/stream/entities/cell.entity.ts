@@ -1,5 +1,5 @@
 import { StreamEntity } from "src/stream/entities/stream.entity";
-import { Column, Entity, Index, JoinColumn, ManyToOne, PrimaryColumn } from "typeorm";
+import { Column, Entity, JoinColumn, ManyToOne, PrimaryColumn } from "typeorm";
 
 
 @Entity({ name: 'cells', schema: 'bingo' })
@@ -16,7 +16,7 @@ export class CellEntity{
     @Column()
     active: boolean
 
-    @ManyToOne(() => StreamEntity)
+    @ManyToOne(() => StreamEntity, { onDelete: 'CASCADE', onUpdate: 'CASCADE' })
     @JoinColumn({name: 'stream_id'})
     stream?: StreamEntity
 }

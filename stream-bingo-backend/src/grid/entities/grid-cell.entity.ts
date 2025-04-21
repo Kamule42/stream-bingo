@@ -1,6 +1,6 @@
 import { Entity, Column, ManyToOne, JoinColumn, PrimaryColumn } from 'typeorm'
 import { GridEntity } from './grid.entity'
-import { CellEntity } from 'src/user/entities/cell.entity'
+import { CellEntity } from 'src/stream/entities/cell.entity'
 
 @Entity({ name: 'grid_cells', schema: 'bingo' })
 export class GridCellEntity {
@@ -9,13 +9,13 @@ export class GridCellEntity {
 
     @PrimaryColumn({name: 'grid_id'})
     gridId: string
-    @ManyToOne(() => GridEntity)
+    @ManyToOne(() => GridEntity, { onDelete: 'CASCADE' })
     @JoinColumn({name: 'grid_id'})
     grid: GridEntity
     
     @PrimaryColumn({name: 'cell_id'})
     cellId: string
-    @ManyToOne(() => CellEntity)
+    @ManyToOne(() => CellEntity, { onDelete: 'CASCADE' })
     @JoinColumn({name: 'cell_id'})
     cell: CellEntity
 

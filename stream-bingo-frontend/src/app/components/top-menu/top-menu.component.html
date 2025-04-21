@@ -1,85 +1,73 @@
 <nav class="navbar is-fixed-top" role="navigation" aria-label="main navigation">
-    <div class="container">
-        <p-menubar
-         [model]="items()"
-         [autoDisplay]="true"
-         [autoHide]="true"
-         [autoHideDelay]="500"
-        >
-            <ng-template  #item let-item let-root>
-                @if(item.route){
-                    <a [routerLink]="item.route" class="p-menubar-item-link">
-                        <span [class]="item.icon"></span>
-                        <span class="ml-2">{{ item.label }}</span>
-                        @if(item.items){
-                            <span [ngClass]="[' ml-2 pi pi-fw', root ? 'pi-angle-down' : 'pi-angle-right']"></span>
-                        }
-                    </a>
-                }
-                @else if(item.url){
-                    <a [href]="item.url" class="p-menubar-item-link">
-                        <span [class]="item.icon"></span>
-                        <span class="ml-2">{{ item.label }}</span>
-                        @if(item.items){
-                            <span [ngClass]="[' ml-2 pi pi-fw', root ? 'pi-angle-down' : 'pi-angle-right']"></span>
-                        }
-                    </a>
-                }
-                @else {
-                    <div class="p-menubar-item-link">
-                        <span [class]="item.icon"></span>
-                        <span class="ml-2">{{ item.label }} 
-                            {{ root }}</span>
-                        @if(item.items){
-                            <span [ngClass]="[' ml-2 pi pi-fw', root ? 'pi-angle-down' : 'pi-angle-right']"></span>
-                        }
-                    </div>
-                }
-            </ng-template>
-            <ng-template #end>
-                <div class="is-flex is-flex-row">
-                    <a pRipple 
-                    (click)="showSettingDialog.set(true)"
-                    aria-hidden="true"
-                     class="p-menubar-item-link">
-                        <span class="mdi mdi-cog-outline"></span>
-                        <span>Paramètres</span>
-                    </a>
-                    @if (isConnected()) {
-                        @let _session = session();
-                        <a pRipple
-                            (click)="loggedinMenu.toggle($event)"
-                            aria-hidden="true"
-                            class="flex items-center p-menubar-item-link">
-                            <span>{{ _session?.username }}</span>
-                            @if(_session?.discord?.avatarId){
-                                <p-avatar [image]="`//cdn.discordapp.com/avatars/${_session?.discord?.id}/${_session?.discord?.avatarId}`" shape="circle" />
-                            }
-                            @else {
-                                <p-avatar shape="circle" [label]="_session?.username?.slice(0,1)" [style]="{'background-color': 'var(--secondary-color)'}" />
-                            }
-                            <span class="mdi mdi-dots-vertical"></span>
-                        </a>
-                        <p-menu
-                            #loggedinMenu
-                            [model]="logoutItems"
-                            [popup]="true"
-                            appendTo="body"
-                            tooltipPosition="right" />
-                    }
-                    @else if(isDisconnected()){
-                        <div class="navbar-item">
-                            <app-discord-auth />
-                        </div>
-                    }
-                </div>
-            </ng-template>
-        </p-menubar>
-    </div>
+  <div class="container">
+    <p-menubar [model]="items()" [autoDisplay]="true" [autoHide]="true" [autoHideDelay]="500">
+      <ng-template #item let-item let-root>
+        @if(item.route){
+        <a [routerLink]="item.route" class="p-menubar-item-link">
+          <span [class]="item.icon"></span>
+          <span class="ml-2">{{ item.label }}</span>
+          @if(item.items){
+          <span [ngClass]="[' ml-2 pi pi-fw', root ? 'pi-angle-down' : 'pi-angle-right']"></span>
+          }
+        </a>
+        }
+        @else if(item.url){
+        <a [href]="item.url" class="p-menubar-item-link">
+          <span [class]="item.icon"></span>
+          <span class="ml-2">{{ item.label }}</span>
+          @if(item.items){
+          <span [ngClass]="[' ml-2 pi pi-fw', root ? 'pi-angle-down' : 'pi-angle-right']"></span>
+          }
+        </a>
+        }
+        @else {
+        <div class="p-menubar-item-link">
+          <span [class]="item.icon"></span>
+          <span class="ml-2">{{ item.label }}
+            {{ root }}</span>
+          @if(item.items){
+          <span [ngClass]="[' ml-2 pi pi-fw', root ? 'pi-angle-down' : 'pi-angle-right']"></span>
+          }
+        </div>
+        }
+      </ng-template>
+      <ng-template #end>
+        <div class="is-flex is-flex-row">
+          <a pRipple (click)="showSettingDialog.set(true)" aria-hidden="true" class="p-menubar-item-link">
+            <span class="mdi mdi-cog-outline"></span>
+            <span>Paramètres</span>
+          </a>
+          @if (isConnected()) {
+          @let _session = session();
+          <a pRipple routerLink="/@me" class="flex items-center p-menubar-item-link">
+            <span>{{ _session?.username }}</span>
+            @if(_session?.discord?.avatarId){
+            <p-avatar [image]="`//cdn.discordapp.com/avatars/${_session?.discord?.id}/${_session?.discord?.avatarId}`"
+              shape="circle" />
+            }
+            @else {
+            <p-avatar shape="circle" [label]="_session?.username?.slice(0,1)"
+              [style]="{'background-color': 'var(--secondary-color)'}" />
+            }
+            <span (click)="loggedinMenu.toggle($event)" aria-hidden="true" class="mdi mdi-dots-vertical">
+            </span>
+          </a>
+          <p-menu #loggedinMenu [model]="logoutItems" [popup]="true" appendTo="body" tooltipPosition="right" />
+          }
+          @else if(isDisconnected()){
+          <div class="navbar-item">
+            <app-discord-auth />
+          </div>
+          }
+        </div>
+      </ng-template>
+    </p-menubar>
+  </div>
 </nav>
 
-<p-dialog header="Préférences" [modal]="true" [(visible)]="showSettingDialog" [breakpoints]="{ '1199px': '75vw', '575px': '90vw' }" >
-    @if(showSettingDialog()){
-        <app-settings (done)="showSettingDialog.set(false)" />
-    }
+<p-dialog header="Préférences" [modal]="true" [(visible)]="showSettingDialog"
+  [breakpoints]="{ '1199px': '75vw', '575px': '90vw' }">
+  @if(showSettingDialog()){
+  <app-settings (done)="showSettingDialog.set(false)" />
+  }
 </p-dialog>

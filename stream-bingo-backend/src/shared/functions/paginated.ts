@@ -2,7 +2,7 @@ import { Paginated } from "nestjs-paginate"
 import { IPaginationMeta } from "../interfaces/paginated.interface"
 
 
-export function toPaginationMetal<T = any>(dbMeta:  Paginated<T>['meta']): IPaginationMeta{
+export function toPaginationMeta<T = any>(dbMeta:  Paginated<T>['meta']): IPaginationMeta{
     return {
         currentPage: dbMeta.currentPage,
         itemsPerPage: dbMeta.itemsPerPage,

@@ -1,5 +1,5 @@
 import { GridEntity } from "src/grid/entities/grid.entity";
-import { IGrid } from "./grid.interface";
+import { IGrid, IGridSummary } from "./grid.interface";
 
 export const gridMapper = (grid: GridEntity): IGrid => ({
     id: grid.id,
@@ -14,4 +14,11 @@ export const gridMapper = (grid: GridEntity): IGrid => ({
         cellDescription: cell.cell.description,
         cellId: cell.cell.id,
     }))
+})
+
+export const gridSummaryMapper = (grid: GridEntity): IGridSummary => ({
+    id: grid.id,
+    roundName: grid.round.name,
+    streamId: grid.round.stream.id,
+    streamName: grid.round.stream.name,
 })

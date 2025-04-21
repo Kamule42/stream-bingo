@@ -27,7 +27,7 @@ export class RoundEntity {
   })
   status: RoundStatus
 
-  @ManyToOne(() => StreamEntity, (stream) => stream.rounds)
+  @ManyToOne(() => StreamEntity, (stream) => stream.rounds, { onDelete: 'CASCADE', onUpdate: 'CASCADE' })
   @JoinColumn({name: 'stream_id'})
   stream: StreamEntity
 

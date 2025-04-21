@@ -8,11 +8,11 @@ export class RightEntity {
     @PrimaryColumn({ name: 'right_key' })
     rightKey: string
 
-    @ManyToOne(() => UserEntity, (user) => user.rights)
+    @ManyToOne(() => UserEntity, (user) => user.rights, { onDelete: 'CASCADE', onUpdate: 'CASCADE' })
     @JoinColumn({name: 'user_id'})
     user: UserEntity
 
-    @ManyToOne(() => StreamEntity)
+    @ManyToOne(() => StreamEntity, { onDelete: 'CASCADE', onUpdate: 'CASCADE' })
     @JoinColumn({name: 'stream_id'})
     stream?: StreamEntity
 }

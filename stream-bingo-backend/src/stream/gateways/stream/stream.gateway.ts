@@ -1,5 +1,5 @@
 import { MessageBody, SubscribeMessage, WebSocketGateway, WsResponse } from '@nestjs/websockets'
-import { map, Observable, tap } from 'rxjs'
+import { map, Observable } from 'rxjs'
 import { StreamService } from 'src/stream/services/stream/stream.service'
 import { ICell, INextStream, IRight, IStream } from './stream.interface' 
 import { cellsMapper, nextStreamMapper, streamMapper } from './stream.mappers'
@@ -7,7 +7,7 @@ import { Paginate, PaginateQuery } from 'nestjs-paginate'
 import { UseGuards } from '@nestjs/common'
 import { Roles } from 'src/shared/decorators/auth/roles.decorator'
 import { IPaginatedResponse } from 'src/shared/interfaces/paginated.interface'
-import { toPaginationMetal } from 'src/shared/functions/paginated'
+import { toPaginationMeta } from 'src/shared/functions/paginated'
 import { CellService } from 'src/stream/services/cell/cell.service'
 import { ISession } from 'src/user/interfaces/session.interface'
 import { IFav } from 'src/user/gateways/user/user.responses'
@@ -31,13 +31,13 @@ export class StreamGateway {
   @Roles([UserRoles.admin])
   getStreams(
     @Paginate() query: PaginateQuery,
-  ): Observable<WsResponse<IPaginatedResponse<IStream>>> {
+  ): Observable<IPaginatedResponse<IStream>> {
     return this.streamService.listServices(query, false).pipe(
       map(result => ({
         event: 'streamList',
         data: {
           data: result.data.map(s => streamMapper(s, true)),
-          meta: toPaginationMetal(result.meta),
+          meta: toPaginationMeta(result.meta),
         }
       }))
     )
@@ -55,13 +55,13 @@ export class StreamGateway {
   @SubscribeMessage('getNexts')
   getNextStreams(
     @Paginate() query: PaginateQuery,
-  ): Observable<WsResponse<IPaginatedResponse<INextStream>>> {
+  ): Observable<IPaginatedResponse<INextStream>> {
     return this.streamService.listNextStreams(query).pipe(
       map(result => ({
         event: 'nextStreams',
         data: {
           data: result.data.map(nextStreamMapper).filter(val => val != null),
-          meta: toPaginationMetal(result.meta),
+          meta: toPaginationMeta(result.meta),
         }
       }))
     );

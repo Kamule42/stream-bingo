@@ -34,7 +34,8 @@ export const routes: Routes = [
         path: '@me',
         canActivate: [hasRightGuard],
         children: [
-            {path: 'favs', loadComponent: () => import('./views/@me/favs/favs.component').then(c => c.FavsComponent)}
+            {path: '', loadComponent: () => import('./views/@me/profile/profile.component').then(c => c.ProfileComponent)},
+            {path: 'favs', loadComponent: () => import('./views/@me/favs/favs.component').then(c => c.FavsComponent)},
         ]
     },
 
