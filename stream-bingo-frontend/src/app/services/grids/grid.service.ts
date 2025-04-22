@@ -1,6 +1,6 @@
 import { Injectable, signal } from '@angular/core';
 import { Socket, io } from 'socket.io-client';
-import { BehaviorSubject, filter, fromEvent, map, pairwise, startWith, Subject, tap, throttleTime,  } from 'rxjs';
+import { BehaviorSubject, distinctUntilChanged, filter, fromEvent, map, pairwise, startWith, Subject, tap, throttleTime,  } from 'rxjs';
 import { IGrid, IValidatedCell } from './grid.interface';
 import { WebsocketService } from '../ws/websocket.service';
 import { IWsError } from '../../shared/models/ws-errors.interface'
@@ -54,7 +54,7 @@ export class GridService extends WebsocketService{
 
   private readonly getGridForStream$$ = new Subject<{ streamId: string, bingoId?: string }>()
   private readonly _getGridForStream$ = toSignal(this.getGridForStream$$.asObservable().pipe(
-    throttleTime(250),
+    distinctUntilChanged(),
     tap(body => 
       this.sendMessage('getGridForStream', body))
   ))

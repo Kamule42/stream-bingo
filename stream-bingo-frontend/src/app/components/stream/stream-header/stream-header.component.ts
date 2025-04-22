@@ -1,8 +1,8 @@
-import { Component, Input, computed, inject, input } from '@angular/core'
+import { Component, computed, inject, input } from '@angular/core'
 import { ButtonModule } from 'primeng/button'
 import { ActivatedRoute, NavigationEnd, Router, RouterModule } from '@angular/router'
 import { toSignal } from '@angular/core/rxjs-interop'
-import { filter, map, } from 'rxjs'
+import { filter, map, merge, mergeMap, shareReplay, switchMap, tap, zip, } from 'rxjs'
 import { SessionService } from '../../../services/session/session.service'
 import { IStream } from '../../../services/streams/stream.interface'
 
@@ -21,11 +21,9 @@ export class StreamHeaderComponent {
 
   readonly session$ = this.sessionService.session$
 
-  private _webhandle = ''
-  @Input()
-  set webhandle(webhandle: string) {
-    this._webhandle = webhandle
-  }
+  _webhandle = toSignal(this.route.paramMap.pipe(
+    map(m => m.get('webhandle'))
+  ))
 
   readonly isManager$ = computed(() => {
     const stream = this.stream()
@@ -43,19 +41,30 @@ export class StreamHeaderComponent {
     return this.sessionService.isStreamPlanificator(stream.id)
   })
 
-  readonly isEditing$ = toSignal(this.router.events.pipe(
-    filter(event => event instanceof NavigationEnd),
-    map(event => event.url.endsWith('edit'))
-  ), {initialValue: this.router.url.endsWith('edit')})
-  readonly isPlaning$ = toSignal(this.router.events.pipe(
-    filter(event => event instanceof NavigationEnd),
-    map(event => event.url.endsWith('plan'))
-  ), {initialValue: this.router.url.endsWith('plan')})
+  private readonly datas$ = merge(
+    this.router.events.pipe(
+      filter(event => event instanceof NavigationEnd),
+      map(() => void 0),
+    ),
+    this.route.url.pipe(map(() => void 0)),
+  ).pipe(
+    switchMap(() => zip(
+      this.route.data,
+      ...(this.route.children.map(child => child.data))
+    )),
+    map(datas => datas.flat()),
+    shareReplay(1),
+  )
+  readonly isEditing$ = toSignal(this.datas$.pipe(
+    map(datas => datas.some(data => data['name'] === 'edit'))
+  ), {initialValue: false})
+  readonly isPlaning$ = toSignal(this.datas$.pipe(
+    map(datas => datas.some(data => data['name'] === 'plan'))
+  ), {initialValue: false})
 
-  readonly isViewing$ = toSignal(this.router.events.pipe(
-    filter(event => event instanceof NavigationEnd),
-    map(event => event.url.split('/').length != 3)
-  ), {initialValue: this.router.url.split('/').length !== 3})
+  readonly isViewing$ = toSignal(this.datas$.pipe(
+    map(datas => datas.some(data => data['name'] === 'bingo'))
+  ), {initialValue: false})
 
 
   flip() {

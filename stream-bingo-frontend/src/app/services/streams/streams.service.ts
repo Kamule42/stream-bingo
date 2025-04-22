@@ -1,5 +1,5 @@
 import { Injectable, signal } from '@angular/core'
-import { Subject, filter, fromEvent, map, merge, share, shareReplay, } from 'rxjs'
+import { Subject, debounce, debounceTime, filter, fromEvent, map, merge, share, shareReplay, tap, throttleTime, } from 'rxjs'
 import { Socket, io } from 'socket.io-client'
 import { DateTime } from 'luxon'
 import { toSignal } from '@angular/core/rxjs-interop'
@@ -124,9 +124,14 @@ export class StreamsService extends WebsocketService {
   public fetchCells(id: string) {
     this.sendMessage('getStreamCells', { id })
   }
-
-  public getFavs(): any {
-    this.sendMessage('getMyFavs')
+  
+  private readonly getFavs$$ = new Subject<void>()
+  private readonly _getFavs$ = toSignal(this.getFavs$$.asObservable().pipe(
+    debounceTime(50),
+    tap(() => this.sendMessage('getMyFavs'))
+  ))
+  public getFavs(): void {
+    this.getFavs$$.next(void 0)
   }
   public flipFav(id: string, { streamName, twitchId, streamTwitchHandle }: Omit<IFav, 'streamId'>) {
     const hasFav = this._favs$()?.some(({ streamId }) => streamId === id)

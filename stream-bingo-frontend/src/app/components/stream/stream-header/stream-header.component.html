@@ -18,7 +18,7 @@
         </div>
         <div id="stream-actions">
             @if(session$()){
-                @if(isViewing$()){
+                @if(!isViewing$()){
                 <p-button
                     severity="secondary"
                     label="Retour"
@@ -35,14 +35,14 @@
                         severity="secondary"
                         label="Planifier"
                         icon="mdi mdi-calendar-month-outline"
-                        routerLink="./plan" />
+                        [routerLink]="['/', 's', _webhandle(), 'plan']" />
                 }
                 @if( isManager$() && !isEditing$()){
                     <p-button
                         severity="secondary"
                         label="Modifier"
                         icon="mdi mdi-pencil-outline"
-                        routerLink="./edit" />
+                        [routerLink]="['/', 's', _webhandle(), 'edit']" />
                 }
             }
         </div>
