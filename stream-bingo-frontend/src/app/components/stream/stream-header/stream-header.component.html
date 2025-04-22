@@ -44,6 +44,10 @@
                         icon="mdi mdi-pencil-outline"
                         [routerLink]="['/', 's', _webhandle(), 'edit']" />
                 }
+                <p-button 
+                    icon="mdi mdi-share-variant-outline"
+                    (onClick)="share()"   
+                />
             }
         </div>
     </div>

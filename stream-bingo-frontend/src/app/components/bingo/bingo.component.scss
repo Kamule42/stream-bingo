@@ -76,9 +76,12 @@
 	}
 
 	.cell-txt {
+		color: #333;
 		position: absolute;
 		z-index: 5;
-		text-shadow: 0 0 3px white;
+		text-shadow: 0 0 5px white;
+		font-weight: 700;
+		padding: 0.3em;
 	}
 
 	.cell-stroke {

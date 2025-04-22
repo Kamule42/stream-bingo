@@ -3,6 +3,8 @@ export enum CheckType {
     CIRCLE = "circle",
     DISC = "disc",
     SCRATCH = "scratch",
+    SCRIBBLE = "scribble",
+    STAR = "star",
 }
 
 export interface ISaveParams {

@@ -80,4 +80,11 @@ export class StreamHeaderComponent {
     this.router.navigate(['./'], { relativeTo: this.route })
   }
 
+  share(){
+    navigator.share({
+      title: `Partager le bingo de ${this.stream().name}`,
+      url: `${window.location.origin}/s/${this.stream().urlHandle}`
+    })
+  }
+
 }
