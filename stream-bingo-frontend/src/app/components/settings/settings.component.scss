@@ -7,9 +7,13 @@
     }
     #settings-strokes{
         flex-wrap: wrap;
+        .control{
+            flex-wrap: wrap;
+        }
         .stroke {
             width: 18vw;
             height: 18vw;
+            min-width: 45px;
             max-width: 150px;
             max-height: 150px;
 

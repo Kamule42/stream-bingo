@@ -7,6 +7,7 @@ import { DiscComponent } from './disc/disc.component';
 import { CheckType } from '../../services/settings/setting.types';
 import { ScribbleComponent } from './scribble/scribble.component'
 import { StarComponent } from './star/star.component'
+import { BrushCircleComponent } from './brush-circle/brush-circle.component'
 
 @Component({
   selector: 'app-stroke',
@@ -26,6 +27,7 @@ export class StrokeComponent {
       case CheckType.SCRATCH: return ScratchComponent
       case CheckType.SCRIBBLE: return ScribbleComponent
       case CheckType.STAR: return StarComponent
+      case CheckType.BRUSH_CIRCLE: return BrushCircleComponent
     }
   })
   readonly params$ = computed(() => {

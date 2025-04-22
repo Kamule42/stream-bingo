@@ -5,6 +5,7 @@ export enum CheckType {
     SCRATCH = "scratch",
     SCRIBBLE = "scribble",
     STAR = "star",
+    BRUSH_CIRCLE = "brush_circle",
 }
 
 export interface ISaveParams {
