@@ -1,11 +1,12 @@
-import { Component, Input, computed, inject, signal } from '@angular/core'
+import { Component, Input, computed, effect, inject, signal } from '@angular/core'
 import { toSignal } from '@angular/core/rxjs-interop'
-import { filter, map, switchMap, } from 'rxjs'
+import { filter, map, switchMap, tap, } from 'rxjs'
 import { BingoComponent } from '../../../components/bingo/bingo.component'
 import { StreamModComponent } from "../../../components/stream/stream-mod/stream-mod.component"
 import { SessionService } from '../../../services/session/session.service'
 import { IStream } from '../../../services/streams/stream.interface'
 import { StreamsService } from '../../../services/streams/streams.service'
+import { RoundsService } from '../../../services/rounds/rounds.service'
 
 
 @Component({
@@ -17,6 +18,7 @@ import { StreamsService } from '../../../services/streams/streams.service'
 export class ViewStreamComponent {
   private readonly streamService = inject(StreamsService)
   private readonly sessionService = inject(SessionService)
+    private readonly roundService = inject(RoundsService)
 
   private readonly _webhandle = signal<string | null>(null)
   @Input()
@@ -38,9 +40,15 @@ export class ViewStreamComponent {
         ...stream,
         isFav: favs?.some(({streamId}) => streamId === stream.id)
       })),
-    )))
+    ))),
+    tap(stream => this.roundService.fetchCurrentRoundForStream(stream.id))
   )
   readonly stream$ =  toSignal<IStream>(this._stream$)
+
+  private readonly  _round$ = this.roundService.currentRound$.pipe(
+      filter(round => round != null),
+   )
+  readonly round$ = toSignal(this._round$)
 
   readonly isModerator$ = computed(() => {
     const stream = this.stream$()

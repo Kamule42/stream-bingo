@@ -5,6 +5,9 @@
                 <div id="twitch-embed"></div>
             }
             <div id="view-stream-bingo">
+                @if(round$(); as round){
+                    <h3 class="title is-3">{{ round.name }}</h3>
+                }
                 <app-bingo [stream]="stream" />
             </div>
         </div>
