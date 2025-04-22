@@ -20,7 +20,6 @@ export class GridService {
   async getGridForStream(streamId: string, userId?: string, bingoId?: string): Promise<GridEntity | null> {
 
     let where = {}
-    console.log(userId, bingoId)
     if (userId != null && bingoId != null) {
       where = {
         user: { id: userId },
