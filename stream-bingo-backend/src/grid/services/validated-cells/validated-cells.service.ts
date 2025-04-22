@@ -16,7 +16,6 @@ export class ValidatedCellsService {
     ){}
 
     async flipCell(roundId: string, cellId: string): Promise<Array<ValidatedCellEntity>> {
-        console.log('flip cell', roundId)
         const round = await this.roundService.getRound(roundId)
         if(!round){
           throw new Error(`No active round for the round ${roundId}`)

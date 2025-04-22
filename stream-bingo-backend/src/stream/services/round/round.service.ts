@@ -95,7 +95,6 @@ export class RoundService {
     }
     const roundStatus = round.status
     const newStatus = this.getFilteredRoundStatus(roundStatus, status)
-    console.log(newStatus)
     if(newStatus == null){ // Nothing to do
       return null
     }

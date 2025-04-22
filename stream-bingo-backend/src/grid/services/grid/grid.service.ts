@@ -5,7 +5,7 @@ import { GridCellEntity } from 'src/grid/entities/grid-cell.entity'
 import { GridEntity } from 'src/grid/entities/grid.entity'
 import { CellService } from 'src/stream/services/cell/cell.service'
 import { RoundService } from 'src/stream/services/round/round.service'
-import { DeepPartial, IsNull, MoreThanOrEqual, Repository } from 'typeorm'
+import { DeepPartial, IsNull, Repository } from 'typeorm'
 import { v7 as uuid } from 'uuid'
 
 @Injectable()
@@ -18,7 +18,7 @@ export class GridService {
   ) { }
 
   async getGridForStream(streamId: string, userId?: string, bingoId?: string): Promise<GridEntity | null> {
-
+    console.log('get grid for stream')
     let where = {}
     if (userId != null && bingoId != null) {
       where = {
@@ -40,6 +40,7 @@ export class GridService {
     else {
       throw Error('No bingo to show')
     }
+    console.log(streamId, userId, bingoId, where)
     return this.gridRepository.findOne({
       where: where,
       relations: ['round', 'round.stream', 'cells', 'cells.cell'],

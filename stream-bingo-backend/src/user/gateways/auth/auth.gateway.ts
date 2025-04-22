@@ -47,7 +47,6 @@ export class AuthGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
 
   @Interval(30*60000)
   handleInterval() {
-    console.log('flush unknown clients')
     const ids = [...this.namespace.sockets.keys()]
     for(const id of ids){
       const foundKey = [...this.clients.entries()].find(([_, value]) => value === id)?.at(0)
