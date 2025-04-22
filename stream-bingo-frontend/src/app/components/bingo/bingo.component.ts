@@ -56,13 +56,13 @@ export class BingoComponent {
 
   readonly grid$ = toSignal(this.gridService.gridForStream$.pipe(
     tap(grid => {
-      // const session = this.session$()
       if (grid &&  this.bingoId() == null) {
         this.router.navigate(['./b', grid.id], { relativeTo: this.route })
       }
     })
   ))
   readonly gridError$ = toSignal(this.gridService.gridNotFound$.pipe(
+    filter(() => this.bingoId() != null),
     tap(() => this.messageService.add({
       summary: 'Grille non trouvée',
       severity: 'warn'

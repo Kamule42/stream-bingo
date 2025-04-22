@@ -18,7 +18,6 @@ export class GridService {
   ) { }
 
   async getGridForStream(streamId: string, userId?: string, bingoId?: string): Promise<GridEntity | null> {
-    console.log('get grid for stream')
     let where = {}
     if (userId != null && bingoId != null) {
       where = {
@@ -40,7 +39,6 @@ export class GridService {
     else {
       throw Error('No bingo to show')
     }
-    console.log(streamId, userId, bingoId, where)
     return this.gridRepository.findOne({
       where: where,
       relations: ['round', 'round.stream', 'cells', 'cells.cell'],
