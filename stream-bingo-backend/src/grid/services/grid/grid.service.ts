@@ -3,6 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm'
 import { paginate, Paginated, PaginateQuery } from 'nestjs-paginate'
 import { GridCellEntity } from 'src/grid/entities/grid-cell.entity'
 import { GridEntity } from 'src/grid/entities/grid.entity'
+import { RoundStatus } from 'src/stream/entities/round.entity'
 import { CellService } from 'src/stream/services/cell/cell.service'
 import { RoundService } from 'src/stream/services/round/round.service'
 import { DeepPartial, IsNull, Repository } from 'typeorm'
@@ -51,6 +52,12 @@ export class GridService {
     const round = await this.roundService.getStreamCurrentRound(streamId)
     if (round == null) {
       throw new Error('No active round')
+    }
+    if(
+      round.status !== RoundStatus.CREATED && 
+      (userId === undefined || round.status != RoundStatus.STARTED)
+    ){
+      throw new Error('Cannot create round')
     }
     const gridId = uuid()
     const cells: Array<DeepPartial<GridCellEntity>> = Array.from(Array(16).keys()).map(index => {

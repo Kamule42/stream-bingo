@@ -14,6 +14,8 @@ import { CheckType } from '../../services/settings/setting.types'
 import { VisibilityService } from '../../services/visibility/visibility.service'
 import { StripeComponent } from '../stripe/stripe.component'
 import { MessageService } from 'primeng/api'
+import { RoundsService } from '../../services/rounds/rounds.service'
+import { RoundStatus } from '../../services/rounds/round.interface'
 
 @Component({
   selector: 'app-bingo',
@@ -29,6 +31,7 @@ export class BingoComponent {
   private readonly settingsService = inject(SettingsService)
   private readonly visibilityService = inject(VisibilityService)
   private readonly messageService = inject(MessageService)
+  private readonly roundService = inject(RoundsService)
   private readonly router = inject(Router)
   private readonly route = inject(ActivatedRoute)
 
@@ -144,8 +147,16 @@ export class BingoComponent {
 
   readonly score$ = computed(() => this.bingos$()?.length)
 
+  private readonly  _round$ = this.roundService.currentRound$.pipe(
+    filter(round => round != null),
+ )
+  readonly round$ = toSignal(this._round$)
 
-
+  readonly canCreateGrid$ = computed(() => 
+    this.round$()?.status === RoundStatus.CREATED || 
+    this.round$()?.status === RoundStatus.STARTED && this.session$() != null
+  )
+  
   public generateGrid() {
     this.gridService.createGrid(this.stream().id)
   }

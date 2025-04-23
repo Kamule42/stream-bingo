@@ -2,18 +2,26 @@
 @use "sass:math";
 
 :host {
+
 	#grid {
 		position: relative;
 		display: flex;
 		flex-direction: column;
 		align-items: center;
+		
+		@include mixins.mobile {
+			font-size: 0.65rem;
+		}
+		@include mixins.tablet {
+			font-size: 0.85rem;
+		}
 	}
 
 	#no-grid {
 		display: flex;
 		flex-direction: column;
 		align-items: center;
-		gap: 1rem;
+		gap: 1em;
 	}
 
 	#cells {
@@ -24,12 +32,14 @@
 		border: 0.2px solid var(--bulma-body-color);
 		border-radius: 10px;
 		overflow: hidden;
+		font-size: 1em;
 	}
 
 	.cells-row {
 		display: flex;
 		flex-direction: row;
 		gap: 0;
+		font-size: 1em;
 
 		&:not(:last-of-type) {
 			border-bottom: 1px solid var(--bulma-body-color);
@@ -38,13 +48,12 @@
 
 	.cell {
 		position: relative;
-		width: 20vw;
-		height: 20vw;
+		width: min(20vw, 16vh);
+		height: min(20vw, 16vh);
 		max-width: 150px;
 		max-height: 150px;
-		padding: 1rem;
+		padding: 1em;
 		background-color: white;
-		// color: var(--secondary-color);
 		text-align: center;
 
 		&:not(:last-of-type) {
@@ -79,9 +88,10 @@
 		color: #333;
 		position: absolute;
 		z-index: 5;
-		text-shadow: 0 0 5px white;
+		text-shadow: 0 0 10px #6669, 0 0 3px white;
 		font-weight: 700;
 		padding: 0.3em;
+		font-size: 0.8em;
 	}
 
 	.cell-stroke {
@@ -111,7 +121,7 @@
 		justify-content: center;
 		align-items: center;
 
-		font-size: 3rem;
+		font-size: 3em;
 	}
 
 	.stripe {

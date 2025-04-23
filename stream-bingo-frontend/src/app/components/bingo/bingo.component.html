@@ -37,10 +37,16 @@
     Score&nbsp;:&nbsp;{{ score$() }}
   </div>
 }
-@else {
+@else if(canCreateGrid$()){
   <div id="no-grid">
     <div>Vous n'avez pas encore de grille</div>
     <p-button label="Générez en une" (onClick)="generateGrid()" />
+  </div>
+}
+@else { 
+  <div id="no-grid">
+    <div>La partie est déjà commencée.</div>
+    <div>Vous pouvez toujours vous connecter pour participer</div>
   </div>
 }
 <p-popover #op appendTo="body" (onHide)="selectedCellDescr.set(null)">
