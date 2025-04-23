@@ -16,7 +16,7 @@
       </div>
     </div>
   </div>
-  <div id="settings-color" class="row">
+  <div id="stroke-color" class="row">
     <div class="field">
       <div class="label">Couleur du marqueur</div>
       <div class="control">
@@ -27,6 +27,23 @@
       <div class="label">Transparence</div>
       <div class="control">
         <p-slider id="settings-transparency" [(ngModel)]="alpha" [min]="42" [max]="255" />
+      </div>
+    </div>
+  </div>
+  <div id="stripe">
+    <app-stripe stripe="row" [color]="stripeAlphaColor()" />
+  </div>
+  <div id="stripe-color" class="row">
+    <div class="field">
+      <div class="label">Couleur de la ligne</div>
+      <div class="control">
+        <p-color-picker [(ngModel)]="stripeColor" appendTo="body" />
+      </div>
+    </div>
+    <div class="field">
+      <div class="label">Transparence</div>
+      <div class="control">
+        <p-slider id="settings-transparency" [(ngModel)]="stripeAlpha" [min]="42" [max]="255" />
       </div>
     </div>
   </div>

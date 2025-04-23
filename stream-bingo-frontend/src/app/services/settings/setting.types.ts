@@ -11,4 +11,5 @@ export enum CheckType {
 export interface ISaveParams {
     check?: CheckType
     checkColor?: string
+    stripeColor?: string,
 }

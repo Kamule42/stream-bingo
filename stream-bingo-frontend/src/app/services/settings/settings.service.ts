@@ -71,5 +71,8 @@ export class SettingsService {
     if(toSave.checkColor !== undefined){
       this._checkColor$.next(toSave.checkColor)
     }
+    if(toSave.stripeColor !== undefined){
+      this._stripeColor$.next(toSave.stripeColor)
+    }
   }
 }
