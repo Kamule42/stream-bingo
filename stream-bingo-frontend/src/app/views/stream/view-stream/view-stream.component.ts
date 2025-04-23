@@ -57,4 +57,10 @@ export class ViewStreamComponent {
     }
     return this.sessionService.isStreamModerator(stream.id)
   })
+
+  
+  readonly isGridOpen = computed(() => {
+    const round = this.round$()
+    return round && round.startAt <= new Date()
+  })
 }

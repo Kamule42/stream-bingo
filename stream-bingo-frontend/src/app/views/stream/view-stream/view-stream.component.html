@@ -1,20 +1,27 @@
 <div id="stream-body">
-    @if (stream$(); as stream) {
-        <div  id="stream-bingo-and-stream" class="container is-fluid">
-            @if(displayStream()){
-                <div id="twitch-embed"></div>
-            }
-            <div id="view-stream-bingo">
-                @if(round$(); as round){
-                    <h3 class="title is-3">{{ round.name }}</h3>
-                }
-                <app-bingo [stream]="stream" />
-            </div>
-        </div>
-        @if(isModerator$()){
-            <div id="stream-moderation" class="container is-fluid">
-                <app-stream-mod [streamId]="stream.id"/>
-            </div>
+  @if (stream$(); as stream) {
+    @if(isGridOpen()){
+      <div id="stream-bingo-and-stream" class="container is-fluid">
+        @if(displayStream()){
+          <div id="twitch-embed"></div>
         }
+        <div id="view-stream-bingo">
+            @if(round$(); as round){
+              <h3 class="title is-3">{{ round.name }}</h3>
+            }
+            <app-bingo [stream]="stream" />
+        </div>
+      </div>
+      @if(isModerator$()){
+        <div id="stream-moderation" class="container is-fluid">
+          <app-stream-mod [streamId]="stream.id" />
+        </div>
+      }
     }
+    @else {
+      <div id="stream-bingo-and-stream" class="container is-fluid">
+        Il n'y a pas de partie de prévue pour l'instant
+      </div>
+    }
+  }
 </div>

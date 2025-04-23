@@ -25,8 +25,8 @@ export class StreamListComponent implements OnInit {
     )),
     map(streams => streams.map((stream: IStream) => ({
       ...stream,
-      nextStreamStartsAtTxt: stream.startAt ?
-        Interval.fromDateTimes(DateTime.now(), stream.startAt)
+      nextStreamStartsAtTxt: stream.streamStartAt ?
+        Interval.fromDateTimes(DateTime.now(), stream.streamStartAt)
           .toDuration(['days', 'hours', 'minutes', 'seconds'])
           .toHuman({
             listStyle: 'long',

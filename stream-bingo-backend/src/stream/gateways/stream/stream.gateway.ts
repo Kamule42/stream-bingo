@@ -55,16 +55,15 @@ export class StreamGateway {
   @SubscribeMessage('getNexts')
   getNextStreams(
     @Paginate() query: PaginateQuery,
-  ): Observable<IPaginatedResponse<INextStream>> {
-    return this.streamService.listNextStreams(query).pipe(
-      map(result => ({
+  ): Promise<IPaginatedResponse<INextStream>> {
+    return this.streamService.listNextStreams(query)
+    .then(result => ({
         event: 'nextStreams',
         data: {
           data: result.data.map(nextStreamMapper).filter(val => val != null),
           meta: toPaginationMeta(result.meta),
         }
       }))
-    );
   }
 
   @SubscribeMessage('getDetail')

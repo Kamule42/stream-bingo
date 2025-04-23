@@ -1,4 +1,5 @@
 import { DateTime } from "luxon"
+import { RoundStatus } from "../rounds/round.interface"
 
 export interface IRight{
     right: string
@@ -13,12 +14,18 @@ export interface IStream<T = IRight>{
     urlHandle: string
     enabled?: boolean
     rights?: T[]
-    startAt?: DateTime
+    startAt?: DateTime,
+    streamStartAt?: DateTime,
     startAtTxt?: string
     startAtIso?: string
     isFav?: boolean,
-    cells?: ICell[]
+    cells?: ICell[],
+    status?: RoundStatus,
 }
+
+
+export type RawStream = Omit<IStream, 'startAt'|'streamStartAt'> & {startAt: string, streamStartAt: string}
+
 
 
 export interface ICell{

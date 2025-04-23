@@ -5,7 +5,7 @@ import { Observable, from,  } from 'rxjs'
 import { NextStreamEntity } from 'src/stream/entities/next-stream.entity'
 import { StreamEntity } from 'src/stream/entities/stream.entity'
 import { IStream, IRight } from 'src/stream/gateways/stream/stream.interface'
-import { Repository, DataSource, Not, IsNull, } from 'typeorm'
+import { Repository, DataSource, Not, IsNull, MoreThanOrEqual, LessThanOrEqual, } from 'typeorm'
 
 @Injectable()
 export class StreamService {
@@ -32,13 +32,13 @@ export class StreamService {
 
   listNextStreams( 
     query: PaginateQuery,
-  ): Observable<Paginated<NextStreamEntity>> {
-    return from (paginate(
+  ): Promise<Paginated<NextStreamEntity>> {
+    return paginate(
       query,
       this.nextStreamRepository ,
       {
         where: {
-          startAt: Not(IsNull())
+          startAt: LessThanOrEqual(new Date())
         },
         sortableColumns: ['startAt'],
         defaultSortBy: [
@@ -46,7 +46,7 @@ export class StreamService {
           ['startAt', 'ASC']
         ],
       }
-    ))
+    )
   }
 
   getStreamDetail(webhandle: string): Observable<NextStreamEntity | null>{

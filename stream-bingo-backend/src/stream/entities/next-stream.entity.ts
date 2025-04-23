@@ -1,4 +1,5 @@
 import { Entity, Column, PrimaryColumn, } from 'typeorm'
+import { RoundStatus } from './round.entity'
 
 @Entity({ name: 'v_next_streams', schema: 'bingo' })
 export class NextStreamEntity {
@@ -19,4 +20,10 @@ export class NextStreamEntity {
 
   @Column({ name: 'start_at'})
   startAt: Date
+  
+  @Column({ name: 'stream_start_at'})
+  streamStartAt: Date
+
+  @Column()
+  status: RoundStatus
 }

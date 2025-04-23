@@ -1,15 +1,13 @@
 import { Injectable, signal } from '@angular/core'
-import { Subject, debounce, debounceTime, filter, fromEvent, map, merge, share, shareReplay, tap, throttleTime, } from 'rxjs'
+import { Subject, debounceTime, filter, fromEvent, map, merge, share, shareReplay, tap, } from 'rxjs'
 import { Socket, io } from 'socket.io-client'
 import { DateTime } from 'luxon'
 import { toSignal } from '@angular/core/rxjs-interop'
-import { ICell, IRight, IStream } from './stream.interface'
+import { ICell, IRight, IStream, RawStream } from './stream.interface'
 import { IPaginated, IPagination } from '../../shared/models/pagination.interface'
 import { WebsocketService } from '../ws/websocket.service'
 import { IFav } from '../users/users.interface'
 
-
-type RawStream = Omit<IStream, 'startAt'|'streamStartAt'> & {startAt: string, streamStartAt: string}
 
 @Injectable({
   providedIn: 'root'
@@ -32,19 +30,20 @@ export class StreamsService extends WebsocketService {
   private readonly currentStreamWebhandle$ = signal<string | null>(null)
 
   private readonly _streams$ = fromEvent<IPaginated<RawStream[]>>(this.socket, 'streamList').pipe(
-    share()
+    shareReplay(1)
   )
 
   public readonly streams$ = this._streams$.pipe(
     map(({ data: streams }) => streams.map<IStream>((stream) => ({
       ...stream,
       startAt: stream.startAt ? DateTime.fromISO(stream.startAt) : undefined,
+      streamStartAt: stream.streamStartAt ? DateTime.fromISO(stream.streamStartAt) : undefined,
     }))),
-    share(),
+    shareReplay(1),
   )
   public readonly streamMeta$ = this._streams$.pipe(
     map(({ meta }) => meta),
-    share(),
+    shareReplay(1),
   )
 
 
@@ -52,8 +51,9 @@ export class StreamsService extends WebsocketService {
     map(streams => streams.data.map((stream): IStream => ({
       ...stream,
       startAt: stream.startAt ? DateTime.fromISO(stream.startAt) : undefined,
+      streamStartAt: stream.streamStartAt ? DateTime.fromISO(stream.streamStartAt) : undefined,
     })) ?? []),
-    share(),
+    shareReplay(1),
   )
   public readonly streamDetail$ = fromEvent<IStream & { startAt: string }>(this.socket, 'streamDetail').pipe(
     filter(stream =>
