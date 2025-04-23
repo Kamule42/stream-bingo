@@ -1,0 +1,48 @@
+<div class="root">
+  <h4 class="title is-4">Trouver un stream</h4>
+  <div class="searchbar">
+    <div class="field">
+      <label class="label" for="search-stream">Nom du stream</label>
+      <div class="control">
+        <p-inputgroup>
+          <p-inputgroup-addon>
+            <i class="mdi mdi-magnify"></i>
+          </p-inputgroup-addon>
+          <input
+            id="search-stream"
+            [(ngModel)]="search$"
+            (ngModelChange)="onSearchChange($event)"
+            pInputText />
+        </p-inputgroup>
+      </div>
+    </div>
+  </div>
+  @if(loading$()){
+    <p-progress-spinner ariaLabel="loading" />
+  }
+  @if(results$(); as result){
+    <div class="result">
+      @if(result.length === 0){
+        Aucun résultat
+      }
+      @else {
+        @for(stream of result; track stream.id){
+          
+          <a [routerLink]="`/s/${stream.urlHandle}`">
+          <div class="card">
+              <div class="card-image is-flex is-justify-content-center">
+                <figure class="image ">
+                  <img [src]="`//static-cdn.jtvnw.net/jtv_user_pictures/${stream.twitchId}-profile_image-300x300.png`"
+                    [alt]="`${stream.name} profil`" />
+                </figure>
+              </div>
+              <div class="card-content">
+                <h6 class="title is-6">{{ stream.name }}</h6>
+              </div>
+          </div>
+        </a>
+        }
+      }
+    </div>
+  }
+</div>

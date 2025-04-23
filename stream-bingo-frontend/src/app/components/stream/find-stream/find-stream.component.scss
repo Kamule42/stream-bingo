@@ -1,0 +1,51 @@
+:host{
+  .root{
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .field{
+    max-width: 30rem;
+  }
+
+  .card{
+    max-width: 14rem;
+    max-height: 100%;
+
+    img{
+        max-width: 16rem;
+        max-height: 16rem;
+    }
+
+    h6{
+      text-wrap: nowrap;
+      text-overflow: ellipsis;
+      overflow: hidden;
+    }
+
+    margin-bottom: 0!important;
+
+    &:hover{
+      @media (prefers-color-scheme: light) {
+        filter: brightness(95%);
+      }
+      @media (prefers-color-scheme: dark) {
+        filter: brightness(105%);
+      }
+      img{
+        filter: brightness(95%);
+      }
+      box-shadow: 0 0 8px #0009;
+    }
+  }
+
+  .result{
+    display: flex;
+    flex-direction: row;
+    gap: 1rem;
+    justify-content: center;
+    align-items: center;
+    flex-wrap: wrap;
+  }
+}

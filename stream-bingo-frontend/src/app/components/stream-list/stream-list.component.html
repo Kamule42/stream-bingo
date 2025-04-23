@@ -1,33 +1,43 @@
 <div>
-  <h3 class="title is-3">Les prochains streams</h3>
+  <h4 class="title is-4">Les prochains streams</h4>
   <div id="next-streams" class="is-flex is-flex-row">
     @if(streams$(); as streams){
-    <p-carousel [value]="streams" [numVisible]="5" [numScroll]="1" [circular]="false"
-      [responsiveOptions]="responsiveOptions">
-      <ng-template let-stream #item>
-        <div class="card">
-          <a [routerLink]="`/s/${stream.urlHandle}`">
-            <div class="card-image is-flex is-justify-content-center">
-              <figure class="image ">
-                <img [src]="`//static-cdn.jtvnw.net/jtv_user_pictures/${stream.twitchId}-profile_image-300x300.png`"
-                  [alt]="`${stream.name} profil`" />
-              </figure>
+      @if(streams.length > 0){
+        <p-carousel [value]="streams" [numVisible]="5" [numScroll]="1" [circular]="false"
+          [responsiveOptions]="responsiveOptions">
+          <ng-template let-stream #item>
+            <div class="card">
+              <a [routerLink]="`/s/${stream.urlHandle}`">
+                <div class="card-image is-flex is-justify-content-center">
+                  <figure class="image ">
+                    <img [src]="`//static-cdn.jtvnw.net/jtv_user_pictures/${stream.twitchId}-profile_image-300x300.png`"
+                      [alt]="`${stream.name} profil`" />
+                  </figure>
+                </div>
+                <div class="card-content">
+                  <h5 class="title is-5">{{ stream.name }}</h5>
+                  <div class="content">
+                    @if(stream.status === 'STARTED'){
+                      Stream en cours
+                    }
+                    @else{
+                    Dans <time [dateTime]="stream.nextStreamStartsAtIso">{{ stream.nextStreamStartsAtTxt }}</time>
+                    }
+                  </div>
+                </div>
+              </a>
             </div>
-            <div class="card-content">
-              <h5 class="title is-5">{{ stream.name }}</h5>
-              <div class="content">
-                @if(stream.status === 'STARTED'){
-                  Stream en cours
-                }
-                @else{
-                Dans <time [dateTime]="stream.nextStreamStartsAtIso">{{ stream.nextStreamStartsAtTxt }}</time>
-                }
-              </div>
-            </div>
-          </a>
+          </ng-template>
+        </p-carousel>
+      }
+      @else {
+        <div id="no-next-stream">
+          <span class="mdi mdi-emoticon-sad-outline"></span>
+          <div>
+            Aucun stream de prévu pour l'instant
+          </div>
         </div>
-      </ng-template>
-    </p-carousel>
+      }
     }
   </div>
 </div>

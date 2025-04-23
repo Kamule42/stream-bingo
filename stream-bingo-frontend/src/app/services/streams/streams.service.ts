@@ -1,5 +1,5 @@
 import { Injectable, signal } from '@angular/core'
-import { Subject, debounceTime, filter, fromEvent, map, merge, share, shareReplay, tap, } from 'rxjs'
+import { Subject, debounceTime, filter, fromEvent, map, merge, shareReplay, tap, } from 'rxjs'
 import { Socket, io } from 'socket.io-client'
 import { DateTime } from 'luxon'
 import { toSignal } from '@angular/core/rxjs-interop'
@@ -13,8 +13,6 @@ import { IFav } from '../users/users.interface'
   providedIn: 'root'
 })
 export class StreamsService extends WebsocketService {
-
-
   private readonly _socket = io('/streams', {
     reconnection: true,
     reconnectionDelay: 1000,
@@ -150,5 +148,13 @@ export class StreamsService extends WebsocketService {
       ])
     }
     this.sendMessage('flipFav', { id })
+  }
+
+  
+  public readonly searchResult$ = fromEvent<RawStream[]>(this.socket, 'searchResult').pipe(
+    shareReplay(1)
+  )
+  searchByName(name: string): void {
+    this.sendMessage('searchByName', { name })
   }
 }

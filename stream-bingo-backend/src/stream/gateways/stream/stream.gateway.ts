@@ -133,4 +133,22 @@ export class StreamGateway {
       data: [...new Set(data)]
     }))
   }
+
+  @SubscribeMessage('searchByName')
+  async searchByName(
+    @MessageBody('name') name: string
+  ): Promise<WsResponse<Array<IStream> | undefined>>{
+    if(name?.length === 0){
+      return {
+        event: 'searchResult',
+        data:  undefined,
+      }
+    }
+    return this.streamService.findByName(name).then(
+      result => ({
+        event: 'searchResult',
+        data:  result.map(s => streamMapper(s, false)),
+      })
+    )
+  }
 }

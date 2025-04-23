@@ -11,4 +11,20 @@
             max-height: 300px;
         }
     }
+
+    #no-next-stream{
+        display: flex;
+        flex-direction: row;
+        flex-wrap: wrap;
+        gap: 1rem;
+        justify-content: center;
+        align-items: center;
+
+        width: 100%;
+
+        span.mdi{
+            font-size: 3rem;
+            color: var(--main-color);
+        }
+    }
 }

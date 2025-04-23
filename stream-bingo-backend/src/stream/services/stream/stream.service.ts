@@ -5,7 +5,7 @@ import { Observable, from,  } from 'rxjs'
 import { NextStreamEntity } from 'src/stream/entities/next-stream.entity'
 import { StreamEntity } from 'src/stream/entities/stream.entity'
 import { IStream, IRight } from 'src/stream/gateways/stream/stream.interface'
-import { Repository, DataSource, Not, IsNull, MoreThanOrEqual, LessThanOrEqual, } from 'typeorm'
+import { Repository, DataSource,  LessThanOrEqual, ILike, Raw, } from 'typeorm'
 
 @Injectable()
 export class StreamService {
@@ -116,5 +116,16 @@ export class StreamService {
         'INSERT INTO bingo.favs(stream_id, user_id) VALUES ($1,$2)',
         [streamId, userId])
     }
+  }
+
+  
+  findByName(name: string) {
+    return this.streamRepository.find({
+      where: [
+        {name:  Raw((alias) => `unaccent(${alias}) ILike unaccent('%:name%')`, { name: name }),  },
+        {twitchLogin:  Raw((alias) => `unaccent(${alias}) ILike unaccent(:name)`, { name: `%${name}%` }),  },
+      ],
+      take: 5,
+    })
   }
 }
