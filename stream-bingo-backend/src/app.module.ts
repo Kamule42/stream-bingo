@@ -10,6 +10,7 @@ import { GridModule } from './grid/grid.module'
 import { JwtAuthGuard } from './shared/guards/jwt-auth/jwt-auth.guard'
 import { RefreshGuard } from './shared/guards/refresh/refresh.guard'
 import { ScheduleModule } from '@nestjs/schedule'
+import { ScoringModule } from './scoring/scoring.module';
 
 @Module({
   imports: [
@@ -36,6 +37,7 @@ import { ScheduleModule } from '@nestjs/schedule'
     UserModule,
     StreamModule,
     GridModule,
+    ScoringModule,
   ],
   controllers: [AppController],
   providers: [

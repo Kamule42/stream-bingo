@@ -1,0 +1,29 @@
+<div class="container">
+  <h5 class="title is-5">Classement</h5>
+  <p-table [value]="rows$()" [tableStyle]="{ 'min-width': '50rem' }">
+    <ng-template #header>
+      <tr>
+        <th>Rang</th>
+        <th>Nom</th>
+        <th>Score</th>
+      </tr>
+    </ng-template>
+    <ng-template #body let-score>
+      <tr>
+        <td>
+          @if(score.index <= 3){
+            <span class="mdi mdi-medal-outline" [class]="`rank-${score.index}`"></span>
+          }
+          {{ score.index }}
+        </td>
+        <td>{{ score.username }}</td>
+        <td>{{ score.score }}</td>
+      </tr>
+    </ng-template>
+    <ng-template emptymessage>
+      <tr>
+        <td colspan="4">No customers found.</td>
+      </tr>
+    </ng-template>
+  </p-table>
+</div>

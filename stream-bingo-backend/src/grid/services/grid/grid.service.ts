@@ -48,7 +48,9 @@ export class GridService {
 
   async createGrid(streamId: string, userId?: string): Promise<GridEntity> {
     const availableCells = await this.cellService.getStreamCells(streamId)
-    let cellIds = availableCells.map(({ id }) => id)
+    let cellIds = availableCells
+      .filter(({ active }) => active)
+      .map(({ id }) => id)
     const round = await this.roundService.getStreamCurrentRound(streamId)
     if (round == null) {
       throw new Error('No active round')

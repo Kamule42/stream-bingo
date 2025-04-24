@@ -1,4 +1,4 @@
-import { Component, Input, computed, effect, inject, signal } from '@angular/core'
+import { Component, Input, computed, inject, signal } from '@angular/core'
 import { toSignal } from '@angular/core/rxjs-interop'
 import { filter, map, switchMap, tap, } from 'rxjs'
 import { BingoComponent } from '../../../components/bingo/bingo.component'

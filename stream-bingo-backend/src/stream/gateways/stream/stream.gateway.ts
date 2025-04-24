@@ -31,16 +31,15 @@ export class StreamGateway {
   @Roles([UserRoles.admin])
   getStreams(
     @Paginate() query: PaginateQuery,
-  ): Observable<IPaginatedResponse<IStream>> {
-    return this.streamService.listServices(query, false).pipe(
-      map(result => ({
+  ): Promise<IPaginatedResponse<IStream>> {
+    return this.streamService.listServices(query, false)
+      .then(result => ({
         event: 'streamList',
         data: {
           data: result.data.map(s => streamMapper(s, true)),
           meta: toPaginationMeta(result.meta),
         }
       }))
-    )
   }
 
   

@@ -5,7 +5,7 @@ import { Observable, from,  } from 'rxjs'
 import { NextStreamEntity } from 'src/stream/entities/next-stream.entity'
 import { StreamEntity } from 'src/stream/entities/stream.entity'
 import { IStream, IRight } from 'src/stream/gateways/stream/stream.interface'
-import { Repository, DataSource,  LessThanOrEqual, ILike, Raw, } from 'typeorm'
+import { Repository, DataSource,  LessThanOrEqual, Raw, } from 'typeorm'
 
 @Injectable()
 export class StreamService {
@@ -21,13 +21,13 @@ export class StreamService {
   listServices(
     query: PaginateQuery,
     onlyEnabled: boolean = true
-  ): Observable<Paginated<StreamEntity>> {
-    return from (paginate(query, this.streamRepository, {
+  ): Promise<Paginated<StreamEntity>> {
+    return paginate(query, this.streamRepository, {
       where: onlyEnabled ? { enabled: true } : undefined,
       sortableColumns: ['name', 'twitchId', 'twitchLogin', 'createdAt'],
       defaultSortBy: [['name', 'ASC']],
       relations: ['rights', 'rights.user']
-    }))
+    })
   }
 
   listNextStreams( 

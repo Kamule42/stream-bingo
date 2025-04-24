@@ -42,6 +42,13 @@ export const routes: Routes = [
           name: 'plan'
         },
       },
+      {
+        path: 'leaderboard',
+        loadComponent: () => import('./views/stream/leaderboard/leaderboard.component').then(c => c.LeaderboardComponent),
+        data: {
+          name: 'leaderboard'
+        }
+      }
     ]
   },
 
