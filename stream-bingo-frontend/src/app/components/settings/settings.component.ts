@@ -10,12 +10,14 @@ import { StrokeComponent } from '../strokes/stroke.component'
 import { StripeComponent } from "../stripe/stripe.component"
 import { SelectButtonModule } from 'primeng/selectbutton'
 import { PopoverModule } from 'primeng/popover'
+import { ToggleSwitchModule } from 'primeng/toggleswitch'
 
 @Component({
   selector: 'app-settings',
   imports: [
     ColorPickerModule, StrokeComponent, FormsModule, ButtonModule,
     SliderModule, SelectButtonModule, PopoverModule,
+    ToggleSwitchModule,
     StripeComponent
 ],
   templateUrl: './settings.component.html',
@@ -24,11 +26,13 @@ import { PopoverModule } from 'primeng/popover'
 export class SettingsComponent {
   private readonly settingsService = inject(SettingsService)
   private readonly _bingoMode$ = toSignal(this.settingsService.bingoMode$, {initialValue: BingoMode.AUTO_COMPLETE})
+  private readonly _showBingoResults$ = toSignal(this.settingsService.showBingoResults$, {initialValue: true})
   private readonly _check$ = toSignal(this.settingsService.check$, {initialValue: CheckType.CIRCLE})
   private readonly _color$ = toSignal(this.settingsService.checkColor$)
   private readonly _stripeColor$ = toSignal(this.settingsService.stripeColor$)
   
   readonly bingoMode = signal<BingoMode>(BingoMode.AUTO_COMPLETE)
+  readonly showBingoResults = signal<boolean>(true)
   readonly checks = Object.values(CheckType)
   readonly stroke = signal(CheckType.CIRCLE)
   readonly color = signal<string>('white')
@@ -40,20 +44,23 @@ export class SettingsComponent {
 
   readonly done = output<void>()
 
-  private _settingBingoModeEffect = effect(() => {
+  private readonly _settingBingoModeEffect = effect(() => {
     this.bingoMode.set(this._bingoMode$() ?? BingoMode.AUTO_COMPLETE)
   })
-  private _settingStrokeEffect = effect(() => {
+  private readonly _settingShowBingoresultEffect = effect(() => {
+    this.showBingoResults.set(this._showBingoResults$())
+  })
+  private readonly _settingStrokeEffect = effect(() => {
     this.stroke.set(this._check$() ?? CheckType.CIRCLE)
   })
-  private _settingColorEffect = effect(() => {
+  private readonly _settingColorEffect = effect(() => {
     const color = this._color$()
     this.color.set(color?.slice(0,7) ?? 'white')
     if(color != null && color?.length > 7){
       this.alpha.set(parseInt(color.slice(7), 16))
     }
   })
-  private _settingStripeColorEffect = effect(() => {
+  private readonly _settingStripeColorEffect = effect(() => {
     const color = this._stripeColor$()
     this.stripeColor.set(color?.slice(0,7) ?? 'white')
     if(color != null && color?.length > 7){
@@ -61,18 +68,20 @@ export class SettingsComponent {
     }
   })
 
+  readonly isManual$ = computed(() => BingoMode.MANUAL === this.bingoMode())
+
   modeOptions: {label: string, value: BingoMode}[] = [
     { label: 'Automatique', value: BingoMode.AUTO_COMPLETE },
     { label: 'Manuel', value: BingoMode.MANUAL }
   ]
 
   public save(){
-    console.log(this.bingoMode())
     this.settingsService.save({
       check: this.stroke(),
       checkColor: this.alphaColor(),
       stripeColor: this.stripeAlphaColor(),
-      bingoMode: this.bingoMode()
+      bingoMode: this.bingoMode(),
+      showBingoResults: this.bingoMode() === BingoMode.MANUAL ? this.showBingoResults() : undefined
     })
     this.done.emit()
   }

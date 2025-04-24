@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { BehaviorSubject, map, shareReplay, tap } from 'rxjs';
+import { BehaviorSubject, map, shareReplay, switchMap, tap } from 'rxjs';
 import { BingoMode, CheckType, ISaveParams } from './setting.types';
 import { enumFromStringValue } from '../../shared/helpers/enum.helper';
 
@@ -10,6 +10,7 @@ const SETTINGS_CHECK_COLOR = SETTINGS_BASE_KEY + 'CHECK_COLOR'
 const SETTINGS_STRIPE_COLOR = SETTINGS_BASE_KEY + 'STRIPE_COLOR'
 
 const SETTINGS_BINGO_MODE = SETTINGS_BASE_KEY + 'BINGO_MODE'
+const SETTINGS_SHOW_BINGO_RESULTS = SETTINGS_BASE_KEY + 'SHOW_BINGO_RESULTS'
 
 const MAIN_COLOR =  window.getComputedStyle(document.body).getPropertyValue('--main-color') ?? '#097679'
 const SECONDARY_COLOR =  window.getComputedStyle(document.body).getPropertyValue('--secondary-color') ?? '#ffc000'
@@ -24,6 +25,7 @@ export class SettingsService {
   private readonly _checkColor$ = new BehaviorSubject<string>(MAIN_COLOR)
   private readonly _stripeColor$ = new BehaviorSubject<string>(SECONDARY_COLOR)
   private readonly _bingoMode$ = new BehaviorSubject<BingoMode>(BingoMode.AUTO_COMPLETE)
+  private readonly _showBingoResults$ = new BehaviorSubject<boolean>(true)
 
 
   constructor() {
@@ -35,6 +37,7 @@ export class SettingsService {
     this._bingoMode$.next(enumFromStringValue(
       BingoMode, localStorage.getItem(SETTINGS_BINGO_MODE)
     ) ?? BingoMode.AUTO_COMPLETE)
+    this._showBingoResults$.next(localStorage.getItem(SETTINGS_SHOW_BINGO_RESULTS) !== '0')
   }
 
   public check$ = this._check$.pipe(
@@ -70,13 +73,23 @@ export class SettingsService {
     this._stripeColor$.next(val ?? SECONDARY_COLOR)
   }
 
-  
   public bingoMode$ = this._bingoMode$.pipe(
     tap(val => localStorage.setItem(SETTINGS_BINGO_MODE, `${val}`)),
     shareReplay(1),
   )
   public set bingoMode(val: BingoMode){
     this._bingoMode$.next(val)
+  }
+  
+  public showBingoResults$ = this._showBingoResults$.pipe(
+    tap(val => localStorage.setItem(SETTINGS_SHOW_BINGO_RESULTS, val ? '1' : '0')),
+    switchMap(val => this._bingoMode$.pipe(
+      map(mode => mode === BingoMode.MANUAL && val)
+    )),
+    shareReplay(1),
+  )
+  public set showBingoResults(val: boolean){
+    this._showBingoResults$.next(val)
   }
   
   save(toSave: ISaveParams) {
@@ -91,6 +104,9 @@ export class SettingsService {
     }
     if(toSave.bingoMode !== undefined){
       this.bingoMode = toSave.bingoMode
+    }
+    if(toSave.showBingoResults !== undefined){
+      this.showBingoResults = toSave.showBingoResults
     }
   }
 }

@@ -69,6 +69,10 @@
     .helper{
         font-size: 2em;
     }
+
+    ::ng-deep .p-togglebutton-checked span{
+        background-color: var(--secondary-color);
+    }
 }
 .settings-explaination{
     max-width: 20em;

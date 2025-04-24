@@ -2,7 +2,8 @@ export interface IGridCell{
     index: number
     cellName: string
     cellDescription: string
-    cellId: string
+    cellId: string,
+    checked?: boolean,
 }
 
 export interface IGrid{

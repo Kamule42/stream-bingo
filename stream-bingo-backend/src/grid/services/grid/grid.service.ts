@@ -96,4 +96,29 @@ export class GridService {
         sortableColumns: ['round.name', 'round.stream.name']
       })
   }
+
+  async flipCell(gridId: string, cellIndex: number, userId?: string) {
+    const grid = await this.gridRepository.findOne({
+      where: { id: gridId },
+      relations: ['round', 'round.stream', 'cells', 'cells.cell', 'user'],
+    })
+    if(
+      grid == null ||
+      userId != undefined && grid.user == null ||
+      userId != grid.user?.id
+    ) {
+      throw new Error('Unable to edit cell')
+    }
+    grid.cells = grid.cells.map(cell => {
+      if(cell.index === cellIndex){
+        return {
+          ...cell,
+          checked: !cell.checked
+        }
+      }
+      return cell
+    })
+    await this.gridRepository.save(grid)
+    return grid
+  }
 }

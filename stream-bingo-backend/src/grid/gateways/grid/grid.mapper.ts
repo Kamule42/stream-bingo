@@ -13,6 +13,7 @@ export const gridMapper = (grid: GridEntity): IGrid => ({
         cellName: cell.cell.name,
         cellDescription: cell.cell.description,
         cellId: cell.cell.id,
+        checked: cell.checked,
     }))
 })
 

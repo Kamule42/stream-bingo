@@ -18,4 +18,5 @@ export interface ISaveParams {
     checkColor?: string
     stripeColor?: string
     bingoMode?: BingoMode
+    showBingoResults?: boolean
 }

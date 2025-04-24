@@ -1,6 +1,6 @@
 import { Injectable, signal } from '@angular/core';
 import { Socket, io } from 'socket.io-client';
-import { BehaviorSubject, distinctUntilChanged, filter, fromEvent, map, pairwise, startWith, Subject, tap, throttleTime,  } from 'rxjs';
+import { distinctUntilChanged, filter, fromEvent, map, pairwise, startWith, Subject, tap, throttleTime,  } from 'rxjs';
 import { IGrid, IValidatedCell } from './grid.interface';
 import { WebsocketService } from '../ws/websocket.service';
 import { IWsError } from '../../shared/models/ws-errors.interface'
@@ -69,6 +69,11 @@ export class GridService extends WebsocketService{
   public flipCell(roundId: string, cellId: string){
     this.sendMessage('flipCell', {
       roundId, cellId
+    })
+  }
+  flipGridCell(gridId: string, cellIndex: number) {
+    this.sendMessage('flipGridCell', {
+      gridId, cellIndex
     })
   }
 }
