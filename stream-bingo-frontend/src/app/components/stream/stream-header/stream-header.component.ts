@@ -66,6 +66,9 @@ export class StreamHeaderComponent {
     map(datas => datas.some(data => data['name'] === 'bingo'))
   ), {initialValue: false})
 
+  readonly isLeaderboard$ = toSignal(this.datas$.pipe(
+    map(datas => datas.some(data => data['name'] === 'leaderboard'))
+  ), {initialValue: false})
 
   flip() {
     const stream = this.stream()
