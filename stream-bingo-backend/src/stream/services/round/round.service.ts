@@ -3,7 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { DateTime } from 'luxon';
 import { RoundEntity, RoundStatus } from 'src/stream/entities/round.entity';
 import { IRoundEdit } from 'src/stream/gateways/round/round.interface';
-import { Brackets, IsNull, MoreThanOrEqual, Repository } from 'typeorm';
+import { Brackets, DataSource, IsNull, MoreThanOrEqual, Repository } from 'typeorm';
 
 type NewStatus = null | {newStatus: RoundStatus, delay: boolean }
 
@@ -12,6 +12,7 @@ export class RoundService {
   constructor(
     @InjectRepository(RoundEntity)
     private readonly roundRepository: Repository<RoundEntity>,
+    private readonly dataSource: DataSource,
   ) { }
 
   getRound(roundId: string) {
@@ -102,7 +103,46 @@ export class RoundService {
       { id: round.id}, 
       {status: newStatus.newStatus }
     )
+    if(newStatus.newStatus === RoundStatus.FINISHED){
+      this.scoreGridsForRound(round.id)
+    }
     return { ...round, status: newStatus.newStatus }
+  }
+
+  private scoreGridsForRound(roundId: string) {
+    this.dataSource.query(
+      `
+      UPDATE bingo.grids g
+        SET score = score.score
+        FROM (SELECT
+          g.id,
+          (
+            -- COLS
+            FLOOR(COUNT(gc.cell_id) FILTER (WHERE MOD(gc.index, 4) = 0) / 4) +
+            FLOOR(COUNT(gc.cell_id) FILTER (WHERE MOD(gc.index, 4) = 1) / 4) +
+            FLOOR(COUNT(gc.cell_id) FILTER (WHERE MOD(gc.index, 4) = 2) / 4) +
+            FLOOR(COUNT(gc.cell_id) FILTER (WHERE MOD(gc.index, 4) = 3) / 4) +
+            -- ROWS
+            FLOOR(COUNT(gc.cell_id) FILTER (WHERE FLOOR(gc.index / 4) = 0) / 4) +
+            FLOOR(COUNT(gc.cell_id) FILTER (WHERE FLOOR(gc.index / 4) = 1) / 4) +
+            FLOOR(COUNT(gc.cell_id) FILTER (WHERE FLOOR(gc.index / 4) = 2) / 4) +
+            FLOOR(COUNT(gc.cell_id) FILTER (WHERE FLOOR(gc.index / 4) = 3) / 4) +
+            -- Diag down
+            FLOOR(COUNT(gc.cell_id) FILTER (WHERE MOD(gc.index, 5) = 0) / 4) +
+            -- Diag up
+            FLOOR(COUNT(gc.cell_id) FILTER (WHERE MOD(gc.index, 3) = 0 AND gc.index between 1 and 15) / 4)
+          ) as score
+        FROM bingo.grids g
+        JOIN bingo.grid_cells gc ON gc.grid_id = g.id
+        JOIN bingo.validated_cells vc ON vc.cell_id = gc.cell_id  AND vc.valide is true AND vc.round_id = g.round_id
+      WHERE g.round_id = $1
+        GROUP BY g.id
+        ) score
+        WHERE
+      score.id = g.id AND
+      g.user_id IS NOT NULL AND
+	  	g.round_id = $1
+    `, [roundId]) 
   }
 
   private getFilteredRoundStatus(roundStatus: RoundStatus, newStatus: RoundStatus): NewStatus{
