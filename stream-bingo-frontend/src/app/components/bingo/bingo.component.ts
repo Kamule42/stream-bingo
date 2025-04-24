@@ -19,7 +19,9 @@ import { RoundStatus } from '../../services/rounds/round.interface'
 
 @Component({
   selector: 'app-bingo',
-  imports: [ButtonModule, PopoverModule, StrokeComponent, StripeComponent],
+  imports: [
+    ButtonModule, PopoverModule, StrokeComponent, StripeComponent,
+  ],
   templateUrl: './bingo.component.html',
   styleUrl: './bingo.component.scss'
 })

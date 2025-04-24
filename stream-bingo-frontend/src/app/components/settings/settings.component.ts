@@ -4,17 +4,18 @@ import { FormsModule } from '@angular/forms'
 import { toSignal } from '@angular/core/rxjs-interop'
 import { ButtonModule } from 'primeng/button'
 import { SliderModule } from 'primeng/slider'
-import { CheckType } from '../../services/settings/setting.types'
+import { BingoMode, CheckType } from '../../services/settings/setting.types'
 import { SettingsService } from '../../services/settings/settings.service'
 import { StrokeComponent } from '../strokes/stroke.component'
-import { StripeComponent } from "../stripe/stripe.component";
-
+import { StripeComponent } from "../stripe/stripe.component"
+import { SelectButtonModule } from 'primeng/selectbutton'
+import { PopoverModule } from 'primeng/popover'
 
 @Component({
   selector: 'app-settings',
   imports: [
     ColorPickerModule, StrokeComponent, FormsModule, ButtonModule,
-    SliderModule,
+    SliderModule, SelectButtonModule, PopoverModule,
     StripeComponent
 ],
   templateUrl: './settings.component.html',
@@ -22,10 +23,12 @@ import { StripeComponent } from "../stripe/stripe.component";
 })
 export class SettingsComponent {
   private readonly settingsService = inject(SettingsService)
+  private readonly _bingoMode$ = toSignal(this.settingsService.bingoMode$, {initialValue: BingoMode.AUTO_COMPLETE})
   private readonly _check$ = toSignal(this.settingsService.check$, {initialValue: CheckType.CIRCLE})
   private readonly _color$ = toSignal(this.settingsService.checkColor$)
   private readonly _stripeColor$ = toSignal(this.settingsService.stripeColor$)
   
+  readonly bingoMode = signal<BingoMode>(BingoMode.AUTO_COMPLETE)
   readonly checks = Object.values(CheckType)
   readonly stroke = signal(CheckType.CIRCLE)
   readonly color = signal<string>('white')
@@ -37,6 +40,9 @@ export class SettingsComponent {
 
   readonly done = output<void>()
 
+  private _settingBingoModeEffect = effect(() => {
+    this.bingoMode.set(this._bingoMode$() ?? BingoMode.AUTO_COMPLETE)
+  })
   private _settingStrokeEffect = effect(() => {
     this.stroke.set(this._check$() ?? CheckType.CIRCLE)
   })
@@ -55,11 +61,18 @@ export class SettingsComponent {
     }
   })
 
+  modeOptions: {label: string, value: BingoMode}[] = [
+    { label: 'Automatique', value: BingoMode.AUTO_COMPLETE },
+    { label: 'Manuel', value: BingoMode.MANUAL }
+  ]
+
   public save(){
+    console.log(this.bingoMode())
     this.settingsService.save({
       check: this.stroke(),
       checkColor: this.alphaColor(),
       stripeColor: this.stripeAlphaColor(),
+      bingoMode: this.bingoMode()
     })
     this.done.emit()
   }
