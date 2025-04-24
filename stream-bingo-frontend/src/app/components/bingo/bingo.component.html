@@ -1,10 +1,14 @@
 @if(grid$(); as grid){
   <div id="grid">
+    <div id="left-spacer">&nbsp;</div>
     <div id="cells">
-      @for(cells of cells$(); track $index){
+      @for(cells of cells$(); track $index; let y=$index){
         <div class="cells-row">
-          @for(cell of cells; track cell.cellId){
-            <div class="cell">
+          @for(cell of cells; track cell.cellId; let x=$index){
+            <div 
+              class="cell"
+              [class.clickable]="isManual$()"
+            >
               @if(cell.cellDescription){
                 <div class="cell-info">
                   <p-button 
@@ -14,8 +18,16 @@
                     rounded />
                 </div>
               }
-              <div class="cell-txt">{{ cell.cellName}}</div>
-              @if( cell.valide ){
+              <div 
+                class="cell-txt"
+                aria-hidden="true"
+                [class.clickable]="isManual$()"
+                (click)="flipCell(x, y)"
+                (keypress)="flipCell(x, y)"
+              >
+                {{ cell.cellName}}
+              </div>
+              @if( cell.checked ){
                 <div class="cell-stroke">
                   <app-stroke
                       [stroke]="stroke$()"
@@ -31,6 +43,14 @@
           <app-stripe [stripe]="stripe.type" [color]="stripeColor$()"/>
         </div>
       }
+    </div>
+    <div id="bingo-actions">
+      <p-button
+        icon="mdi mdi-help-box-outline"
+        [rounded]="true"
+        size="large"
+        (onClick)="showResults$.set(true)"
+      />
     </div>
   </div>
   <div id="bingo-score">
@@ -52,3 +72,25 @@
 <p-popover #op appendTo="body" (onHide)="selectedCellDescr.set(null)">
   {{ selectedCellDescr() }}
 </p-popover>
+
+@let validatedCells = validatedCellsWithText$();
+<p-dialog
+  [header]="`Cases validée${(validatedCells?.length ?? 1) > 0 ? 's' : ''}`"
+  [(visible)]="showResults$"
+  [modal]="true">
+  <div class="content">
+    @if(validatedCells === undefined){
+      Non disponible
+    }
+    @else if(validatedCells.length === 0){
+      Aucune validée pour l'instant
+    }
+    @else{
+      <ul>
+        @for(validatedCell of validatedCells; track validatedCell.id){
+          <li>{{ validatedCell.name }}</li>
+        }
+      </ul>
+    }
+  </div>
+</p-dialog>

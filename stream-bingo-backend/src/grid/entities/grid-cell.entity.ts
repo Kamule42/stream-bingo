@@ -7,6 +7,9 @@ export class GridCellEntity {
     @PrimaryColumn()
     index: number
 
+    @Column()
+    checked: boolean
+
     @PrimaryColumn({name: 'grid_id'})
     gridId: string
     @ManyToOne(() => GridEntity, { onDelete: 'CASCADE' })

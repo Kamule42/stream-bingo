@@ -126,4 +126,18 @@ export class GridGateway {
       cells
     })
   }
+
+  @SubscribeMessage('flipGridCell')
+  async flipGridCell(
+    @MessageBody('gridId') gridId: string,
+    @MessageBody('cellIndex') cellIndex: number,
+    @Session() session?: ISession,
+  ): Promise<WsResponse<IGrid>> {
+    return this.gridService
+      .flipCell(gridId, cellIndex, session?.sub)
+      .then(grid => ({
+        event: 'gridForStream',
+        data: gridMapper(grid)
+      }))
+  }
 }

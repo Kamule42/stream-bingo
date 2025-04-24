@@ -8,8 +8,15 @@ export enum CheckType {
     BRUSH_CIRCLE = "brush_circle",
 }
 
+export enum BingoMode {
+    AUTO_COMPLETE = "auto_complete",
+    MANUAL = "manual",
+}
+
 export interface ISaveParams {
     check?: CheckType
     checkColor?: string
-    stripeColor?: string,
+    stripeColor?: string
+    bingoMode?: BingoMode
+    showBingoResults?: boolean
 }

@@ -1,54 +1,46 @@
 <div id="settings-root">
-  <div id="settings-strokes">
-    <div class="field">
-      <div class="label">Marqueur</div>
-      <div class="control row">
-        @for(check of checks; track check){
-          <div class="stroke"
-            [class.selected]="check === stroke()"
-            (click)="stroke.set(check)"
-            (keydown)="stroke.set(check)"
-            aria-hidden="true"
-          >
-            <app-stroke [color]="alphaColor()" [stroke]="check" />
-          </div>
-          }
-      </div>
-    </div>
+  <h5 class="title is-5">Bingo</h5>
+  <div class="row">
+    <strong>Mode de remplissage</strong>
+    <p-selectbutton [options]="modeOptions" [(ngModel)]="bingoMode" optionLabel="label" optionValue="value" aria-labelledby="basic" />
+    <span class="helper mdi mdi-help-circle-outline" (click)="op.toggle($event)"></span>
   </div>
+  <h5 class="title is-5">Style</h5>
+  <strong>Marqueur</strong>
   <div id="stroke-color" class="row">
-    <div class="field">
-      <div class="label">Couleur du marqueur</div>
-      <div class="control">
-        <p-color-picker [(ngModel)]="color" appendTo="body" />
+    <p-color-picker [(ngModel)]="color" appendTo="body" />
+    <p-slider class="transparency" [(ngModel)]="alpha" [min]="42" [max]="255" />
+  </div>
+  <div id="settings-strokes">
+    <div class="row">
+      @for(check of checks; track check){
+      <div class="stroke" [class.selected]="check === stroke()" (click)="stroke.set(check)"
+        (keydown)="stroke.set(check)" aria-hidden="true">
+        <app-stroke [color]="alphaColor()" [stroke]="check" />
       </div>
-    </div>
-    <div class="field">
-      <div class="label">Transparence</div>
-      <div class="control">
-        <p-slider id="settings-transparency" [(ngModel)]="alpha" [min]="42" [max]="255" />
-      </div>
+      }
     </div>
   </div>
-  <div id="stripe">
-    <app-stripe stripe="row" [color]="stripeAlphaColor()" />
-  </div>
+  <strong>Ligne</strong>
   <div id="stripe-color" class="row">
-    <div class="field">
-      <div class="label">Couleur de la ligne</div>
-      <div class="control">
-        <p-color-picker [(ngModel)]="stripeColor" appendTo="body" />
-      </div>
-    </div>
-    <div class="field">
-      <div class="label">Transparence</div>
-      <div class="control">
-        <p-slider id="settings-transparency" [(ngModel)]="stripeAlpha" [min]="42" [max]="255" />
-      </div>
-    </div>
+    <p-color-picker [(ngModel)]="stripeColor" appendTo="body" />
+    <p-slider class="transparency" [(ngModel)]="stripeAlpha" [min]="42" [max]="255" />
+    <app-stripe stripe="row" [color]="stripeAlphaColor()" />
   </div>
   <div id="settings-actions">
     <p-button label="Annuler" (onClick)="done.emit()" severity="secondary" />
     <p-button label="Save" (onClick)="save()" severity="primary" />
   </div>
 </div>
+
+<p-popover #op>
+  <div class="settings-explaination">
+    <div>
+      <strong>Le mode automatique</strong> va cocher vos cases de bingo dès qu'elles seront validées.
+    </div>
+    <div>
+      <strong>Le mode manuel</strong> vous laisse la responsabilité de cocher vous même vos cases.
+      Vous pourrez toujours vérifier les cases déjà validées d'un simple clique et votre score sera tout de même comptabilisé automatiquement
+    </div>
+  </div>
+</p-popover>

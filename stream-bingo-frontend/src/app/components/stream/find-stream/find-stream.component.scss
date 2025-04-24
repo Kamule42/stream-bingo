@@ -27,6 +27,7 @@
     margin-bottom: 0!important;
 
     &:hover{
+      box-shadow: 0 0 8px #0009;
       @media (prefers-color-scheme: light) {
         filter: brightness(95%);
       }
@@ -36,7 +37,6 @@
       img{
         filter: brightness(95%);
       }
-      box-shadow: 0 0 8px #0009;
     }
   }
 

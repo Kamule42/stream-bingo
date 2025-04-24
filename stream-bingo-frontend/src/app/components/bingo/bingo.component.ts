@@ -10,16 +10,22 @@ import { GridService } from '../../services/grids/grid.service'
 import { IStream } from '../../services/streams/stream.interface'
 import { SettingsService } from '../../services/settings/settings.service'
 import { StrokeComponent } from '../strokes/stroke.component'
-import { CheckType } from '../../services/settings/setting.types'
+import { BingoMode, CheckType } from '../../services/settings/setting.types'
 import { VisibilityService } from '../../services/visibility/visibility.service'
 import { StripeComponent } from '../stripe/stripe.component'
 import { MessageService } from 'primeng/api'
 import { RoundsService } from '../../services/rounds/rounds.service'
 import { RoundStatus } from '../../services/rounds/round.interface'
+import { IGridCell } from '../../services/grids/grid.interface'
+import { DialogModule } from 'primeng/dialog'
+import { StreamsService } from '../../services/streams/streams.service'
 
 @Component({
   selector: 'app-bingo',
-  imports: [ButtonModule, PopoverModule, StrokeComponent, StripeComponent],
+  imports: [
+    ButtonModule, PopoverModule, StrokeComponent, StripeComponent,
+    DialogModule,
+  ],
   templateUrl: './bingo.component.html',
   styleUrl: './bingo.component.scss'
 })
@@ -32,6 +38,7 @@ export class BingoComponent {
   private readonly visibilityService = inject(VisibilityService)
   private readonly messageService = inject(MessageService)
   private readonly roundService = inject(RoundsService)
+  private readonly streamService = inject(StreamsService)
   private readonly router = inject(Router)
   private readonly route = inject(ActivatedRoute)
 
@@ -55,6 +62,7 @@ export class BingoComponent {
       return;
     }
     this.gridService.getGridForStream(this.stream().id , bingoId ?? undefined)
+    this.streamService.fetchCells(this.stream().id)
   })
 
   readonly grid$ = toSignal(this.gridService.gridForStream$.pipe(
@@ -72,16 +80,22 @@ export class BingoComponent {
     })),
     tap(() => this.router.navigate(['../../'], { relativeTo: this.route }) )
   ))
-
-  readonly cells$ = computed(() => {
-    const grid = this.grid$()
-    return grid != null ? toChunk(grid.cells
-      .map(cell => ({
-        ...cell,
-        valide: this.validatedCells$()?.includes(cell.cellId)
-      }))
-      .toSorted((a, b) => a.index - b.index),
-      4) : []
+  readonly bingoMode$ = toSignal(this.settingsService.bingoMode$)
+  readonly isManual$ = computed(() => this.bingoMode$() === BingoMode.MANUAL)
+  readonly cells$ = signal<IGridCell[][]>([])
+  private readonly _cellEffect = effect(() => {
+      const grid = this.grid$()
+      this.cells$.set(grid != null ?
+        toChunk(grid.cells
+          .map(cell => ({
+            ...cell,
+            checked:
+              this.bingoMode$() == BingoMode.AUTO_COMPLETE && this.validatedCells$()?.includes(cell.cellId) ||
+              this.bingoMode$() == BingoMode.MANUAL && cell.checked
+          }))
+          .toSorted((a, b) => a.index - b.index),
+          4) : []
+      )
   })
 
   readonly selectedCellDescr = signal<string | null>(null)
@@ -105,12 +119,26 @@ export class BingoComponent {
       map(() => cells),
     )),
   ))
+  readonly availableCells$ = toSignal(this.streamService.cells$, {initialValue: [] })
+  readonly validatedCellsWithText$ = computed(() => {
+    const validatedCells = this.validatedCells$()
+    const availableCells = this.availableCells$()
+    if(validatedCells === undefined || availableCells === undefined){
+      return undefined
+    }
+    return validatedCells.map(id => ({
+      id,
+      name: availableCells.find(c => c.id === id)?.name
+    }))
+    .filter(c => c.name !== undefined)
+  })
+
   readonly bingos$ = computed<{ type: 'row' | 'col' | 'diag_down' | 'diag_up', index?: number, class: string }[]>(() => {
     const cells = this.cells$()
     return [
       // Rows
       ...cells
-        .filter(row => row.every(({ valide }) => valide === true))
+        .filter(row => row.every(({ checked }) => checked === true))
         .map((row) => ({
           type: 'row',
           index: Math.floor(row[0].index / 4),
@@ -118,7 +146,7 @@ export class BingoComponent {
         })),
       // Cols
       ...[0, 1, 2, 3]
-        .filter(col => cells.every(row => row[col].valide === true))
+        .filter(col => cells.every(row => row[col].checked === true))
         .map((index) => ({
           type: 'col',
           index: index,
@@ -126,7 +154,7 @@ export class BingoComponent {
         })),
       // Diagonal Down
       ...[
-        [0, 1, 2, 3].every(index => cells[index][index].valide)
+        [0, 1, 2, 3].every(index => cells[index][index].checked)
       ]
         .filter(val => val)
         .map(() => ({
@@ -135,7 +163,7 @@ export class BingoComponent {
         })),
       // Diagonal Up
       ...[
-        [0, 1, 2, 3].every(index => cells[3 - index][index].valide)
+        [0, 1, 2, 3].every(index => cells[3 - index][index].checked)
       ]
         .filter(val => val)
         .map(() => ({
@@ -157,6 +185,8 @@ export class BingoComponent {
     this.round$()?.status === RoundStatus.STARTED && this.session$() != null
   )
   
+  readonly showResults$ = signal<boolean>(false)
+
   public generateGrid() {
     this.gridService.createGrid(this.stream().id)
   }
@@ -172,5 +202,15 @@ export class BingoComponent {
         this.op.align();
       }
     }
+  }
+
+  public flipCell(x: number, y:number){
+    if(!this.isManual$()){
+      return
+    }
+    const cells = this.cells$()
+    cells[y][x].checked = !(cells[y][x].checked ?? false)
+    this.cells$.set(cells)
+    this.gridService.flipGridCell(this.grid$()!.id, x+y*4)
   }
 }

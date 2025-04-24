@@ -1,19 +1,40 @@
 @use "bulma/sass/utilities/mixins";
+@use 'sass:color';
 @use "sass:math";
+@use "../../../style/_variables" as variables;
 
 :host {
-
+	width: 100%;
+	
 	#grid {
 		position: relative;
 		display: flex;
-		flex-direction: column;
-		align-items: center;
+		flex-direction: row;
+		align-items: stretch;
+		justify-content: space-between;
+		gap: 1em;
 		
 		@include mixins.mobile {
 			font-size: 0.65rem;
 		}
 		@include mixins.tablet {
 			font-size: 0.85rem;
+		}
+	}
+
+	#left-spacer, #bingo-actions{
+		flex: 1;
+	}
+
+	#bingo-actions{
+		display: flex;
+		flex-direction: column;
+
+		align-items: start;
+		justify-content: start;
+
+		::ng-deep .mdi{
+			font-size: 1.5em;
 		}
 	}
 
@@ -41,7 +62,7 @@
 		gap: 0;
 		font-size: 1em;
 
-		&:not(:last-of-type) {
+		&:not(:nth-of-type(4)) {
 			border-bottom: 1px solid var(--bulma-body-color);
 		}
 	}
@@ -56,9 +77,6 @@
 		background-color: white;
 		text-align: center;
 
-		&:not(:last-of-type) {
-			border-right: 1px solid var(--bulma-body-color);
-		}
 
 		display: flex;
 		justify-content: center;
@@ -66,6 +84,20 @@
 
 		@include mixins.mobile {
 			font-size: 0.75rem;
+		}
+
+		&:not(:last-of-type) {
+			border-right: 1px solid var(--bulma-body-color);
+		}
+
+		&.clickable{	
+			&:hover{
+				background-color: #eee;
+
+			}
+			&:active{
+				background-color: #ddd;
+			}
 		}
 
 		.cell-info {
@@ -85,6 +117,13 @@
 	}
 
 	.cell-txt {
+		width: 100%;
+		height: 100%;
+
+		display: flex;
+		align-items: center;
+		justify-content: center;
+
 		color: #333;
 		position: absolute;
 		z-index: 5;
@@ -92,6 +131,10 @@
 		font-weight: 700;
 		padding: 0.3em;
 		font-size: 0.8em;
+
+		&.clickable{
+			cursor: pointer;
+		}
 	}
 
 	.cell-stroke {
