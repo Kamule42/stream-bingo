@@ -62,6 +62,7 @@ export class BingoComponent {
       return;
     }
     this.gridService.getGridForStream(this.stream().id , bingoId ?? undefined)
+    this.streamService.fetchCells(this.stream().id)
   })
 
   readonly grid$ = toSignal(this.gridService.gridForStream$.pipe(

@@ -76,9 +76,7 @@ export class StreamGateway {
     )
   }
 
-  @Roles([
-    {id: 'man', 'streamKey': 'id'}
-  ])
+
   @SubscribeMessage('getStreamCells')
   getStreamCells(@MessageBody('id') id: string): Promise<WsResponse<Array<ICell>>>{
     return this.cellService.getStreamCells(id).then(cells => ({
