@@ -61,6 +61,6 @@ export class ViewStreamComponent {
   
   readonly isGridOpen = computed(() => {
     const round = this.round$()
-    return round && round.startAt <= new Date()
+    return round && round.startAt <= new Date() || this._bingoId() != null
   })
 }
