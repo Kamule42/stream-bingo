@@ -7,7 +7,7 @@ import { RefreshGuard } from 'src/shared/guards/refresh/refresh.guard'
 import { IScore } from './score.interface'
 import { IPaginatedResponse } from 'src/shared/interfaces/paginated.interface'
 import { toPaginationMeta } from 'src/shared/functions/paginated'
-import { leaderboardMapper } from './scoring.mappers'
+import { streamLeaderboardMapper } from './scoring.mappers'
 
 @WebSocketGateway({
   namespace: 'scoring',
@@ -28,7 +28,7 @@ export class ScoringGateway {
     .then(result => ({
       event: 'leaderBoardForStream',
       data: {
-        data: result.data.map(s => leaderboardMapper(s)),
+        data: result.data.map(s => streamLeaderboardMapper(s)),
         meta: toPaginationMeta(result.meta),
       }
     }))
