@@ -1,9 +1,10 @@
 import { Injectable } from '@angular/core';
 import { Socket, io } from 'socket.io-client';
-import { fromEvent, map, shareReplay } from 'rxjs';
+import { distinctUntilChanged, fromEvent, map, merge, shareReplay, Subject, tap } from 'rxjs';
 import { DateTime } from 'luxon';
 import { IEditRound, IRound, RoundStatus } from './round.interface';
 import { WebsocketService } from '../ws/websocket.service';
+import { toSignal } from '@angular/core/rxjs-interop'
 
 type RawRound = Omit<IRound, 'startAt'|'streamStartAt'> & {startAt: string, streamStartAt: string}
 
@@ -24,8 +25,12 @@ export class RoundsService extends WebsocketService{
     return this._socket
   }
 
-  readonly currentRound$ = fromEvent<RawRound>(this.socket, 'roundDetail').pipe(
-    map(this.toRound),
+  readonly currentRound$ = merge(
+    fromEvent<RawRound>(this.socket, 'roundDetail').pipe(
+      map(this.toRound),
+    ),
+    fromEvent<void>(this.socket, 'noRoundDetail')
+  ).pipe(
     shareReplay(1),
   )
 
@@ -34,11 +39,22 @@ export class RoundsService extends WebsocketService{
     shareReplay(1),
   )
 
+  private readonly fetchCurrentRoundForStream$$ = new Subject<string>()
+  private readonly _fetchCurrentRoundForStream$ = toSignal(this.fetchCurrentRoundForStream$$.asObservable().pipe(
+    distinctUntilChanged(),
+    tap(streamId => this.sendMessage('getCurrentRoundForStream', {streamId}))
+  ))
   public fetchCurrentRoundForStream(streamId: string) {
-    this.sendMessage('getCurrentRoundForStream', {streamId})
+    this.fetchCurrentRoundForStream$$.next(streamId)
   }
+
+  private readonly fetchRoundForGrid$$ = new Subject<string>()
+  private readonly _fetchRoundForGrid$ = toSignal(this.fetchRoundForGrid$$.asObservable().pipe(
+    distinctUntilChanged(),
+    tap(gridId => this.sendMessage('getRoundForGrid', {gridId}))
+  ))
   public fetchRoundForGrid(gridId: string) {
-    this.sendMessage('getRoundForGrid', {gridId})
+    this.fetchRoundForGrid$$.next(gridId)
   }
   public fetchRoundsForStream(streamId: string) {
     this.sendMessage('getRoundsForStream', {streamId})

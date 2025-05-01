@@ -41,7 +41,7 @@ export class RefreshGuard implements CanActivate {
       null
     const exp = session?.exp ? DateTime.fromSeconds(session.exp) : null
     const refreshTokenStr = refreshTokenCookie.value
-    if((exp == null || exp < DateTime.now().plus({ seconds: 60})) && refreshTokenStr != null){
+    if((exp == null || exp < DateTime.now().plus({ seconds: 60}) || client.handshake.auth.user == null) && refreshTokenStr != null){
       const refreshToken = JSON.parse(refreshTokenStr) as {sub: string}
       const token = await this.authService.signSession(refreshToken.sub)
       session = this.authService.validateToken(token)

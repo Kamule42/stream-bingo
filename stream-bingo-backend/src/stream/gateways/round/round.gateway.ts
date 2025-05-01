@@ -5,7 +5,7 @@ import { RoundService } from 'src/stream/services/round/round.service'
 import { Roles } from 'src/shared/decorators/auth/roles.decorator'
 import { JwtAuthGuard } from 'src/shared/guards/jwt-auth/jwt-auth.guard'
 import { RefreshGuard } from 'src/shared/guards/refresh/refresh.guard'
-import { roundMapper } from './round.mapper'
+import { roundDetailMapper, roundMapper } from './round.mapper'
 import { UserRoles } from 'src/shared/roles'
 import { RoundStatus } from 'src/stream/entities/round.entity'
 import { ISession } from 'src/user/interfaces/session.interface'
@@ -24,29 +24,16 @@ export class RoundGateway {
   @SubscribeMessage('getCurrentRoundForStream')
   GetCurrentRoundForStream(
     @MessageBody('streamId') streamId: string
-  ): Promise<WsResponse<IRound>> {
-    return this.roundService.getStreamCurrentRound(streamId)
-    .then(round => ({
-      event: 'roundDetail',
-      data: roundMapper(round)
-    }))
+  ): Promise<WsResponse<IRound | undefined>> {
+    return this.roundService.getStreamCurrentRound(streamId).then(roundDetailMapper)
   }
 
   @SubscribeMessage('getRoundForGrid')
   getRoundForGrid(
     @MessageBody('gridId') gridId: string,
     @Session() session?: ISession
-  ): Promise<WsResponse<IRound>> {
-    return this.roundService.getRoundForGrid(gridId, session?.sub)
-    .then(round => {
-        if(round === null){
-          throw new WsException({ type: 'unknownRound'})
-        }
-        return {
-        event: 'roundDetail',
-        data: roundMapper(round)
-      }
-    })
+  ): Promise<WsResponse<IRound | undefined>> {
+    return this.roundService.getRoundForGrid(gridId, session?.sub).then(roundDetailMapper)
   }
 
   @SubscribeMessage('getRoundsForStream')

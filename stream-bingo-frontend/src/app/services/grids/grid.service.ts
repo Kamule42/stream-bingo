@@ -48,16 +48,19 @@ export class GridService extends WebsocketService{
   public subscribeForRound(roundId: string){
     this.sendMessage('subscribeForRound', { roundId })
   }
+
   public unsubscribeForRound(roundId: string){
     this.sendMessage('unsubscribeForRound', { roundId })
   }
 
   private readonly getGridForStream$$ = new Subject<{ streamId: string, bingoId?: string }>()
   private readonly _getGridForStream$ = toSignal(this.getGridForStream$$.asObservable().pipe(
-    distinctUntilChanged(),
-    tap(body => 
-      this.sendMessage('getGridForStream', body))
+    distinctUntilChanged((prev, curr) =>
+      prev.streamId === curr.streamId &&
+      prev.bingoId === curr.bingoId),
+    tap(body => this.sendMessage('getGridForStream', body))
   ))
+
   public getGridForStream(streamId: string, bingoId?: string) {
     this.currentStream$.set(streamId)
     this.getGridForStream$$.next({ streamId, bingoId })

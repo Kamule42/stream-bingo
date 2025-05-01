@@ -18,7 +18,7 @@ import { UserRoles } from 'src/shared/roles'
 
 @WebSocketGateway({
   namespace: 'streams',
-  transports: ['websocket', 'polling']
+  transports: ['websocket', 'polling'],
 })
 @UseGuards(JwtAuthGuard, RefreshGuard, )
 export class StreamGateway {

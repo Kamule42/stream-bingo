@@ -1,5 +1,4 @@
-
-export const roundMapper = (round) => ({
+export const roundMapper = round => ({
   id: round.id,
   name: round.name,
   startAt: round.startAt,
@@ -8,3 +7,7 @@ export const roundMapper = (round) => ({
   streamName: round.stream.name,
   status: round.status
 })
+
+export const roundDetailMapper = (round) =>
+  round == null ? { event: 'noRoundDetail', data: undefined } :
+  { event: 'roundDetail', data: roundMapper(round) }

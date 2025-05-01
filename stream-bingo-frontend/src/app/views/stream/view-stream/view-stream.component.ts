@@ -45,9 +45,7 @@ export class ViewStreamComponent {
   )
   readonly stream$ =  toSignal<IStream>(this._stream$)
 
-  private readonly  _round$ = this.roundService.currentRound$.pipe(
-      filter(round => round != null),
-   )
+  private readonly  _round$ = this.roundService.currentRound$
   readonly round$ = toSignal(this._round$)
 
   readonly isModerator$ = computed(() => {

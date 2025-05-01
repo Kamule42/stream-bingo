@@ -140,8 +140,7 @@ export class RoundService {
         ) score
         WHERE
       score.id = g.id AND
-      g.user_id IS NOT NULL AND
-	  	g.round_id = $1
+      g.user_id IS NOT NULL
     `, [roundId]) 
   }
 

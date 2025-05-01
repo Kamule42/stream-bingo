@@ -28,6 +28,8 @@ export class AuthService {
     this.authorization$$.next(localStorage.getItem(AUTHORIZATION_KEY) ?? null)
   }
 
+  public rawAuthorization$ = this.authorization$$.asObservable()
+
   public get authorization$(): Observable<string | null>{
     return this.authorization$$.pipe(
       tap(val => {
