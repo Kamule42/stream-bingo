@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { WebsocketService } from '../ws/websocket.service'
 import { io, Socket } from 'socket.io-client'
-import { fromEvent, shareReplay } from 'rxjs'
+import { fromEvent, map, shareReplay } from 'rxjs'
 import { IPaginated, IPagination } from '../../shared/models/pagination.interface'
 import { IScore } from './score.interface'
 
@@ -21,10 +21,17 @@ export class LeaderboardService extends WebsocketService{
   override get socket(): Socket {
     return this._socket
   }
-
-  readonly leaderboard$ = fromEvent<IPaginated<IScore[]>>(this.socket, 'leaderBoardForStream').pipe(
+private readonly _leaderboard$ = fromEvent<IPaginated<IScore[]>>(this.socket, 'leaderBoardForStream').pipe(
     shareReplay(1)
   )
+
+  readonly leaderboard$ = this._leaderboard$.pipe(
+    shareReplay(1)
+  )
+  readonly leaderboardMeta$ = this._leaderboard$.pipe(
+      map(({ meta }) => meta),
+      shareReplay(1),
+    )
 
   public getLeaderBoardForStream(streamId: string, pagination?: IPagination) {
     this.sendMessage('getLeaderBoardForStream', {

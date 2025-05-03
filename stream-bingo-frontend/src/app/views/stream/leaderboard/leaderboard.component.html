@@ -26,4 +26,11 @@
       </tr>
     </ng-template>
   </p-table>
+  <p-paginator
+      [first]="page()"
+      [rows]="limit()"
+      [totalRecords]="totalItems$()"
+      [rowsPerPageOptions]="rowsPerPageOptions()"
+      (onPageChange)="updatePagination($event)"
+   />
 </div>
