@@ -1,14 +1,16 @@
 <div id="stream-root">
     @if(stream$(); as stream){
-        <app-stream-header [stream]="stream" />
+        <app-stream-header />
         <router-outlet></router-outlet>
     }
-    @else if(noWebhandle$() === true || stream$() === null){
-        Ce Stream n'existe pas
-    }
-    @else {
+    @else if(isLoading()){
+        <app-stream-header />
+        
         <div class="is-flex is-justify-content-center">
             <p-progress-spinner ariaLabel="loading" />
         </div>
+    }
+    @else{
+        Ce Stream n'existe pas
     }
 </div>

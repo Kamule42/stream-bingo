@@ -29,17 +29,17 @@ export class StreamGateway {
 
   @SubscribeMessage('getList')
   @Roles([UserRoles.admin])
-  getStreams(
+  async getStreams(
     @Paginate() query: PaginateQuery,
   ): Promise<IPaginatedResponse<IStream>> {
-    return this.streamService.listServices(query, false)
-      .then(result => ({
-        event: 'streamList',
-        data: {
-          data: result.data.map(s => streamMapper(s, true)),
-          meta: toPaginationMeta(result.meta),
-        }
-      }))
+    const result = await this.streamService.listServices(query, false)
+    return {
+      event: 'streamList',
+      data: {
+        data: result.data.map(s => streamMapper(s, true)),
+        meta: toPaginationMeta(result.meta),
+      }
+    }
   }
 
   
@@ -66,13 +66,12 @@ export class StreamGateway {
   }
 
   @SubscribeMessage('getDetail')
-  getStreamDetail(@MessageBody('webhandle') webhandle: string): Observable<WsResponse<INextStream | null>>{
-    return this.streamService.getStreamDetail(webhandle).pipe(
-      map(stream => ({
-        event: 'streamDetail',
-        data: nextStreamMapper(stream)
-      } ))
-    )
+  async getStreamDetail(@MessageBody('webhandle') webhandle: string): Promise<WsResponse<INextStream | null>>{
+    const stream = await this.streamService.getStreamDetail(webhandle)
+    return {
+      event: 'streamDetail',
+      data: nextStreamMapper(stream)
+    }
   }
 
 

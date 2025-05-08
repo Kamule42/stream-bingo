@@ -1,32 +1,36 @@
-import { Component, computed, inject, input } from '@angular/core'
-import { ButtonModule } from 'primeng/button'
+import { Component, computed, inject, } from '@angular/core'
 import { ActivatedRoute, NavigationEnd, Router, RouterModule } from '@angular/router'
 import { toSignal } from '@angular/core/rxjs-interop'
-import { filter, map, merge, mergeMap, shareReplay, switchMap, tap, zip, } from 'rxjs'
+import { SkeletonModule } from 'primeng/skeleton'
+import { ButtonModule } from 'primeng/button'
+import { filter, map, merge, shareReplay, switchMap, zip, } from 'rxjs'
 import { SessionService } from '../../../services/session/session.service'
-import { IStream } from '../../../services/streams/stream.interface'
+import { StreamsService } from '../../../services/streams/streams.service'
 
 @Component({
   selector: 'app-stream-header',
-  imports: [ ButtonModule, RouterModule ],
+  imports: [ ButtonModule, RouterModule, SkeletonModule ],
   templateUrl: './stream-header.component.html',
   styleUrl: './stream-header.component.scss'
 })
 export class StreamHeaderComponent {
-  readonly stream = input.required<IStream>()
 
+  private readonly streamService = inject(StreamsService)
   private readonly router = inject(Router)
   private readonly route = inject(ActivatedRoute)
   private readonly sessionService = inject(SessionService)
 
   readonly session$ = this.sessionService.session$
 
+  readonly isLoading$ = toSignal(this.streamService.isStreamLoading$, {initialValue: false})
+  readonly stream$ = toSignal(this.streamService.streamDetail$)
+
   _webhandle = toSignal(this.route.paramMap.pipe(
     map(m => m.get('webhandle'))
   ))
 
   readonly isManager$ = computed(() => {
-    const stream = this.stream()
+    const stream = this.stream$()
     if(stream == null){
       return false
     }
@@ -34,7 +38,7 @@ export class StreamHeaderComponent {
   })
 
   readonly isPlanificator$ = computed(() => {
-    const stream = this.stream()
+    const stream = this.stream$()
     if(stream == null){
       return false
     }
@@ -71,7 +75,7 @@ export class StreamHeaderComponent {
   ), {initialValue: false})
 
   flip() {
-    const stream = this.stream()
+    const stream = this.stream$()!
     this.sessionService.flipFav(stream.id, {
       streamName: stream.name,
       streamTwitchHandle: stream.urlHandle,
@@ -84,9 +88,10 @@ export class StreamHeaderComponent {
   }
 
   share(){
+    const stream = this.stream$()!
     navigator.share({
-      title: `Partager le bingo de ${this.stream().name}`,
-      url: `${window.location.origin}/s/${this.stream().urlHandle}`
+      title: `Partager le bingo de ${stream.name}`,
+      url: `${window.location.origin}/s/${stream.urlHandle}`
     })
   }
 

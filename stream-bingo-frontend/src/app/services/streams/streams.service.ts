@@ -1,5 +1,5 @@
 import { Injectable, signal } from '@angular/core'
-import { Subject, debounceTime, filter, fromEvent, map, merge, shareReplay, tap, } from 'rxjs'
+import { Subject, debounceTime, filter, fromEvent, map, merge, shareReplay, startWith, tap, } from 'rxjs'
 import { Socket, io } from 'socket.io-client'
 import { DateTime } from 'luxon'
 import { toSignal } from '@angular/core/rxjs-interop'
@@ -24,6 +24,9 @@ export class StreamsService extends WebsocketService {
   override get socket(): Socket {
     return this._socket
   }
+
+  
+  private readonly _fetchDetail$$ = new Subject<string>()
 
   private readonly currentStreamWebhandle$ = signal<string | null>(null)
 
@@ -72,6 +75,13 @@ export class StreamsService extends WebsocketService {
     }),
     shareReplay(1),
   )
+  public readonly isStreamLoading$ = merge(
+    this.streamDetail$.pipe(map(() => false)),
+    this._fetchDetail$$.pipe(map(() => true)),
+  ).pipe(
+    startWith(false),
+    shareReplay(1),
+  )
 
   public readonly cells$ = fromEvent<ICell[]>(this.socket, 'streamCells').pipe(
     shareReplay(1)
@@ -106,9 +116,13 @@ export class StreamsService extends WebsocketService {
         limit: 10,
       })
   }
+
+  private readonly _fetchDetail$ = this._fetchDetail$$.asObservable().subscribe({
+    next: (webhandle) =>  this.sendMessage('getDetail', { webhandle })
+  })
   public fetchDetails(webhandle: string) {
     this.currentStreamWebhandle$.set(webhandle)
-    this.sendMessage('getDetail', { webhandle })
+    this._fetchDetail$$.next(webhandle)
   }
   public update(stream: IStream<Omit<IRight, 'username'>>) {
     this.sendMessage('updateStream', stream)

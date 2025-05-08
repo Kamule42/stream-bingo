@@ -1,32 +1,57 @@
+@let stream = stream$();
+@let isLoading = isLoading$();
+
 <div id="stream-header" class="container block is-flex is-flex-direction-row">
   <figure class="image">
-    <img [src]="`//static-cdn.jtvnw.net/jtv_user_pictures/${stream().twitchId}-profile_image-70x70.png`"
-      [alt]="`${stream.name} profil`" class="is-rounded" />
+    @if(isLoading || !stream){
+      <p-skeleton shape="circle" size="70px" />
+    }
+    @else {
+      <img [src]="`//static-cdn.jtvnw.net/jtv_user_pictures/${stream.twitchId}-profile_image-70x70.png`"
+        [alt]="`${stream.name} profil`" class="is-rounded" />
+    }
   </figure>
   <div id="stream-data" class="is-flex is-flex-direction-column">
-    <h5 class="title is-5">{{ stream().name }}</h5>
+    <h5 class="title is-5">
+      @if(isLoading || !stream){
+        <p-skeleton width="10rem" height="1.25rem" />
+      }
+      @else{
+        {{ stream.name }}
+      }
+    </h5>
     <div class="content">
-      @if(stream().startAtTxt && stream().startAtIso){
-      Prochain stream dans <time [dateTime]="stream().startAtIso">{{ stream().startAtTxt }}</time>
+      @if(isLoading || !stream){
+        <p-skeleton height="1rem" />
+      }
+      @else if(stream.startAtTxt && stream.startAtIso){
+        Prochain stream dans <time [dateTime]="stream.startAtIso">{{ stream.startAtTxt }}</time>
       }
       @else {
-      Pas de stream prévu
+        Pas de stream prévu
       }
     </div>
     <div id="stream-actions">
-      @if(session$()){
-        @if(!isViewing$()){
-          <p-button severity="secondary" title="Retour" icon="mdi mdi-arrow-u-left-top" (click)="goBack()" />
+      @if(isLoading || !stream){
+        <p-skeleton size="2rem" />
+      }
+      @else if(session$() && !isViewing$()){
+        <p-button severity="secondary" title="Retour" icon="mdi mdi-arrow-u-left-top" (click)="goBack()" />
+      }
+      
+      @if(!isLeaderboard$()){
+        @if(isLoading || !stream){
+          <p-skeleton size="2rem"  />
+        }
+        @else {
+          <p-button icon="mdi mdi-trophy-outline" severity="secondary"
+            title="Classement"
+            [routerLink]="['/', 's', _webhandle(), 'leaderboard']" />
         }
       }
-      @if(!isLeaderboard$()){
-        <p-button icon="mdi mdi-trophy-outline" severity="secondary"
-          title="Classement"
-          [routerLink]="['/', 's', _webhandle(), 'leaderboard']" />
-      }
-      @if(session$()){
-        <p-button severity="secondary" [title]="stream().isFav ? 'Suivi' : 'Suivre'"
-          [icon]="`mdi mdi-star${stream().isFav ? '' : '-outline'}`" (click)="flip()" />
+      @if(session$() && stream){
+        <p-button severity="secondary" [title]="stream.isFav ? 'Suivi' : 'Suivre'"
+          [icon]="`mdi mdi-star${stream.isFav ? '' : '-outline'}`" (click)="flip()" />
         @if( isPlanificator$() && !isPlaning$()){
           <p-button severity="secondary" title="Planifier" icon="mdi mdi-calendar-month-outline"
             [routerLink]="['/', 's', _webhandle(), 'plan']" />
@@ -36,8 +61,13 @@
             [routerLink]="['/', 's', _webhandle(), 'edit']" />
         }
       }
-      <p-button icon="mdi mdi-share-variant-outline" (onClick)="share()" 
-        title="Partager" />
+      @if(isLoading || !stream){
+        <p-skeleton size="2rem" />
+      }
+      @else {
+        <p-button icon="mdi mdi-share-variant-outline" (onClick)="share()" 
+          title="Partager" />
+      }
     </div>
   </div>
 </div>

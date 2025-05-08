@@ -49,10 +49,10 @@ export class StreamService {
     )
   }
 
-  getStreamDetail(webhandle: string): Observable<NextStreamEntity | null>{
-    return from(this.nextStreamRepository.findOneBy({
+  getStreamDetail(webhandle: string): Promise<NextStreamEntity | null>{
+    return this.nextStreamRepository.findOneBy({
       twitchLogin: webhandle
-    }))
+    })
   }
 
   async updateStream(updatedStream: IStream<Omit<IRight, "username">>) {

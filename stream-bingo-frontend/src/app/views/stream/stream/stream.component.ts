@@ -24,6 +24,8 @@ export class StreamComponent implements OnInit{
   private readonly sessionService = inject(SessionService)
 
   readonly noWebhandle$ = signal<boolean>(false)
+  
+  readonly isLoading = toSignal(this.streamService.isStreamLoading$, {initialValue: false})
 
   private readonly _stream$$ = this.streamService.streamDetail$.pipe(
     switchMap((stream) => timer(0, 1000).pipe(
