@@ -83,8 +83,8 @@ export class EditStreamComponent {
     this.toEdit.set({
       ...this.toEdit(),
       cells: [
+        { id: uuid() },
         ...this.toEdit()?.cells ?? [],
-        { id: uuid() }
       ]
     })
   }
