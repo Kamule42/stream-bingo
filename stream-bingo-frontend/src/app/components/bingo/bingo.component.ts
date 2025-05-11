@@ -2,7 +2,7 @@ import { Component, ViewChild, computed, effect, inject, input, signal } from '@
 import { toSignal } from '@angular/core/rxjs-interop'
 import { ButtonModule } from 'primeng/button'
 import { Popover, PopoverModule } from 'primeng/popover'
-import { delay, filter, map, of, pairwise, startWith, switchMap, tap } from 'rxjs'
+import { debounceTime, delay, filter, map, of, pairwise, startWith, switchMap, tap } from 'rxjs'
 import { ActivatedRoute, Router } from '@angular/router'
 import { toChunk } from '../../shared/helpers/array.helper'
 import { SessionService } from '../../services/session/session.service'
@@ -61,19 +61,20 @@ export class BingoComponent {
     if (session == null && bingoId == null) {
       return;
     }
-    console.log('get grid fro stream', bingoId)
     this.gridService.getGridForStream(this.stream().id , bingoId ?? undefined)
     this.streamService.fetchCells(this.stream().id)
   })
 
-  readonly grid$ = toSignal(this.gridService.gridForStream$.pipe(
-    tap(grid => console.log(grid)),
-    tap(grid => {
-      if (grid &&  this.bingoId() == null) {
-        this.router.navigate(['./b', grid.id], { relativeTo: this.route })
-      }
-    })
-  ))
+  private gridRedirect = this.gridService.gridForStream$.pipe(
+    filter(grid => grid != null && this.bingoId() == null),
+    debounceTime(250),
+  ).subscribe({
+    next: grid =>  {
+      this.router.navigate(['./b', grid!.id], { relativeTo: this.route })
+    }
+  })
+  
+  readonly grid$ = toSignal(this.gridService.gridForStream$)
   readonly gridError$ = toSignal(this.gridService.gridNotFound$.pipe(
     filter(() => this.bingoId() != null),
     tap(() => this.messageService.add({

@@ -31,7 +31,7 @@ export class GridService extends WebsocketService{
     throttleTime(1500),
   )
   public readonly gridForStream$ = fromEvent<IGrid | null>(this.socket, 'gridForStream').pipe(
-    filter(grid => grid == null || grid?.streamId === this.currentStream$()),
+    // filter(grid => grid == null || grid?.streamId === this.currentStream$()),
     startWith(null),
     pairwise(),
     map(([oldGrid, newGrid]) => {
