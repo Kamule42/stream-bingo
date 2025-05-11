@@ -15,9 +15,12 @@ export class RoundService {
     private readonly dataSource: DataSource,
   ) { }
 
-  getRound(roundId: string) {
+  getRound(roundId: string, streamId?: string) {
     return this.roundRepository.findOne({
-      where: { id: roundId},
+      where: {
+        id: roundId,
+        ...(streamId ? {stream: {id : streamId}} : {})
+      },
       relations: ['stream']
     })
   }
@@ -89,8 +92,8 @@ export class RoundService {
       }
   }
 
-  async streamRoundStatus(streamId: string, status: RoundStatus) {
-    const round = await this.getStreamCurrentRound(streamId)
+  async streamRoundStatus(streamId: string, roundId: string, status: RoundStatus) {
+    const round = await this.getRound(roundId, streamId)
     if(round === null){
       throw new Error('Unknown round')
     }

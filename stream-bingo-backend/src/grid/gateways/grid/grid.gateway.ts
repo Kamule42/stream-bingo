@@ -81,8 +81,9 @@ export class GridGateway {
   getMyGrids(
     @Session() session: ISession,
     @Paginate() query: PaginateQuery,
+    @MessageBody('streamId') streamId: string,
   ): Promise<IPaginatedResponse<IGridSummary>> {
-    return this.gridService.getUserGrids(session?.sub, query)
+    return this.gridService.getUserGrids(session?.sub, query, streamId)
       .then(result => ({
         event: 'myGrids',
         data: {

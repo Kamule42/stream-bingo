@@ -86,16 +86,18 @@ export class GridService {
     }) as Promise<GridEntity>
   }
 
-  getUserGrids(userId: string, query: PaginateQuery): Promise<Paginated<GridEntity>> {
+  getUserGrids(userId: string, query: PaginateQuery, streamId?: string): Promise<Paginated<GridEntity>> {
     return paginate(
       query,
       this.gridRepository,
       {
         where: {
-          user: { id: userId }
+          user: { id: userId },
+          ...(streamId ? { round: { stream : { id: streamId } } } : {})
         },
         relations: ['round', 'round.stream'],
-        sortableColumns: ['round.name', 'round.stream.name']
+        sortableColumns: ['round.name', 'round.stream.name'],
+        defaultSortBy: [[ 'round.startAt', 'DESC' ]],
       })
   }
 

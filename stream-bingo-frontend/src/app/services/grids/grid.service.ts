@@ -1,10 +1,11 @@
 import { Injectable, signal } from '@angular/core';
 import { Socket, io } from 'socket.io-client';
-import { distinctUntilChanged, filter, fromEvent, map, pairwise, startWith, Subject, tap, throttleTime,  } from 'rxjs';
-import { IGrid, IValidatedCell } from './grid.interface';
+import { distinctUntilChanged, filter, fromEvent, map, merge, pairwise, shareReplay, startWith, Subject, tap, throttleTime,  } from 'rxjs';
+import { IGrid, IGridSummary, IValidatedCell } from './grid.interface';
 import { WebsocketService } from '../ws/websocket.service';
 import { IWsError } from '../../shared/models/ws-errors.interface'
 import { toSignal } from '@angular/core/rxjs-interop'
+import { IPaginated, IPagination } from '../../shared/models/pagination.interface'
 
 @Injectable({
   providedIn: 'root'
@@ -42,8 +43,24 @@ export class GridService extends WebsocketService{
       }
       return newGrid
     }),
+    shareReplay(1),
   )
-  public readonly validatedCells$ = fromEvent<{ roundId: string, cells: IValidatedCell[]} | null>(this.socket, 'validatedcells')
+  public readonly validatedCells$ = fromEvent<{ roundId: string, cells: IValidatedCell[]} | null>(this.socket, 'validatedcells').pipe(
+    shareReplay(1)
+  )
+
+
+  private readonly _gridHistory$ = fromEvent<IPaginated<IGridSummary[]>>(this.socket, 'myGrids').pipe(
+    shareReplay(1)
+  )
+  public readonly gridHistory$ = this._gridHistory$.pipe(
+    map(({ data: grids }) => grids),
+    shareReplay(1),
+  )
+  public readonly gridsMeta$ = this._gridHistory$.pipe(
+    map(({ meta }) => meta),
+    shareReplay(1),
+  )
 
   public subscribeForRound(roundId: string){
     this.sendMessage('subscribeForRound', { roundId })
@@ -74,9 +91,30 @@ export class GridService extends WebsocketService{
       roundId, cellId
     })
   }
-  flipGridCell(gridId: string, cellIndex: number) {
+  public flipGridCell(gridId: string, cellIndex: number) {
     this.sendMessage('flipGridCell', {
       gridId, cellIndex
+    })
+  }
+  private readonly getHistoryForStream$$ = new Subject<{ streamId: string, pagination?: IPagination }>()
+  private readonly getHistoryForStream$ = toSignal(this.getHistoryForStream$$.asObservable().pipe(
+    distinctUntilChanged((prev, curr) =>
+      prev.streamId === curr.streamId &&
+      prev.pagination?.page === curr.pagination?.page &&
+      prev.pagination?.limit === curr.pagination?.limit
+    ),
+    tap(body => this.sendMessage('getMyGrids', body))
+  ))
+  public getHistoryForStream(streamId: string, pagination?: IPagination){
+    this.getHistoryForStream$$.next({
+      streamId,
+      ...(pagination ? {
+        ...pagination,
+        page: (pagination.page ?? 0) + 1
+      } : {
+        page: 1,
+        limit: 25,
+      }),
     })
   }
 }

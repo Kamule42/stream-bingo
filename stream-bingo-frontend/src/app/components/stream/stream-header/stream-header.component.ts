@@ -74,6 +74,10 @@ export class StreamHeaderComponent {
     map(datas => datas.some(data => data['name'] === 'leaderboard'))
   ), {initialValue: false})
 
+  readonly isHistory$ = toSignal(this.datas$.pipe(
+    map(datas => datas.some(data => data['name'] === 'history'))
+  ), {initialValue: false})
+
   flip() {
     const stream = this.stream$()!
     this.sessionService.flipFav(stream.id, {

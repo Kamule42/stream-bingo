@@ -14,9 +14,12 @@ export interface IGrid{
     roundName: string
     streamStartAt: Date
     cells: IGridCell[]
+    score: number
 }
 
 export interface IValidatedCell{
     cellId: string
     valide: boolean
 }
+
+export type IGridSummary = Pick<IGrid, 'id' | 'streamId' | 'streamName' | 'roundName' | 'streamStartAt'>

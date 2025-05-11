@@ -64,9 +64,10 @@ export class RoundGateway {
   @SubscribeMessage('updateStreamStatus')
   async updateStreamStatus(
     @MessageBody('streamId') streamId: string,
+    @MessageBody('roundId') roundId: string,
     @MessageBody('status') status: RoundStatus,
   ) : Promise<WsResponse<IRound> | void> {
-    const updated = await this.roundService.streamRoundStatus(streamId, status)
+    const updated = await this.roundService.streamRoundStatus(streamId, roundId, status)
     if(updated != null){
       return {
         event: 'roundDetail',

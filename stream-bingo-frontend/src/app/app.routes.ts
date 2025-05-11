@@ -48,7 +48,14 @@ export const routes: Routes = [
         data: {
           name: 'leaderboard'
         }
-      }
+      },
+      {
+        path: 'history',
+        loadComponent: () => import('./views/stream/history/history.component').then(c => c.HistoryComponent),
+        data: {
+          name: 'history'
+        }
+      },
     ]
   },
 

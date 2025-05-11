@@ -115,6 +115,7 @@ export class StreamModComponent {
   }
 
   updateStatus(status: RoundStatus){
-    this.roundService.updateCurrentRoundStatus(this.round$()!.streamId!, status)
+    const round = this.round$()!
+    this.roundService.updateCurrentRoundStatus(round.id, round.streamId!, status)
   }
 }

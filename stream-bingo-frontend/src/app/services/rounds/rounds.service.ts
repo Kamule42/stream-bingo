@@ -62,8 +62,8 @@ export class RoundsService extends WebsocketService{
   public updateStreamRounds(streamId: string, rounds: IEditRound[], toDelete?: string[]) {
     this.sendMessage('updateStreamRounds', { streamId, rounds, toDelete})
   }
-  public updateCurrentRoundStatus(streamId: string, status: RoundStatus){
-    this.sendMessage('updateStreamStatus', { streamId, status})
+  public updateCurrentRoundStatus(roundId: string, streamId: string, status: RoundStatus){
+    this.sendMessage('updateStreamStatus', { roundId, streamId, status})
   }
 
   private toRound(raw: RawRound): IRound{

@@ -61,11 +61,13 @@ export class BingoComponent {
     if (session == null && bingoId == null) {
       return;
     }
+    console.log('get grid fro stream', bingoId)
     this.gridService.getGridForStream(this.stream().id , bingoId ?? undefined)
     this.streamService.fetchCells(this.stream().id)
   })
 
   readonly grid$ = toSignal(this.gridService.gridForStream$.pipe(
+    tap(grid => console.log(grid)),
     tap(grid => {
       if (grid &&  this.bingoId() == null) {
         this.router.navigate(['./b', grid.id], { relativeTo: this.route })

@@ -50,8 +50,22 @@
         }
       }
       @if(session$() && stream){
-        <p-button severity="secondary" [title]="stream.isFav ? 'Suivi' : 'Suivre'"
-          [icon]="`mdi mdi-star${stream.isFav ? '' : '-outline'}`" (click)="flip()" />
+        @if(isLoading || !stream){
+          <p-skeleton size="2rem"  />
+        }
+        @else {
+          <p-button severity="secondary" [title]="stream.isFav ? 'Suivi' : 'Suivre'"
+            [icon]="`mdi mdi-star${stream.isFav ? '' : '-outline'}`" (click)="flip()" />
+        }
+        @if(!isHistory$()){
+          @if(isLoading || !stream){
+            <p-skeleton size="2rem"  />
+          }
+          @else {
+          <p-button severity="secondary" title="Historique" icon="mdi mdi-timer-sand"
+            [routerLink]="['/', 's', _webhandle(), 'history']" />
+          }
+        }
         @if( isPlanificator$() && !isPlaning$()){
           <p-button severity="secondary" title="Planifier" icon="mdi mdi-calendar-month-outline"
             [routerLink]="['/', 's', _webhandle(), 'plan']" />

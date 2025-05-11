@@ -1,0 +1,24 @@
+<div class="container">
+  @if(history$(); as history){
+    <p-table [value]="history">
+      <ng-template #header>
+          <tr>
+              <th>Stream</th>
+              <th>Date</th>
+              <th></th>
+          </tr>
+      </ng-template>
+      <ng-template #body let-entry>
+          <tr>
+              <td>{{ entry.roundName }}</td>
+              <td>{{ dateFormat(entry.streamStartAt) }}</td>
+              <td>
+              <p-button icon="mdi mdi-eye-outline" severity="secondary"
+                title="Classement"
+                [routerLink]="['/', 's', _webhandle(), 'b', entry.id]" />
+              </td>
+          </tr>
+      </ng-template>
+    </p-table>
+  }
+</div>

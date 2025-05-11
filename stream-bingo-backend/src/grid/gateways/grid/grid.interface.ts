@@ -20,4 +20,4 @@ export interface IValidatedCell{
     valide: boolean
 }
 
-export type IGridSummary = Pick<IGrid, 'id' | 'streamId' | 'streamName' | 'roundName'>
+export type IGridSummary = Pick<IGrid, 'id' | 'streamId' | 'streamName' | 'roundName' | 'streamStartAt'>

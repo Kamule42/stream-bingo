@@ -22,4 +22,5 @@ export const gridSummaryMapper = (grid: GridEntity): IGridSummary => ({
     roundName: grid.round.name,
     streamId: grid.round.stream.id,
     streamName: grid.round.stream.name,
+    streamStartAt: grid.round.startAt,
 })
