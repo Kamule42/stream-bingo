@@ -21,7 +21,7 @@ export class LeaderboardService extends WebsocketService{
   override get socket(): Socket {
     return this._socket
   }
-private readonly _leaderboard$ = fromEvent<IPaginated<IScore[]>>(this.socket, 'leaderBoardForStream').pipe(
+private readonly _leaderboard$ = fromEvent<IPaginated<IScore>>(this.socket, 'leaderBoardForStream').pipe(
     shareReplay(1)
   )
 

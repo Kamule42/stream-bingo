@@ -29,7 +29,7 @@ export class StreamsService extends WebsocketService {
 
   private readonly currentStreamWebhandle$ = signal<string | null>(null)
 
-  private readonly _streams$ = fromEvent<IPaginated<IStream[]>>(this.socket, 'streamList').pipe(
+  private readonly _streams$ = fromEvent<IPaginated<IStream>>(this.socket, 'streamList').pipe(
     shareReplay(1)
   )
 
@@ -44,6 +44,7 @@ export class StreamsService extends WebsocketService {
 
 
   public readonly nextStreams$ = fromEvent<IPaginated<IStream>>(this.socket, 'nextStreams').pipe(
+    map(({ data: streams }) => streams),
     shareReplay(1),
   )
   public readonly streamDetail$ = fromEvent<IStream>(this.socket, 'streamDetail').pipe(

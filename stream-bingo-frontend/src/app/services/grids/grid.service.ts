@@ -54,7 +54,7 @@ export class GridService extends WebsocketService{
   )
 
 
-  private readonly _gridHistory$ = fromEvent<IPaginated<IGridSummary[]>>(this.socket, 'myGrids').pipe(
+  private readonly _gridHistory$ = fromEvent<IPaginated<IGridSummary>>(this.socket, 'myGrids').pipe(
     shareReplay(1)
   )
   public readonly gridHistory$ = this._gridHistory$.pipe(

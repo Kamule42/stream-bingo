@@ -1,5 +1,5 @@
 export interface IPaginated<T = unknown> {
-    data: T,
+    data: T[],
     meta: IPaginationMeta
 }
 
