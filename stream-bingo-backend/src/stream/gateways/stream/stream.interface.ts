@@ -20,8 +20,6 @@ export interface INextStream{
     twitchId: string
     urlHandle: string
     enabled?: boolean
-    startAt: Date
-    streamStartAt: Date
     status: RoundStatus
 }
 

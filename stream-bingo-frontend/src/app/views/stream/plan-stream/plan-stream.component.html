@@ -2,39 +2,22 @@
   <h4 class="title is-4">Planification</h4>
   <p-card>
     <div id="plan-content">
-      <app-timeline
-        [(rounds)]="rounds$"
-        (isValid)="isTimelineValid.set($event)"
-        (roundsToDelete)="roundsToDelete.set($event)"
-      />
-      <div id="plan-actions">
-        <p-button
-          label="Annuler"
-          severity="secondary"
-          icon="mdi mdi-cancel"
-          (onClick)="cancel()" />
-        <p-button
-          label="Sauvegarder"
-          icon="mdi mdi-content-save-outline"
-          [disabled]="!isTimelineValid()"
-          (onClick)="saveTimeline()"
-        />
-      </div>
-    @if(false){
       <p-table [value]="toEdit$()" dataKey="id" stripedRows>
         <ng-template #emptymessage>
           Aucune partie de prévue
         </ng-template>
         <ng-template #caption>
           <div class="is-flex is-flex-direction-row is-justify-content-end">
-            <p-button label="Ajouter" icon="mdi mdi-plus" text (onClick)="addNewRound()" />
+            <p-button
+              label="Ajouter" icon="mdi mdi-plus" text
+              [disabled]="!canAddRound$()"
+              (onClick)="addNewRound()" />
           </div>
         </ng-template>
         <ng-template #header>
           <tr>
             <th pSortableColumn="name">Nom <p-sortIcon field="name" /></th>
-            <th pSortableColumn="startAt">Ouverture <p-sortIcon field="startAt" /></th>
-            <th pSortableColumn="streamStartAt">Début estimé du stream <p-sortIcon field="streamStartAt" /></th>
+            <th>Status <p-sortIcon field="status" /></th>
           </tr>
         </ng-template>
         <ng-template #body let-round>
@@ -49,27 +32,8 @@
                 </ng-template>
               </p-cellEditor>
             </td>
-            <td [pEditableColumn]="round.startAt" pEditableColumnField="startAt">
-              <p-cellEditor>
-                <ng-template #input>
-                  <p-datepicker [(ngModel)]="round.startAt" [maxDate]="round.streamStartAt" [showTime]="true"
-                    appendTo="body" (keydown)="stopNavigation($event)" />
-                </ng-template>
-                <ng-template #output>
-                  {{ round.startAt | date }}
-                </ng-template>
-              </p-cellEditor>
-            </td>
-            <td [pEditableColumn]="round.streamStartAt" pEditableColumnField="streamStartAt">
-              <p-cellEditor>
-                <ng-template #input>
-                  <p-datepicker [(ngModel)]="round.streamStartAt" [minDate]="now" [showTime]="true" appendTo="body"
-                    (keydown)="stopNavigation($event)" />
-                </ng-template>
-                <ng-template #output>
-                  {{ round.streamStartAt | date }}
-                </ng-template>
-              </p-cellEditor>
+            <td>
+              {{ round.status}}
             </td>
           </tr>
         </ng-template>
@@ -78,7 +42,6 @@
         <p-button label="Annuler" severity="secondary" (onClick)="cancel()" />
         <p-button label="Sauvegarder" (onClick)="saveTimeline()" />
       </div>
-    }
     </div>
   </p-card>
 </div>

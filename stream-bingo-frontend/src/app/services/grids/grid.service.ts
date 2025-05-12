@@ -30,8 +30,12 @@ export class GridService extends WebsocketService{
     filter(error => typeof error !== 'string' && error?.type === 'unkownGrid'),
     throttleTime(1500),
   )
-  public readonly gridForStream$ = fromEvent<IGrid | null>(this.socket, 'gridForStream').pipe(
-    // filter(grid => grid == null || grid?.streamId === this.currentStream$()),
+  private readonly invalidateGrid$ = new Subject()
+  public readonly gridForStream$ = merge(
+      fromEvent<IGrid | null>(this.socket, 'gridForStream'),
+      this.gridNotFound$.pipe(map(() => null)),
+      this.invalidateGrid$.asObservable().pipe(map(() => null)),
+    ).pipe(
     startWith(null),
     pairwise(),
     map(([oldGrid, newGrid]) => {
@@ -75,6 +79,7 @@ export class GridService extends WebsocketService{
     distinctUntilChanged((prev, curr) =>
       prev.streamId === curr.streamId &&
       prev.bingoId === curr.bingoId),
+    tap(() => this.invalidateGrid$.next(null)),
     tap(body => this.sendMessage('getGridForStream', body))
   ))
 

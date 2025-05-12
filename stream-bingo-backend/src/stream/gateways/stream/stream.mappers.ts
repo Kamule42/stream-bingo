@@ -20,14 +20,12 @@ export const nextStreamMapper = (entity: NextStreamEntity  | null): INextStream 
   if(entity == null){
     return null
   }
-  const {id, name, twitchLogin, twitchId, enabled, startAt, streamStartAt, status} = entity
+  const {id, name, twitchLogin, twitchId, enabled, status} = entity
   return {
     id, 
     name,
     urlHandle: twitchLogin,
     twitchId,
-    startAt,
-    streamStartAt,
     enabled,
     status,
   }

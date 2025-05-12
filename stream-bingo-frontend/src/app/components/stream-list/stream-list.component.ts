@@ -1,12 +1,9 @@
 import { Component, OnInit, inject, input } from '@angular/core'
 import { toSignal } from '@angular/core/rxjs-interop'
-import { map, switchMap, timer } from 'rxjs'
-import { DateTime, Interval } from 'luxon'
 import { CardModule } from 'primeng/card'
 import { RouterLink } from '@angular/router'
 import { CarouselModule } from 'primeng/carousel'
 import { StreamsService } from '../../services/streams/streams.service'
-import { IStream } from '../../services/streams/stream.interface'
 
 
 @Component({
@@ -19,23 +16,7 @@ export class StreamListComponent implements OnInit {
   private readonly streamService = inject(StreamsService)
   readonly streamType = input<'next', 'all'>
 
-  private readonly _streams$ = this.streamService.nextStreams$.pipe(
-    switchMap((streams) => timer(0, 1000).pipe(
-      map(() => streams)
-    )),
-    map(streams => streams.map((stream: IStream) => ({
-      ...stream,
-      nextStreamStartsAtTxt: stream.streamStartAt ?
-        Interval.fromDateTimes(DateTime.now(), stream.streamStartAt)
-          .toDuration(['days', 'hours', 'minutes', 'seconds'])
-          .toHuman({
-            listStyle: 'long',
-            unitDisplay: 'short',
-            maximumFractionDigits: 0
-          }) : null,
-      nextStreamStartsAtIso: stream.startAt?.toISO(),
-    })))
-  )
+  private readonly _streams$ = this.streamService.nextStreams$
   readonly streams$ = toSignal(this._streams$, { initialValue: undefined })
 
 

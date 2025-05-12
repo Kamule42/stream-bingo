@@ -18,12 +18,6 @@ export class NextStreamEntity {
   @Column()
   enabled: boolean
 
-  @Column({ name: 'start_at'})
-  startAt: Date
-  
-  @Column({ name: 'stream_start_at'})
-  streamStartAt: Date
-
   @Column()
   status: RoundStatus
 }

@@ -2,7 +2,7 @@ import { Component, ViewChild, computed, effect, inject, input, signal } from '@
 import { toSignal } from '@angular/core/rxjs-interop'
 import { ButtonModule } from 'primeng/button'
 import { Popover, PopoverModule } from 'primeng/popover'
-import { debounceTime, delay, filter, map, of, pairwise, startWith, switchMap, tap } from 'rxjs'
+import { debounceTime, delay, filter, map, of, pairwise, startWith, switchMap, tap, throttleTime } from 'rxjs'
 import { ActivatedRoute, Router } from '@angular/router'
 import { toChunk } from '../../shared/helpers/array.helper'
 import { SessionService } from '../../services/session/session.service'
@@ -43,7 +43,7 @@ export class BingoComponent {
   private readonly route = inject(ActivatedRoute)
 
   private readonly bingoId = toSignal(this.route.paramMap.pipe(
-    map(m => m.get('bingoId'))
+    map(m => m.get('bingoId')),
   ), { initialValue: null })
 
 
@@ -61,13 +61,21 @@ export class BingoComponent {
     if (session == null && bingoId == null) {
       return;
     }
+    
+    if(bingoId){
+      this.roundService.fetchRoundForGrid(bingoId)
+    }
+    else{
+      this.roundService.fetchRoundsForStream(this.stream().id)
+    }
+
     this.gridService.getGridForStream(this.stream().id , bingoId ?? undefined)
     this.streamService.fetchCells(this.stream().id)
   })
 
   private gridRedirect = this.gridService.gridForStream$.pipe(
-    filter(grid => grid != null && this.bingoId() == null),
     debounceTime(250),
+    filter(grid => grid != null && this.bingoId() == null),
   ).subscribe({
     next: grid =>  {
       this.router.navigate(['./b', grid!.id], { relativeTo: this.route })
@@ -76,6 +84,8 @@ export class BingoComponent {
   
   readonly grid$ = toSignal(this.gridService.gridForStream$)
   readonly gridError$ = toSignal(this.gridService.gridNotFound$.pipe(
+    filter(grid => grid != null && this.bingoId() == null),
+    throttleTime(250),
     filter(() => this.bingoId() != null),
     tap(() => this.messageService.add({
       summary: 'Grille non trouvée',

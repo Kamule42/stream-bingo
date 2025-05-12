@@ -3,9 +3,10 @@ import { InjectRepository } from '@nestjs/typeorm'
 import { paginate, Paginated, PaginateQuery } from 'nestjs-paginate'
 import { Observable, from,  } from 'rxjs'
 import { NextStreamEntity } from 'src/stream/entities/next-stream.entity'
+import { RoundStatus } from 'src/stream/entities/round.entity'
 import { StreamEntity } from 'src/stream/entities/stream.entity'
 import { IStream, IRight } from 'src/stream/gateways/stream/stream.interface'
-import { Repository, DataSource,  LessThanOrEqual, Raw, } from 'typeorm'
+import { Repository, DataSource,  LessThanOrEqual, Raw, Not, } from 'typeorm'
 
 @Injectable()
 export class StreamService {
@@ -38,12 +39,12 @@ export class StreamService {
       this.nextStreamRepository ,
       {
         where: {
-          startAt: LessThanOrEqual(new Date())
+          status: Not(RoundStatus.FINISHED)
         },
-        sortableColumns: ['startAt'],
+        sortableColumns: [],
         defaultSortBy: [
           ['id', 'ASC'],
-          ['startAt', 'ASC']
+          ['status', 'DESC']
         ],
       }
     )

@@ -3,7 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { DateTime } from 'luxon';
 import { RoundEntity, RoundStatus } from 'src/stream/entities/round.entity';
 import { IRoundEdit } from 'src/stream/gateways/round/round.interface';
-import { Brackets, DataSource, IsNull, MoreThanOrEqual, Repository } from 'typeorm';
+import { Brackets, DataSource, IsNull, MoreThanOrEqual, Repository, Not } from 'typeorm';
 
 type NewStatus = null | {newStatus: RoundStatus, delay: boolean }
 
@@ -35,16 +35,13 @@ export class RoundService {
       .leftJoinAndSelect('round.stream', 'stream')
       .where('round.stream.id=:streamId', { streamId })
       .andWhere(new Brackets((qb) => {
-        qb
-          .where('round.streamStartAt >= :date', { date: DateTime.now().minus({ hours: 3 }).toJSDate() })
-          .orWhere('round.status = :status', { status: RoundStatus.STARTED })
+        qb.where('round.status != :status', { status: RoundStatus.FINISHED })
       }))
       .orderBy('statusOrder', 'ASC')
-      .addOrderBy('round.streamStartAt', 'ASC')
+      .addOrderBy('round.createdAt', 'DESC')
       .getOne()
   }
   getRoundForGrid(gridId: string, userId: string | undefined) {
-    let where = {}
     return this.roundRepository.findOne({
       where: {
         grids: { 
@@ -59,12 +56,12 @@ export class RoundService {
   getStreamRounds(streamId: string): Promise<Array<RoundEntity>> {
     return this.roundRepository.find({
       where: [
-          { stream: { id: streamId }, streamStartAt: MoreThanOrEqual(DateTime.now().minus({ hours: 3 }).toJSDate()) },
-          { stream: { id: streamId }, status: RoundStatus.STARTED }
+          { stream: { id: streamId }, createdAt: MoreThanOrEqual(DateTime.now().minus({ day: 7 }).toJSDate()) },
+          { stream: { id: streamId }, status: Not(RoundStatus.FINISHED) }
       ],
       relations: ['stream'],
       order: {
-        streamStartAt: 'asc'
+        createdAt: 'desc'
       }
     })
   }
@@ -76,8 +73,6 @@ export class RoundService {
         .map(round => ({
           id: round.id,
           name: round.name,
-          startAt: round.startAt,
-          streamStartAt: round.streamStartAt,
           stream: { id: streamId },
         })),
       ['id'])
@@ -104,7 +99,12 @@ export class RoundService {
     }
     this.roundRepository.update(
       { id: round.id}, 
-      {status: newStatus.newStatus }
+      {
+        status: newStatus.newStatus,
+        ...(
+          status === RoundStatus.STARTED ? { streamStartAt: new Date() } : {}
+        ),
+      }
     )
     if(newStatus.newStatus === RoundStatus.FINISHED){
       this.scoreGridsForRound(round.id)

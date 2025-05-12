@@ -7,22 +7,19 @@ import { CardModule } from 'primeng/card'
 import { FormsModule } from '@angular/forms'
 import { InputTextModule } from 'primeng/inputtext'
 import { DatePickerModule } from 'primeng/datepicker'
-import { DatePipe } from '@angular/common'
 import { v7 as uuid} from 'uuid'
 import { Router } from '@angular/router'
 import { MessageService } from 'primeng/api'
 import { StreamsService } from '../../../services/streams/streams.service'
-import { IEditRound } from '../../../services/rounds/round.interface'
+import { IEditRound, RoundStatus } from '../../../services/rounds/round.interface'
 import { RoundsService } from '../../../services/rounds/rounds.service'
-import { TimelineComponent } from "../../../components/timeline/timeline.component";
 import { SessionService } from '../../../services/session/session.service'
 
 @Component({
   selector: 'app-plan-stream',
   imports: [
     TableModule, ButtonModule, CardModule, FormsModule,
-    InputTextModule, DatePickerModule, DatePipe,
-    TimelineComponent
+    InputTextModule, DatePickerModule,
 ],
   templateUrl: './plan-stream.component.html',
   styleUrl: './plan-stream.component.scss'
@@ -81,10 +78,18 @@ export class PlanStreamComponent{
     }
   })
 
+  readonly canAddRound$ = computed(() => {
+    const rounds = this.rounds$()
+    if(!rounds){
+      return false
+    }
+    return rounds.every(({status}) => status === RoundStatus.FINISHED)
+  })
+
   addNewRound(){
     this.toEdit$.set([
+      { id: uuid(), name: 'Nouveau stream', },
       ...this.toEdit$(),
-      { id: uuid(), name: '', startAt: new Date(), streamStartAt: new Date() }
     ])
   }
 
@@ -93,7 +98,7 @@ export class PlanStreamComponent{
     this.messageService.add({ severity: 'info', summary: 'Sauvegardé'})
   }
   saveTimeline(){
-    this.roundService.updateStreamRounds( this.streamId$()!, this.rounds$(), this.roundsToDelete())
+    this.roundService.updateStreamRounds( this.streamId$()!, this.toEdit$(), this.roundsToDelete())
     this.messageService.add({ severity: 'info', summary: 'Sauvegardé'})
   }
   cancel(){

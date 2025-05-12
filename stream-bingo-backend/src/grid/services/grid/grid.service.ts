@@ -97,7 +97,7 @@ export class GridService {
         },
         relations: ['round', 'round.stream'],
         sortableColumns: ['round.name', 'round.stream.name'],
-        defaultSortBy: [[ 'round.startAt', 'DESC' ]],
+        defaultSortBy: [[ 'round.createdAt', 'DESC' ]],
       })
   }
 

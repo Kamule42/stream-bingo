@@ -7,11 +7,9 @@ export enum RoundStatus{
 export interface IRound{
     id: string
     name: string
-    startAt: Date
-    streamStartAt: Date
     streamId?: string
     streamName?: string
     status: RoundStatus
 }
 
-export type IEditRound = Omit<IRound, 'status' | 'streamId' | 'streamName'>
+export type IEditRound = Omit<IRound, 'status' | 'streamId' | 'streamName'> & { status?: RoundStatus}

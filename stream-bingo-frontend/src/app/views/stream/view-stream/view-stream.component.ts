@@ -44,9 +44,7 @@ export class ViewStreamComponent {
     tap(stream => this.roundService.fetchCurrentRoundForStream(stream.id))
   )
   readonly stream$ =  toSignal<IStream>(this._stream$)
-
-  private readonly  _round$ = this.roundService.currentRound$
-  readonly round$ = toSignal(this._round$)
+  readonly round$ = toSignal(this.roundService.currentRound$)
 
   readonly isModerator$ = computed(() => {
     const stream = this.stream$()
@@ -59,6 +57,6 @@ export class ViewStreamComponent {
   
   readonly isGridOpen = computed(() => {
     const round = this.round$()
-    return round && round.startAt <= new Date() || this._bingoId() != null
+    return round || this._bingoId() != null
   })
 }

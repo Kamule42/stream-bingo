@@ -1,9 +1,8 @@
 import { Injectable, signal } from '@angular/core'
 import { Subject, debounceTime, filter, fromEvent, map, merge, shareReplay, startWith, tap, } from 'rxjs'
 import { Socket, io } from 'socket.io-client'
-import { DateTime } from 'luxon'
 import { toSignal } from '@angular/core/rxjs-interop'
-import { ICell, IRight, IStream, RawStream } from './stream.interface'
+import { ICell, IRight, IStream, } from './stream.interface'
 import { IPaginated, IPagination } from '../../shared/models/pagination.interface'
 import { WebsocketService } from '../ws/websocket.service'
 import { IFav } from '../users/users.interface'
@@ -30,16 +29,12 @@ export class StreamsService extends WebsocketService {
 
   private readonly currentStreamWebhandle$ = signal<string | null>(null)
 
-  private readonly _streams$ = fromEvent<IPaginated<RawStream[]>>(this.socket, 'streamList').pipe(
+  private readonly _streams$ = fromEvent<IPaginated<IStream[]>>(this.socket, 'streamList').pipe(
     shareReplay(1)
   )
 
   public readonly streams$ = this._streams$.pipe(
-    map(({ data: streams }) => streams.map<IStream>((stream) => ({
-      ...stream,
-      startAt: stream.startAt ? DateTime.fromISO(stream.startAt) : undefined,
-      streamStartAt: stream.streamStartAt ? DateTime.fromISO(stream.streamStartAt) : undefined,
-    }))),
+    map(({ data: streams }) => streams),
     shareReplay(1),
   )
   public readonly streamMeta$ = this._streams$.pipe(
@@ -48,31 +43,13 @@ export class StreamsService extends WebsocketService {
   )
 
 
-  public readonly nextStreams$ = fromEvent<IPaginated<RawStream[]>>(this.socket, 'nextStreams').pipe(
-    map(streams => streams.data.map((stream): IStream => ({
-      ...stream,
-      startAt: stream.startAt ? DateTime.fromISO(stream.startAt) : undefined,
-      streamStartAt: stream.streamStartAt ? DateTime.fromISO(stream.streamStartAt) : undefined,
-    })) ?? []),
+  public readonly nextStreams$ = fromEvent<IPaginated<IStream>>(this.socket, 'nextStreams').pipe(
     shareReplay(1),
   )
-  public readonly streamDetail$ = fromEvent<IStream & { startAt: string }>(this.socket, 'streamDetail').pipe(
+  public readonly streamDetail$ = fromEvent<IStream>(this.socket, 'streamDetail').pipe(
     filter(stream =>
       this.currentStreamWebhandle$() == null ||
       this.currentStreamWebhandle$() == stream?.urlHandle),
-    map(stream => {
-      if (!stream) {
-        return undefined
-      }
-      let startAt = stream.startAt ? DateTime.fromISO(stream.startAt) : undefined
-      if (!startAt?.isValid) {
-        startAt = undefined
-      }
-      return {
-        ...stream,
-        startAt: startAt as DateTime | undefined,
-      }
-    }),
     shareReplay(1),
   )
   public readonly isStreamLoading$ = merge(
@@ -165,7 +142,7 @@ export class StreamsService extends WebsocketService {
   }
 
   
-  public readonly searchResult$ = fromEvent<RawStream[]>(this.socket, 'searchResult').pipe(
+  public readonly searchResult$ = fromEvent<IStream[]>(this.socket, 'searchResult').pipe(
     shareReplay(1)
   )
   searchByName(name: string): void {

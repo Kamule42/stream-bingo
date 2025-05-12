@@ -1,6 +1,5 @@
 import { Component, OnInit, computed, inject, signal } from '@angular/core'
-import { map, share, switchMap, tap, timer, } from 'rxjs'
-import { DateTime, Interval } from 'luxon'
+import { map, shareReplay, switchMap, tap, timer, } from 'rxjs'
 import { toObservable, toSignal } from '@angular/core/rxjs-interop'
 import { ActivatedRoute, RouterOutlet } from '@angular/router'
 import { ProgressSpinnerModule } from 'primeng/progressspinner'
@@ -31,21 +30,7 @@ export class StreamComponent implements OnInit{
     switchMap((stream) => timer(0, 1000).pipe(
       map(() => stream)
     )),
-    map(stream =>  stream ? {
-      ...stream,
-      startAtTxt: stream?.startAt && stream.startAt >= DateTime.now() ? 
-        Interval.fromDateTimes(DateTime.now(), stream.startAt)
-        .toDuration(['days', 'hours', 'minutes', 'seconds'])
-        .toHuman({
-          listStyle: 'long',
-          unitDisplay: 'short',
-          maximumFractionDigits: 0
-        }) : undefined,
-        startAtIso: stream?.startAt && stream.startAt >= DateTime.now() ?
-          stream.startAt.toISO() ?? undefined :
-          undefined,
-    } : null),
-    share(),
+    shareReplay(1),
   )
   private readonly _stream$ =  toSignal(this._stream$$)
   readonly stream$ = computed<IStream | null>(() => {

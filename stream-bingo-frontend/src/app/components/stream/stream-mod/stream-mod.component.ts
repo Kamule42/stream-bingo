@@ -74,9 +74,12 @@ export class StreamModComponent {
     const searchText = this.debouncedSearchText$().toLowerCase()
     return cells
       .filter(
-        cell => searchText?.trim().length === 0 ||
-        cell.name.toLocaleLowerCase().includes(searchText) ||
-        cell.description?.toLocaleLowerCase()?.includes(searchText))
+        cell =>
+          cell.active && (
+          searchText?.trim().length === 0 ||
+          cell.name.toLocaleLowerCase().includes(searchText) ||
+          cell.description?.toLocaleLowerCase()?.includes(searchText)
+        ))
       .toSorted((a,b) => a.name.toLocaleLowerCase().localeCompare(b.name.toLocaleLowerCase()))
       .map(cell => ({
         ...cell,

@@ -25,20 +25,7 @@ export class StreamsComponent{
   readonly toEdit$ = signal<Partial<IStream>>({})
   readonly modalTitle$ = computed(() => this.toEdit$()?.id === undefined ? 'Ajouter un stream' : 'Modifier le stream')
 
-  private readonly _streams$ = this.streamService.streams$.pipe(
-    map(streams => streams.map((stream: IStream) => ({
-        ...stream,
-        nextStreamStartsAtTxt: stream.startAt ?
-          Interval.fromDateTimes(DateTime.now(), stream.startAt)
-          .toDuration(['days', 'hours', 'minutes', 'seconds'])
-          .toHuman({
-            listStyle: 'long',
-            unitDisplay: 'short',
-            maximumFractionDigits: 0
-          }) : null,
-        nextStreamStartsAtIso:  stream.startAt?.toISO(),
-      })))
-  )
+  private readonly _streams$ = this.streamService.streams$
   readonly streams$ = toSignal(this._streams$, {initialValue: undefined})
 
   private readonly _streamMeta$ = this.streamService.streamMeta$

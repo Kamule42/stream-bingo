@@ -7,7 +7,6 @@ export const gridMapper = (grid: GridEntity): IGrid => ({
     streamName: grid.round.stream.name,
     roundId: grid.round.id,
     roundName: grid.round.name,
-    streamStartAt: grid.round.streamStartAt,
     cells: grid.cells.map(cell => ({
         index: cell.index,
         cellName: cell.cell.name,
@@ -22,5 +21,4 @@ export const gridSummaryMapper = (grid: GridEntity): IGridSummary => ({
     roundName: grid.round.name,
     streamId: grid.round.stream.id,
     streamName: grid.round.stream.name,
-    streamStartAt: grid.round.startAt,
 })

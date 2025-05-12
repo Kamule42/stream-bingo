@@ -37,6 +37,9 @@ export class HistoryComponent {
   })
 
   dateFormat(date: string){
+    if(!date){
+      return 'En attente'
+    }
     return DateTime.fromISO(date).toLocaleString(DateTime.DATETIME_SHORT)
   }
 }

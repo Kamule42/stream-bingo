@@ -20,17 +20,6 @@
         {{ stream.name }}
       }
     </h5>
-    <div class="content">
-      @if(isLoading || !stream){
-        <p-skeleton height="1rem" />
-      }
-      @else if(stream.startAtTxt && stream.startAtIso){
-        Prochain stream dans <time [dateTime]="stream.startAtIso">{{ stream.startAtTxt }}</time>
-      }
-      @else {
-        Pas de stream prévu
-      }
-    </div>
     <div id="stream-actions">
       @if(isLoading || !stream){
         <p-skeleton size="2rem" />
