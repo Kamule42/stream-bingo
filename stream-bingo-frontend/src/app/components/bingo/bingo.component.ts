@@ -229,12 +229,14 @@ export class BingoComponent {
   }
 
   public async screenshot(){
-    const grid = document.querySelector("#cells")
+    const grid = document.querySelector("#bingo-root")
     if(grid == null){
       this.messageService.add({ severity: 'warn', summary: 'Erreur lors de la copie de la grille', life: 3000 })
       return
     }
-    const canvas = await html2canvas(grid as HTMLElement)
+    const canvas = await html2canvas(grid as HTMLElement, {
+      backgroundColor : window.getComputedStyle(grid).getPropertyValue('--main-color')
+    })
     const blob = await new Promise<Blob | null>(resolve => canvas.toBlob(resolve))
     if(blob == null){
       this.messageService.add({ severity: 'warn', summary: 'Erreur lors de la copie de la grille', life: 3000 })

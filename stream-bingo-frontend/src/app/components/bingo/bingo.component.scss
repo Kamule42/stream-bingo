@@ -5,6 +5,22 @@
 
 :host {
 	width: 100%;
+	#bingo-wrapper{
+		display: flex;
+		justify-content: center;
+		width: 100%;
+	}
+
+	#bingo-root{
+		display: flex;
+		flex-direction: column;
+		gap: 0.5rem;
+		justify-content: center;
+
+		h3{
+			text-align: center;
+		}
+	}
 	
 	#grid {
 		position: relative;

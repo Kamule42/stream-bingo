@@ -1,67 +1,74 @@
 @if(grid$(); as grid){
-  <div id="grid">
-    <div id="left-spacer">&nbsp;</div>
-    <div id="cells">
-      @for(cells of cells$(); track $index; let y=$index){
-        <div class="cells-row">
-          @for(cell of cells; track cell.cellId; let x=$index){
-            <div 
-              class="cell"
-              [class.clickable]="isManual$()"
-            >
-              @if(cell.cellDescription){
-                <div class="cell-info">
-                  <p-button 
-                    icon="pi pi-info-circle" variant="text"
-                    severity="info"
-                    (onClick)="showDescription($event, cell.cellDescription)"
-                    rounded />
-                </div>
-              }
+<div id="bingo-wrapper">
+  <div id="bingo-root">
+    @if(round$(); as round){
+      <h3 class="title is-3">{{ round.name }}</h3>
+    }
+    <div id="grid">
+      <div id="left-spacer">&nbsp;</div>
+      <div id="cells">
+        @for(cells of cells$(); track $index; let y=$index){
+          <div class="cells-row">
+            @for(cell of cells; track cell.cellId; let x=$index){
               <div 
-                class="cell-txt"
-                aria-hidden="true"
+                class="cell"
                 [class.clickable]="isManual$()"
-                (click)="flipCell(x, y)"
-                (keypress)="flipCell(x, y)"
               >
-                {{ cell.cellName}}
+                @if(cell.cellDescription){
+                  <div class="cell-info">
+                    <p-button 
+                      icon="pi pi-info-circle" variant="text"
+                      severity="info"
+                      (onClick)="showDescription($event, cell.cellDescription)"
+                      rounded />
+                  </div>
+                }
+                <div 
+                  class="cell-txt"
+                  aria-hidden="true"
+                  [class.clickable]="isManual$()"
+                  (click)="flipCell(x, y)"
+                  (keypress)="flipCell(x, y)"
+                >
+                  {{ cell.cellName}}
+                </div>
+                @if( cell.checked ){
+                  <div class="cell-stroke">
+                    <app-stroke
+                        [stroke]="stroke$()"
+                        [color]="strokeColor$()" />
+                </div>
+                }
               </div>
-              @if( cell.checked ){
-                <div class="cell-stroke">
-                  <app-stroke
-                      [stroke]="stroke$()"
-                      [color]="strokeColor$()" />
-              </div>
-              }
-            </div>
-          }
-        </div>
-      }
-      @for(stripe of bingos$(); track stripe.class){
-        <div class="stripe" [class]="stripe.class">
-          <app-stripe [stripe]="stripe.type" [color]="stripeColor$()"/>
-        </div>
-      }
-    </div>
-    <div id="bingo-actions">
-      <p-button
-        icon="mdi mdi-help-box-outline"
-        [rounded]="true"
-        size="large"
-        (onClick)="showResults$.set(true)"
-      />
-      <p-button
-        icon="mdi mdi-camera-outline"
-        [rounded]="true"
-        size="large"
-        (onClick)="screenshot()"
+            }
+          </div>
+        }
+        @for(stripe of bingos$(); track stripe.class){
+          <div class="stripe" [class]="stripe.class">
+            <app-stripe [stripe]="stripe.type" [color]="stripeColor$()"/>
+          </div>
+        }
+      </div>
+      <div id="bingo-actions">
+        <p-button
+          icon="mdi mdi-help-box-outline"
+          [rounded]="true"
+          size="large"
+          (onClick)="showResults$.set(true)"
         />
+        <p-button
+          icon="mdi mdi-camera-outline"
+          [rounded]="true"
+          size="large"
+          (onClick)="screenshot()"
+          />
+      </div>
+    </div>
+    <div id="bingo-score">
+      Score&nbsp;:&nbsp;{{ score$() }}
     </div>
   </div>
-  <div id="bingo-score">
-    Score&nbsp;:&nbsp;{{ score$() }}
-  </div>
+</div>
 }
 @else if(canCreateGrid$()){
   <div id="no-grid">
