@@ -19,6 +19,7 @@ import { RoundStatus } from '../../services/rounds/round.interface'
 import { IGridCell } from '../../services/grids/grid.interface'
 import { DialogModule } from 'primeng/dialog'
 import { StreamsService } from '../../services/streams/streams.service'
+import html2canvas from 'html2canvas'
 
 @Component({
   selector: 'app-bingo',
@@ -225,5 +226,28 @@ export class BingoComponent {
     cells[y][x].checked = !(cells[y][x].checked ?? false)
     this.cells$.set(cells)
     this.gridService.flipGridCell(this.grid$()!.id, x+y*4)
+  }
+
+  public async screenshot(){
+    const grid = document.querySelector("#cells")
+    if(grid == null){
+      this.messageService.add({ severity: 'warn', summary: 'Erreur lors de la copie de la grille', life: 3000 })
+      return
+    }
+    const canvas = await html2canvas(grid as HTMLElement)
+    const blob = await new Promise<Blob | null>(resolve => canvas.toBlob(resolve))
+    if(blob == null){
+      this.messageService.add({ severity: 'warn', summary: 'Erreur lors de la copie de la grille', life: 3000 })
+      return
+    }
+    await navigator.clipboard.write([
+      new ClipboardItem(
+        Object.defineProperty({}, blob.type, {
+          value: blob,
+          enumerable: true
+        })
+      )
+    ])
+    this.messageService.add({ severity: 'info', summary: 'Grille copiée', life: 3000 })
   }
 }

@@ -51,6 +51,12 @@
         size="large"
         (onClick)="showResults$.set(true)"
       />
+      <p-button
+        icon="mdi mdi-camera-outline"
+        [rounded]="true"
+        size="large"
+        (onClick)="screenshot()"
+        />
     </div>
   </div>
   <div id="bingo-score">
