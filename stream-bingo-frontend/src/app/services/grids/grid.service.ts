@@ -1,6 +1,6 @@
 import { Injectable, signal } from '@angular/core';
 import { Socket, io } from 'socket.io-client';
-import { distinctUntilChanged, filter, fromEvent, map, merge, pairwise, shareReplay, startWith, Subject, tap, throttleTime,  } from 'rxjs';
+import { distinctUntilChanged, filter, fromEvent, map, merge, shareReplay, Subject, tap, throttleTime,  } from 'rxjs';
 import { IGrid, IGridSummary, IValidatedCell } from './grid.interface';
 import { WebsocketService } from '../ws/websocket.service';
 import { IWsError } from '../../shared/models/ws-errors.interface'
@@ -36,17 +36,6 @@ export class GridService extends WebsocketService{
       this.gridNotFound$.pipe(map(() => null)),
       this.invalidateGrid$.asObservable().pipe(map(() => null)),
     ).pipe(
-    startWith(null),
-    pairwise(),
-    map(([oldGrid, newGrid]) => {
-      if(oldGrid?.streamId != null){
-        this.unsubscribeForRound(oldGrid?.roundId)
-      }
-      if(newGrid?.streamId != null){
-        this.subscribeForRound(newGrid?.roundId)
-      }
-      return newGrid
-    }),
     shareReplay(1),
   )
   public readonly validatedCells$ = fromEvent<{ roundId: string, cells: IValidatedCell[]} | null>(this.socket, 'validatedcells').pipe(

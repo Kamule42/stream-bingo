@@ -1,24 +1,23 @@
 import { Component, computed, inject, signal } from '@angular/core'
 import { MenubarModule } from 'primeng/menubar'
 import { AvatarModule } from 'primeng/avatar'
-import { MenuModule } from 'primeng/menu';
 import { ButtonModule } from 'primeng/button'
-import { RouterLink } from '@angular/router';
-import { MenuItem } from 'primeng/api';
-import { CommonModule } from '@angular/common';
-import { DialogModule } from 'primeng/dialog';
-import { Ripple } from 'primeng/ripple';
-import { SessionService } from '../../services/session/session.service';
+import { RouterLink } from '@angular/router'
+import { MenuItem } from 'primeng/api'
+import { CommonModule } from '@angular/common'
+import { DialogModule } from 'primeng/dialog'
+import { Ripple } from 'primeng/ripple'
+import { SessionService } from '../../services/session/session.service'
 import { DiscordAuthComponent } from '../discord-auth/discord-auth.component'
 import { AuthService } from '../../services/auth'
-import { SettingsComponent } from "../settings/settings.component";
+import { SettingsComponent } from "../settings/settings.component"
 
 @Component({
   selector: 'app-top-menu',
   imports: [
     CommonModule,
     DiscordAuthComponent, MenubarModule,
-    AvatarModule, MenuModule, ButtonModule, RouterLink,
+    AvatarModule, ButtonModule, RouterLink,
     DialogModule, Ripple,
     SettingsComponent
 ],
@@ -66,16 +65,5 @@ export class TopMenuComponent {
     }
     return result
   })
-
-  readonly logoutItems = [
-    {
-      label: 'Déconnexion',
-      icon: 'mdi mdi-logout',
-      command: () =>  this.logout()
-    }
-  ]
   
-  public logout(){
-    this.authService.logout()
-  }
 }

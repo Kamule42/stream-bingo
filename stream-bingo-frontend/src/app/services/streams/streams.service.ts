@@ -1,5 +1,5 @@
 import { Injectable, signal } from '@angular/core'
-import { Subject, debounceTime, filter, fromEvent, map, merge, shareReplay, startWith, tap, } from 'rxjs'
+import { Subject, debounceTime, filter, fromEvent, map, merge, shareReplay, startWith, switchMap, tap, } from 'rxjs'
 import { Socket, io } from 'socket.io-client'
 import { toSignal } from '@angular/core/rxjs-interop'
 import { ICell, IRight, IStream, } from './stream.interface'
@@ -51,6 +51,12 @@ export class StreamsService extends WebsocketService {
     filter(stream =>
       this.currentStreamWebhandle$() == null ||
       this.currentStreamWebhandle$() == stream?.urlHandle),
+    switchMap(stream => this.favs$.pipe(
+      map(favs => ({
+      ...stream,
+      isFav: favs?.find(fav => fav.streamId === stream.id) != null,
+      }))
+    )),
     shareReplay(1),
   )
   public readonly isStreamLoading$ = merge(

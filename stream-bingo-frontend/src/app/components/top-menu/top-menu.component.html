@@ -49,10 +49,7 @@
             <p-avatar shape="circle" [label]="_session?.username?.slice(0,1)"
               [style]="{'background-color': 'var(--secondary-color)'}" />
             }
-            <span (click)="loggedinMenu.toggle($event)" aria-hidden="true" class="mdi mdi-dots-vertical">
-            </span>
           </a>
-          <p-menu #loggedinMenu [model]="logoutItems" [popup]="true" appendTo="body" tooltipPosition="right" />
           }
           @else if(isDisconnected()){
           <div class="navbar-item">

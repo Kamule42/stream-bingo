@@ -6,6 +6,7 @@ import { NextStreamEntity } from 'src/stream/entities/next-stream.entity'
 import { RoundStatus } from 'src/stream/entities/round.entity'
 import { StreamEntity } from 'src/stream/entities/stream.entity'
 import { IStream, IRight } from 'src/stream/gateways/stream/stream.interface'
+import { RightEntity } from 'src/user/entities/right.entity'
 import { Repository, DataSource,  LessThanOrEqual, Raw, Not, } from 'typeorm'
 
 @Injectable()
@@ -85,6 +86,7 @@ export class StreamService {
         })) ?? []
       }
       await manager.save(StreamEntity,toUpdate)
+      await manager.upsert(RightEntity, toUpdate.rights, ['stream.id', 'user.id', 'rightKey'])
     })
   }
 

@@ -33,4 +33,8 @@ export class ProfileComponent implements OnInit {
     this.userService.delete()
     this.authService.logout()
   }
+  
+  public logout(){
+    this.authService.logout()
+  }
 }

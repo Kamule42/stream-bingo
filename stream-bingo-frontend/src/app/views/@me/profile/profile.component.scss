@@ -8,3 +8,11 @@
   flex-direction: row;
   gap: 1rem;
 }
+
+:host{
+  .box{
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+}

@@ -1,9 +1,10 @@
-import { Injectable } from '@angular/core'
+import { inject, Injectable } from '@angular/core'
 import { Socket, io } from 'socket.io-client'
-import { distinctUntilChanged, filter, fromEvent, map, merge, shareReplay, Subject, tap } from 'rxjs'
+import { distinctUntilChanged, filter, fromEvent, map, merge, pairwise, shareReplay, startWith, Subject, tap } from 'rxjs'
 import { IEditRound, IRound, RoundStatus } from './round.interface'
 import { WebsocketService } from '../ws/websocket.service'
 import { toSignal } from '@angular/core/rxjs-interop'
+import { GridService } from '../grids/grid.service'
 
 
 @Injectable({
@@ -23,7 +24,10 @@ export class RoundsService extends WebsocketService{
     return this._socket
   }
 
+  private readonly gridService = inject(GridService)
+
   private readonly invalidateRound = new Subject()
+
   readonly currentRound$ = merge(
     this.invalidateRound.asObservable().pipe(
       map(() => null),
@@ -33,6 +37,20 @@ export class RoundsService extends WebsocketService{
   ).pipe(
     shareReplay(1),
   )
+
+  private readonly _roundSubscription = this.currentRound$.pipe(
+    startWith(null),
+    pairwise(),
+  ).subscribe({
+    next: ([oldRound, newRound]) => {
+      if(oldRound != null){
+        this.gridService.unsubscribeForRound(oldRound.id)
+      }
+      if(newRound != null){
+        this.gridService.subscribeForRound(newRound.id)
+      }
+    }
+  })
 
   readonly streamNexRouds$ = fromEvent<IRound[]>(this.socket, 'streamRounds').pipe(
     map(rounds => rounds),
