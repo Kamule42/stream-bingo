@@ -229,6 +229,7 @@ export class BingoComponent {
   }
 
   public async screenshot(){
+    window.scrollTo(0,0)
     const grid = document.querySelector("#bingo-root")
     if(grid == null){
       this.messageService.add({ severity: 'warn', summary: 'Erreur lors de la copie de la grille', life: 3000 })
