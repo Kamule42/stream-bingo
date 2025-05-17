@@ -72,12 +72,18 @@
 }
 @else if(canCreateGrid$()){
   <div id="no-grid">
+    @if(round$(); as round){
+      <h3 class="title is-3">{{ round.name }}</h3>
+    }
     <div>Vous n'avez pas encore de grille</div>
     <p-button label="Générez en une" (onClick)="generateGrid()" />
   </div>
 }
 @else { 
   <div id="no-grid">
+    @if(round$(); as round){
+      <h3 class="title is-3">{{ round.name }}</h3>
+    }
     <div>La partie est déjà commencée.</div>
     <div>Vous pouvez toujours vous connecter pour participer</div>
   </div>

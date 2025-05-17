@@ -1,25 +1,27 @@
 import { Entity, Column, PrimaryColumn, Index, OneToMany, JoinColumn, ManyToMany, JoinTable } from 'typeorm'
 import { RightEntity } from './right.entity'
 import { StreamEntity } from 'src/stream/entities/stream.entity'
+import { ProviderEntity } from './provider.entity'
 
 @Entity({ name: 'users', schema: 'bingo' })
 export class UserEntity {
   @PrimaryColumn()
   id: string
 
-  @Column({ name: 'discord_id' })
-  @Index()
-  discordId: string
+  @Column({ name: 'username', })
+  username: string
+  
+  @Column({ name: 'avatar_provider', })
+  avatarProvider: string
 
-  @Column({ name: 'discord_username' })
-  discordUsername: string
+  @OneToMany(() => ProviderEntity, (provider) => provider.user, {cascade: true})
+  @JoinColumn({name: 'user_id'})
+  providers: Array<ProviderEntity>
 
-  @Column({ name: 'discord_avatar' })
-  discordAvatar: string
-
-  @OneToMany(() => RightEntity, (right) => right.user,)
+  @OneToMany(() => RightEntity, (right) => right.user, {cascade: true})
   @JoinColumn({name: 'user_id'})
   rights: Array<RightEntity>
+
 
   @ManyToMany(() => StreamEntity)
   @JoinTable({

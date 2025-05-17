@@ -8,7 +8,6 @@ import { CommonModule } from '@angular/common'
 import { DialogModule } from 'primeng/dialog'
 import { Ripple } from 'primeng/ripple'
 import { SessionService } from '../../services/session/session.service'
-import { DiscordAuthComponent } from '../discord-auth/discord-auth.component'
 import { AuthService } from '../../services/auth'
 import { SettingsComponent } from "../settings/settings.component"
 
@@ -16,7 +15,7 @@ import { SettingsComponent } from "../settings/settings.component"
   selector: 'app-top-menu',
   imports: [
     CommonModule,
-    DiscordAuthComponent, MenubarModule,
+    MenubarModule,
     AvatarModule, ButtonModule, RouterLink,
     DialogModule, Ripple,
     SettingsComponent

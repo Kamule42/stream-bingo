@@ -28,7 +28,7 @@ export class UserGateway {
       .findByName(payload.name)
       .then(users => ({
         event: 'userList',
-        data: users?.map(({id, discordUsername}) => ({id, name: discordUsername}))
+        data: users?.map(({id, username}) => ({id, name: username}))
     }))
   }
 

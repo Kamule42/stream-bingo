@@ -48,15 +48,9 @@ export class AuthService {
     this.authorization$$.next(authorization)
   }
 
-  public getDiscordUrl(): Observable<string>{
-    return this.http.get<{url: string}>('/api/auth/discord-url').pipe(
-      map(({url}) => url)
-    )
-  }
-
-  public validateCode(code: string): Observable<IValidateCodeResponse>{
+  public validateCode(code: string, provider: string): Observable<IValidateCodeResponse>{
     return this.http
-      .post<IValidateCodeResponse>('/api/auth/discord-validate', { code})
+      .get<IValidateCodeResponse>(`/api/auth/${provider}`, { params: { code }})
       .pipe(
         tap(({access_token}) => this.authorization$ = access_token)
       )

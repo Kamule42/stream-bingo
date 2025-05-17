@@ -1,0 +1,17 @@
+<section class="hero is-fullheight">
+  <div class="hero-body">
+    <p-card>
+      <h5 class="title is-5">Connexion</h5>
+      <div class="providers">
+        @for(provider of providers; track provider){
+        <a [href]="`/api/auth/${provider}`" [class]="`button ${provider}`">
+          <span class="icon is-small">
+            <img [src]="`/assets/providers/${provider}.svg`" [alt]="`${provider} logo`" />
+          </span>
+          <span>{{ formatLabel(provider) }}</span>
+        </a>
+        }
+      </div>
+    </p-card>
+  </div>
+</section>

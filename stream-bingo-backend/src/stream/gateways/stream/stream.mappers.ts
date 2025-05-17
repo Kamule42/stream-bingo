@@ -34,7 +34,7 @@ export const nextStreamMapper = (entity: NextStreamEntity  | null): INextStream 
 export const rightsMapper = (rights: Array<RightEntity>) => rights?.map(({ rightKey, user }) => ({
   right: rightKey,
   user_id: user.id,
-  username: user.discordUsername
+  username: user.username
 }))
 
 export const cellsMapper = (cells?: Array<CellEntity>): Array<ICell> => cells

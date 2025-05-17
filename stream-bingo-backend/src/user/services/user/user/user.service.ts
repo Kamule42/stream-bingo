@@ -13,7 +13,7 @@ export class UserService {
   findByName(name: string): Promise<Array<UserEntity>> {
     return this.usersRepository.find({
       where: {
-          discordUsername: ILike(`${name}%`)
+          username: ILike(`${name}%`)
       }
     })
   }

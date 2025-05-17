@@ -13,11 +13,13 @@ import { PassportModule } from '@nestjs/passport'
 import { DiscordStrategy } from './services/passport/discord-strategy/discord-strategy.service'
 import { JwtStrategy } from './services/passport/jwt-strategy/jwt-strategy.service'
 import { AuthGateway } from './gateways/auth/auth.gateway';
+import { ProviderEntity } from './entities/provider.entity'
+import { GoogleStrategyService } from './services/passport/google-strategy/google-strategy.service';
 
 @Module({
   imports: [
     HttpModule,
-    TypeOrmModule.forFeature([ UserEntity, RightEntity, ]),
+    TypeOrmModule.forFeature([ UserEntity, RightEntity, ProviderEntity ]),
     PassportModule,
     JwtModule.registerAsync({
       inject: [ConfigService],
@@ -28,7 +30,7 @@ import { AuthGateway } from './gateways/auth/auth.gateway';
       }),
     }),
   ],
-  providers: [AuthService, UserGateway, UserService, DiscordStrategy, JwtStrategy, AuthGateway, ],
+  providers: [AuthService, UserGateway, UserService, DiscordStrategy, JwtStrategy, AuthGateway, GoogleStrategyService, ],
   exports: [ AuthService ],
   controllers: [AuthController],
 })

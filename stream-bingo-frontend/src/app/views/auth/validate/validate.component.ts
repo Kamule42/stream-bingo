@@ -1,7 +1,7 @@
 import { Component, OnInit, computed, inject } from '@angular/core'
 import { ActivatedRoute, Router, RouterLink } from '@angular/router'
 import { toSignal } from '@angular/core/rxjs-interop'
-import { Subject, catchError, delay, filter, map, of, share, startWith, switchMap, takeWhile, tap, timer } from 'rxjs'
+import { Subject, catchError, combineLatest, delay, filter, map, of, share, startWith, switchMap, takeWhile, tap, timer } from 'rxjs'
 import { ProgressSpinnerModule } from 'primeng/progressspinner'
 import { AsyncPipe } from '@angular/common'
 import { CardModule } from 'primeng/card'
@@ -9,20 +9,28 @@ import { HttpRequestStatus } from '../../../shared/models/http-request.status'
 import { AuthService } from '../../../services/auth/auth.service'
 
 @Component({
-  selector: 'app-discord-redirect',
+  selector: 'app-validate',
   imports: [ProgressSpinnerModule, CardModule, AsyncPipe, RouterLink, ],
-  templateUrl: './discord-redirect.component.html',
-  styleUrl: './discord-redirect.component.scss',
+  templateUrl: './validate.component.html',
+  styleUrl: './validate.component.scss'
 })
-export class DiscordRedirectComponent implements OnInit{
+export class ValidateComponent implements OnInit{
   private readonly authService = inject(AuthService)
   private readonly router = inject(Router)
   private readonly route = inject(ActivatedRoute)
 
-  private readonly validateCode$ = this.route.queryParams.pipe(
-    filter(({ code }) => code),
-    switchMap(({ code }) => this.authService
-      .validateCode(code)
+  private readonly code$ = this.route.queryParams.pipe(
+    map(({ code }) => code),
+    filter(code => code != null),
+  )
+  private readonly provider$ = this.route.data.pipe(
+    map(({provider}) => provider),
+    filter(provider => provider != null)
+  )
+
+  private readonly validateCode$ = combineLatest([this.code$, this.provider$]).pipe(
+    switchMap(([code, provider]) => this.authService
+      .validateCode(code, provider)
       .pipe(
         map(() => HttpRequestStatus.FINISHED),
         startWith(HttpRequestStatus.LOADING),

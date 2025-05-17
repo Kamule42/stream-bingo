@@ -37,24 +37,30 @@
             <span class="mdi mdi-cog-outline"></span>
             <span>Paramètres</span>
           </a>
-          @if (isConnected()) {
-          @let _session = session();
+          @if (session(); as session) {
           <a pRipple routerLink="/@me" class="flex items-center p-menubar-item-link">
-            <span>{{ _session?.username }}</span>
-            @if(_session?.discord?.avatarId){
-            <p-avatar [image]="`//cdn.discordapp.com/avatars/${_session?.discord?.id}/${_session?.discord?.avatarId}`"
-              shape="circle" />
-            }
-            @else {
-            <p-avatar shape="circle" [label]="_session?.username?.slice(0,1)"
-              [style]="{'background-color': 'var(--secondary-color)'}" />
+            <span>{{ session.username }}</span>
+            @switch (session.avatar.provider) {
+              @case('discord'){
+              <p-avatar [image]="`//cdn.discordapp.com/avatars/${session.avatar.id}`"
+                shape="circle" />
+              }
+              @case('google'){
+              <p-avatar [image]="session.avatar.id"
+                shape="circle" />
+              }
+              @default {
+                <p-avatar shape="circle" [label]="session.username.slice(0,1)"
+                  [style]="{'background-color': 'var(--secondary-color)'}" />
+              }
             }
           </a>
           }
           @else if(isDisconnected()){
-          <div class="navbar-item">
-            <app-discord-auth />
-          </div>
+          <a pRipple routerLink="/auth" class="navbar-item">
+              <span class="mdi mdi-login"></span>
+              Connexion
+          </a>
           }
         </div>
       </ng-template>

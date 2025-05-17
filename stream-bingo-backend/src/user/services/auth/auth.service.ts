@@ -1,14 +1,14 @@
-import { HttpService } from '@nestjs/axios'
 import { HttpException, HttpStatus, Injectable, Logger } from '@nestjs/common'
 import { ConfigService } from '@nestjs/config'
-import { AxiosError } from 'axios'
-import { BehaviorSubject, catchError, filter, map, mergeMap, Observable, tap, throttleTime, } from 'rxjs'
+import { BehaviorSubject, filter, throttleTime, } from 'rxjs'
 import { v7 as uuid } from 'uuid'
 import { UserEntity } from '../../entities/user.entity'
 import { InjectRepository } from '@nestjs/typeorm'
 import { Repository } from 'typeorm'
 import { JwtService } from '@nestjs/jwt'
 import { ISession } from 'src/user/interfaces/session.interface'
+import { PassportData } from 'src/user/interfaces/passport-data.interface'
+import { ProviderEntity } from 'src/user/entities/provider.entity'
 
 interface ITokens {
   access_token: string;
@@ -27,7 +27,6 @@ export class AuthService {
   )
 
   public constructor(
-    private readonly httpService: HttpService,
     private readonly jwtService: JwtService,
     @InjectRepository(UserEntity)
     private readonly usersRepository: Repository<UserEntity>,
@@ -49,86 +48,23 @@ export class AuthService {
     return result;
   }
 
-  public validateDiscord(code: string): Observable<{access_token: string, user_id: string,}> {
-    const body = {
-      grant_type: 'authorization_code',
-      code,
-      client_id: this.configService.get<string>('discord.client_id'),
-      client_secret: this.configService.get<string>('discord.client_secret'),
-      redirect_uri: this.configService.get<string>('discord.target_uri'),
-      scopes: 'identify',
-    };
-    return this.httpService
-      .post<ITokens>('https://discord.com/api/oauth2/token', body, {
-        headers: {
-          'Content-Type': 'application/x-www-form-urlencoded',
-        },
-      })
-      .pipe(
-        map(({ data }) => data),
-        mergeMap((token) =>
-          this.httpService
-            .get<{ id: string; username: string; avatar: string }>(
-              'https://discord.com/api/users/@me',
-              {
-                headers: {
-                  Authorization: `${token.token_type} ${token.access_token}`,
-                },
-              },
-            )
-            .pipe(
-              map(({ data }) => ({
-                ...token,
-                id: data.id,
-                username: data.username,
-                avatar: data.avatar,
-              })),
-            ),
-        ),
-        mergeMap(async (data) => {
-          let existingUser = await this.usersRepository.findOne({
-            where: {discordId: data.id,},
-            relations: ['rights', 'rights.stream'],
-          });
-          existingUser ??= await this.usersRepository.save({
-              id: uuid(),
-              discordId: data.id,
-              discordUsername: data.username,
-              discordAvatar: data.avatar,
-            })
-          return {
-            user_id: existingUser.id,
-            access_token: await this.signSession(existingUser)
-          }
-        }),
-        catchError((error: AxiosError) => {
-          if (error?.response?.data) {
-            this.logger.error(error?.response?.data);
-          } else {
-            this.logger.error(error);
-          }
-          throw 'An error happened!';
-        }),
-      );
-  }
-
   public async signSession(param: string | UserEntity): Promise<string>{
     const existingUser = typeof param === 'string' ?
       await this.usersRepository.findOne({
         where: {id: param,},
-        relations: ['rights', 'rights.stream'],
+        relations: ['rights', 'rights.stream', 'providers'],
       }) :
       param;
     if(existingUser == null){
       throw new Error('unknown user')
     }
+    const avatarProvider = existingUser.providers?.find(({provider}) => provider == existingUser.avatarProvider) ?? existingUser.providers?.at(0)
+    const avatar = this.avatar(avatarProvider)
+
     return this.jwtService.signAsync({
       sub: existingUser.id,
-      username: existingUser.discordUsername,
-      discord: {
-        id: existingUser.discordId,
-        avatarId: existingUser.discordAvatar,
-      },
+      username: existingUser.username,
+      avatar,
       rights: existingUser.rights?.map(val => {
         return val
       })?.map(({rightKey, stream}) => ({
@@ -138,7 +74,55 @@ export class AuthService {
     })
   }
 
+  private avatar(avatarProvider: ProviderEntity | undefined){
+    console.log(avatarProvider)
+    if(!avatarProvider){
+      return {provider: 'none', id: 'none'}
+    }
+    switch(avatarProvider.provider){
+      case 'discord': return {
+        provider: avatarProvider.provider,
+        id: avatarProvider.reference+'/'+avatarProvider.avatarReference
+      }
+    }
+    return {
+      provider: avatarProvider.provider,
+      id: avatarProvider.avatarReference,
+    }
+  }
+
   validateToken(token: string): ISession {
     return this.jwtService.decode(token?.replace('Bearer ', ''))
+  }
+
+  async validatePassport(provider: string, data: PassportData): Promise<ISession> {
+    let existingUser = await this.usersRepository.findOne({
+      where: {providers: { provider, reference: data.id, },},
+      relations: ['rights', 'rights.stream', 'providers'],
+    }) ??  await this.usersRepository.save({
+      id: uuid(),
+      username: data.username,
+      avatarProvider: provider,
+      providers: [
+        {
+          provider,
+          reference: data.id,
+          avatarReference: data.avatar
+        }
+      ]
+    })
+    const avatarProvider = existingUser.providers?.find(({provider}) => provider == existingUser.avatarProvider) ?? existingUser.providers.at(0)
+    const avatar = this.avatar(avatarProvider)
+    return {
+      sub: existingUser.id,
+      username: existingUser.username,
+      avatar,
+      rights: existingUser.rights?.map(val => {
+        return val
+      })?.map(({rightKey, stream}) => ({
+        right: rightKey,
+        streamId: stream?.id
+      }))
+    }
   }
 }

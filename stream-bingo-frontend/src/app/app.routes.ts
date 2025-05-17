@@ -9,7 +9,11 @@ export const routes: Routes = [
 
 
   // Auth
-  { path: 'auth/redirect/discord', loadComponent: () => import('./views/auth/discord-redirect/discord-redirect.component').then(c => c.DiscordRedirectComponent) },
+  { path: 'auth/redirect/discord', data: { provider: 'discord' },
+    loadComponent: () => import('./views/auth/validate/validate.component').then(c => c.ValidateComponent) },
+  { path: 'auth/redirect/google', data: { provider: 'google' },
+    loadComponent: () => import('./views/auth/validate/validate.component').then(c => c.ValidateComponent) },
+  { path: 'auth', loadComponent: () => import('./views/auth/auth/auth.component').then(c => c.AuthComponent) },
 
   // Stream
   {
