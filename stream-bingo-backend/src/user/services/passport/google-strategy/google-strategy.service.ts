@@ -21,11 +21,14 @@ export class GoogleStrategyService extends PassportStrategy(Strategy) {
     })
   }
 
-  async validate(token, _, data): Promise<ISession> {
-    return this.authService.validatePassport('google', {
+  async validate(
+    token, _, data
+  ): Promise<PassportData> {
+    return  {
+      provider: 'google',
       id: data.id,
       username: data.displayName,
       avatar: data.photos.at(0)?.value ?? 'none',
-    })
+    }
   }
 }

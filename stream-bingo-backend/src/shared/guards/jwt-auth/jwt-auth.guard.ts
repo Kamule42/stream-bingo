@@ -1,17 +1,20 @@
 import { ExecutionContext, Injectable, Logger } from '@nestjs/common'
 import { Reflector } from '@nestjs/core'
 import { AuthGuard } from '@nestjs/passport'
+import { FastifyRequest } from 'fastify'
 import { Socket } from 'socket.io'
 import { Roles } from 'src/shared/decorators/auth/roles.decorator'
 import { IRole } from 'src/shared/interfaces/auth.interface'
 import { ISession } from 'src/user/interfaces/session.interface'
+import { AuthService } from 'src/user/services/auth/auth.service'
 
 @Injectable()
 export class JwtAuthGuard extends AuthGuard('jwt') {
   private readonly logger = new Logger(JwtAuthGuard.name)
 
   constructor(
-    private readonly reflector: Reflector
+    private readonly reflector: Reflector,
+    private readonly authService: AuthService,
   ){
     super()
   }
@@ -27,7 +30,15 @@ export class JwtAuthGuard extends AuthGuard('jwt') {
         session =  client.handshake.auth.user
         break;
       }
-      case 'http': break;
+      case 'http': {
+        const httpContext = context.switchToHttp()
+        const request = httpContext.getRequest()
+        session = request.headers.authorization ?
+          this.authService.validateToken(request.headers.authorization) :
+          undefined
+        request.session = session
+        break;
+      }
     }
 
     const result = roles == null ||

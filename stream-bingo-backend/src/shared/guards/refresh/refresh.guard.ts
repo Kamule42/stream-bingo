@@ -26,7 +26,7 @@ export class RefreshGuard implements CanActivate {
     return true;
   }
 
-  private async handleWsRequest(client: Socket){
+  private async handleWsRequest(client: Socket): Promise<void>{
     if(!client.handshake.headers.cookie){
       return
     }
@@ -54,6 +54,7 @@ export class RefreshGuard implements CanActivate {
       throw new WsException('Invalid session')
     }
   }
+
 
   private isValid(refreshTokenCookie, session: ISession){
     const refreshToken = refreshTokenCookie.value ? JSON.parse(refreshTokenCookie.value) : null

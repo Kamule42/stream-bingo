@@ -1,7 +1,9 @@
 SET ROLE role_bingo_admin;
 
 ALTER TABLE bingo.users
-  RENAME COLUMN discord_username TO username,
+  RENAME COLUMN discord_username TO username;
+
+ALTER TABLE bingo.users
   DROP COLUMN IF EXISTS discord_id,
   DROP COLUMN IF EXISTS discord_avatar,
   ADD COLUMN IF NOT EXISTS avatar_provider varchar;
@@ -16,7 +18,6 @@ CREATE TABLE IF NOT EXISTS bingo.authentication(
 GRANT SELECT, INSERT, UPDATE, DELETE ON bingo.authentication TO role_bingo_app;
 
 CREATE OR REPLACE VIEW bingo.v_leaderboard AS 
-
 SELECT 
   u.id as user_id,
   u.username as username,

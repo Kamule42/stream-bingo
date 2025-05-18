@@ -5,6 +5,7 @@ import { ConfigService } from '@nestjs/config'
 import { Reflector } from '@nestjs/core'
 import { Socket } from 'socket.io'
 import { ISession } from 'src/user/interfaces/session.interface'
+import { FastifyRequest } from 'fastify'
 
 const extractToken = (request) => {
   const requestType = request?.constructor?.name
@@ -13,7 +14,12 @@ const extractToken = (request) => {
       const client = request as Socket
       return client.handshake.auth.token?.substring(7)
     }
-    default: return null
+    case 'FastifyRequest': {
+      const req = request as FastifyRequest
+      return req.headers.authorization?.substring(7)
+    }
+    default: 
+      return null
   }
 }
 

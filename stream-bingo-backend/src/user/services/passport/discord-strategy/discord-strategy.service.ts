@@ -21,8 +21,16 @@ export class DiscordStrategy extends PassportStrategy(Strategy) {
     })
   }
 
-  async validate(accessToken, _, data: PassportData): Promise<ISession> {
-    return this.authService.validatePassport('discord', data)
+  // async validate(accessToken, _, data: PassportData): Promise<ISession> {
+  //   return this.authService.validatePassport('discord', data)
+  // }
+  async validate(
+    token, _, data
+  ): Promise<PassportData> {
+    return  {
+      provider: 'discord',
+      ...data,
+    }
   }
 
 }

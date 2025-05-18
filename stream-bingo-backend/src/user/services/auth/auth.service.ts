@@ -1,4 +1,4 @@
-import { HttpException, HttpStatus, Injectable, Logger } from '@nestjs/common'
+import { Injectable, Logger } from '@nestjs/common'
 import { ConfigService } from '@nestjs/config'
 import { BehaviorSubject, filter, throttleTime, } from 'rxjs'
 import { v7 as uuid } from 'uuid'
@@ -40,14 +40,6 @@ export class AuthService {
     this._newToken$$.next(newToken)
   }
 
-  public getAuthUrl(): string {
-    const result = this.configService.get<string>('discord.validation_uri');
-    if (!result) {
-      throw new HttpException('Unknown url', HttpStatus.INTERNAL_SERVER_ERROR);
-    }
-    return result;
-  }
-
   public async signSession(param: string | UserEntity): Promise<string>{
     const existingUser = typeof param === 'string' ?
       await this.usersRepository.findOne({
@@ -59,6 +51,10 @@ export class AuthService {
       throw new Error('unknown user')
     }
     const avatarProvider = existingUser.providers?.find(({provider}) => provider == existingUser.avatarProvider) ?? existingUser.providers?.at(0)
+    if(existingUser.avatarProvider !== 'discord'){
+      console.log(avatarProvider)
+      console.trace()
+    }
     const avatar = this.avatar(avatarProvider)
 
     return this.jwtService.signAsync({
@@ -75,7 +71,6 @@ export class AuthService {
   }
 
   private avatar(avatarProvider: ProviderEntity | undefined){
-    console.log(avatarProvider)
     if(!avatarProvider){
       return {provider: 'none', id: 'none'}
     }
@@ -95,34 +90,54 @@ export class AuthService {
     return this.jwtService.decode(token?.replace('Bearer ', ''))
   }
 
-  async validatePassport(provider: string, data: PassportData): Promise<ISession> {
-    let existingUser = await this.usersRepository.findOne({
-      where: {providers: { provider, reference: data.id, },},
+  async validatePassport(data: PassportData, session: ISession): Promise<UserEntity> {
+    if(session){
+      return this.addProvider(data, session)
+    }
+    return this.validateLogin(data)
+  }
+
+  private async addProvider(data: PassportData, session: ISession): Promise<UserEntity> {
+    const user = await this.usersRepository.findOne({
+      where: {id: session.sub,},
       relations: ['rights', 'rights.stream', 'providers'],
-    }) ??  await this.usersRepository.save({
+    })
+    if(!user){
+      throw new Error('user not found for session')
+    }
+    if(!user.providers.find(({provider,}) => provider == data.provider)){
+      const provider = new ProviderEntity()
+      provider.provider = data.provider
+      provider.reference = data.id
+      provider.avatarReference = data.avatar
+      user.providers.push(provider)
+      this.usersRepository.save(user)
+    }
+    return user
+  }
+
+  private async validateLogin(data: PassportData): Promise<UserEntity> {
+    const result =  await this.usersRepository.createQueryBuilder('u')
+      .innerJoin(
+        'u.providers', 'provider',
+        'provider.provider = :provider AND provider.reference = :reference', {
+          provider: data.provider,
+          reference: data.id,
+        })
+        .leftJoinAndSelect('u.providers', 'providers')
+        .getOne() ??  await this.usersRepository.save({
       id: uuid(),
       username: data.username,
-      avatarProvider: provider,
+      avatarProvider: data.provider,
       providers: [
         {
-          provider,
+          provider: data.provider,
           reference: data.id,
           avatarReference: data.avatar
         }
       ]
     })
-    const avatarProvider = existingUser.providers?.find(({provider}) => provider == existingUser.avatarProvider) ?? existingUser.providers.at(0)
-    const avatar = this.avatar(avatarProvider)
-    return {
-      sub: existingUser.id,
-      username: existingUser.username,
-      avatar,
-      rights: existingUser.rights?.map(val => {
-        return val
-      })?.map(({rightKey, stream}) => ({
-        right: rightKey,
-        streamId: stream?.id
-      }))
-    }
+    return result
   }
+  
 }
