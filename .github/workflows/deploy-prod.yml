@@ -1,0 +1,94 @@
+name: Deploy to prod
+
+on: workflow_dispatch
+
+jobs:
+  build-frontend:
+    runs-on: ubuntu-latest
+    name: Build frontend
+    steps:
+      - name: Use Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - uses: actions/checkout@v4
+      - run: yarn install
+        name: install frontend
+        working-directory: stream-bingo-frontend
+      - run: yarn build
+        name: build frontend
+        working-directory: stream-bingo-frontend
+      - uses: actions/upload-artifact@v4
+        with:
+          name: frontend
+          path: ./stream-bingo-frontend/dist/stream-bingo-frontend/browser/
+
+  build-backend:
+    runs-on: ubuntu-latest
+    name: Build backend
+    steps:
+      - name: Use Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - uses: actions/checkout@v4
+      - run: yarn install
+        name: install backend
+        working-directory: stream-bingo-backend
+      - run: yarn build
+        name: build backend
+        working-directory: stream-bingo-backend
+      - name: Add package.json to output
+        run: cp package.json ./dist
+        working-directory: stream-bingo-backend
+      - uses: actions/upload-artifact@v4
+        with:
+          name: backend
+          path: ./stream-bingo-backend/dist/
+  deploy-to-prod:
+    runs-on: ubuntu-latest
+    name: Deploy to prod
+    needs: [build-frontend, build-backend]
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: frontend
+          path: frontend/
+      - uses: actions/download-artifact@v4
+        with:
+          name: backend
+          path: backend/
+      - name: Install SSH Key
+        uses: webfactory/ssh-agent@v0.9.0
+        with:
+          ssh-private-key: ${{ secrets.DEPLOY_SSH_PRIVATE_KEY }}
+      - name: Adding Known Hosts
+        run: ssh-keyscan -H $SSH_HOST >> ~/.ssh/known_hosts
+        env:
+          SSH_HOST: ${{ secrets.VPS_IP }}
+      - name: Deploy Backend and frontend
+        env:
+          SSH_KEY: ${{ secrets.DEPLOY_SSH_PRIVATE_KEY }}
+          SSH_HOST: ${{ secrets.VPS_IP }}
+          SSH_USER: ${{ secrets.VPS_USER }}
+        run: |
+          rsync -avz ./frontend/ $SSH_USER@$SSH_HOST:/apps/stream-bingo-prod/frontend
+          rsync -avz ./backend/ $SSH_USER@$SSH_HOST:/apps/stream-bingo-prod/backend
+      - name: Install deps
+        run: ssh $SSH_USER@$SSH_HOST 'yarn install --production=true --cwd /apps/stream-bingo-prod/backend'
+        env:
+          SSH_HOST: ${{ secrets.VPS_IP }}
+          SSH_USER: ${{ secrets.VPS_USER }}
+      - name: Setup config
+        run: ssh $SSH_USER@$SSH_HOST 'cp /apps/stream-bingo-prod/config.yaml /apps/stream-bingo-prod/backend/config'
+        env:
+          SSH_HOST: ${{ secrets.VPS_IP }}
+          SSH_USER: ${{ secrets.VPS_USER }}
+      - name: reload backend
+        run: |
+          ssh $SSH_USER@$SSH_HOST 'pm2 reload /apps/ecosystem.config.js'
+          ssh $SSH_USER@$SSH_HOST 'pm2 restart /apps/ecosystem.config.js'
+        env:
+          SSH_HOST: ${{ secrets.VPS_IP }}
+          SSH_USER: ${{ secrets.VPS_USER }}
+
