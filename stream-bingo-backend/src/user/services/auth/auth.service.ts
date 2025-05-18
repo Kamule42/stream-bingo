@@ -125,6 +125,8 @@ export class AuthService {
           reference: data.id,
         })
         .leftJoinAndSelect('u.providers', 'providers')
+        .leftJoinAndSelect('u.rights', 'rights')
+        .leftJoinAndSelect('rights.stream', 'streams')
         .getOne() ??  await this.usersRepository.save({
       id: uuid(),
       username: data.username,
