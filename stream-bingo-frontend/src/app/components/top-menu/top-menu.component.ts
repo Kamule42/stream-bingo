@@ -38,7 +38,7 @@ export class TopMenuComponent {
   readonly items = computed(() => {
     const result: MenuItem[] = [
       {
-        label: 'BStreamgo',
+        label: 'Stream Bingo',
         icon: 'mdi mdi-home-outline',
         route: '/',
       },
