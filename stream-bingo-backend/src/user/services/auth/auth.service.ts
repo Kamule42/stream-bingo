@@ -117,28 +117,31 @@ export class AuthService {
   }
 
   private async validateLogin(data: PassportData): Promise<UserEntity> {
+    const id = uuid()
     const result =  await this.usersRepository.createQueryBuilder('u')
       .innerJoin(
         'u.providers', 'provider',
         'provider.provider = :provider AND provider.reference = :reference', {
           provider: data.provider,
           reference: data.id,
-        })
-        .leftJoinAndSelect('u.providers', 'providers')
-        .leftJoinAndSelect('u.rights', 'rights')
-        .leftJoinAndSelect('rights.stream', 'streams')
-        .getOne() ??  await this.usersRepository.save({
-      id: uuid(),
-      username: data.username,
-      avatarProvider: data.provider,
-      providers: [
-        {
-          provider: data.provider,
-          reference: data.id,
-          avatarReference: data.avatar
-        }
-      ]
-    })
+      })
+      .leftJoinAndSelect('u.providers', 'providers')
+      .leftJoinAndSelect('u.rights', 'rights')
+      .leftJoinAndSelect('rights.stream', 'streams')
+      .getOne() ?? 
+      await this.usersRepository.save({
+        id,
+        username: data.username,
+        avatarProvider: data.provider,
+        providers: [
+          {
+            provider: data.provider,
+            reference: data.id,
+            avatarReference: data.avatar,
+          }
+        ]
+      })
+    console.log(data, result)
     return result
   }
   
