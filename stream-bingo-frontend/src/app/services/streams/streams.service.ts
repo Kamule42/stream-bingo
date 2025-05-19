@@ -1,5 +1,5 @@
 import { Injectable, signal } from '@angular/core'
-import { Subject, debounceTime, filter, fromEvent, map, merge, shareReplay, startWith, switchMap, tap, } from 'rxjs'
+import { Subject, debounceTime, filter, fromEvent, map, merge, shareReplay, startWith, switchMap, tap, zip, } from 'rxjs'
 import { Socket, io } from 'socket.io-client'
 import { toSignal } from '@angular/core/rxjs-interop'
 import { ICell, IRight, IStream, } from './stream.interface'
@@ -42,23 +42,40 @@ export class StreamsService extends WebsocketService {
     shareReplay(1),
   )
 
+  private readonly forceFavs$ = new Subject<IFav[]>()
+  readonly favs$ = merge(
+    fromEvent<IFav[]>(this.socket, 'myFavs'),
+    this.forceFavs$,
+  ).pipe(
+    shareReplay(1),
+  )
+  private readonly _favs$ = toSignal(this.favs$)
 
   public readonly nextStreams$ = fromEvent<IPaginated<IStream>>(this.socket, 'nextStreams').pipe(
     map(({ data: streams }) => streams),
     shareReplay(1),
   )
-  public readonly streamDetail$ = fromEvent<IStream>(this.socket, 'streamDetail').pipe(
-    filter(stream =>
-      this.currentStreamWebhandle$() == null ||
-      this.currentStreamWebhandle$() == stream?.urlHandle),
-    switchMap(stream => this.favs$.pipe(
-      map(favs => ({
-      ...stream,
-      isFav: favs?.find(fav => fav.streamId === stream.id) != null,
-      }))
-    )),
-    shareReplay(1),
-  )
+  public readonly streamDetail$ = zip([
+      fromEvent<IStream>(this.socket, 'streamDetail').pipe(
+        filter(stream =>
+          this.currentStreamWebhandle$() == null ||
+          this.currentStreamWebhandle$() == stream?.urlHandle),
+        ),
+        this.favs$.pipe(
+          startWith(null)
+        )
+      ]).pipe(
+        map(([stream, favs]) => {
+          if(!stream){
+            return null
+          }
+          return {
+            ...stream,
+            isFav: favs?.find(fav => fav.streamId === stream.id) != null,
+          }
+        }),
+        shareReplay(1)
+      )
   public readonly isStreamLoading$ = merge(
     this.streamDetail$.pipe(map(() => false)),
     this._fetchDetail$$.pipe(map(() => true)),
@@ -70,15 +87,6 @@ export class StreamsService extends WebsocketService {
   public readonly cells$ = fromEvent<ICell[]>(this.socket, 'streamCells').pipe(
     shareReplay(1)
   )
-
-  private readonly forceFavs$ = new Subject<IFav[]>()
-  readonly favs$ = merge(
-    fromEvent<IFav[]>(this.socket, 'myFavs'),
-    this.forceFavs$,
-  ).pipe(
-    shareReplay(1),
-  )
-  private readonly _favs$ = toSignal(this.favs$)
 
   public listStreams(pagination?: IPagination): void {
     this.sendMessage('getList', pagination ?
