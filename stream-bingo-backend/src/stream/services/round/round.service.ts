@@ -133,7 +133,7 @@ export class RoundService {
             -- Diag down
             FLOOR(COUNT(gc.cell_id) FILTER (WHERE MOD(gc.index, 5) = 0) / 4) +
             -- Diag up
-            FLOOR(COUNT(gc.cell_id) FILTER (WHERE MOD(gc.index, 3) = 0 AND gc.index between 1 and 15) / 4)
+            FLOOR(COUNT(gc.cell_id) FILTER (WHERE MOD(gc.index, 3) = 0 AND gc.index between 1 and 14) / 4)
           ) as score
         FROM bingo.grids g
         JOIN bingo.grid_cells gc ON gc.grid_id = g.id
