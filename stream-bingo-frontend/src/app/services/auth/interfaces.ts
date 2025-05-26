@@ -7,12 +7,13 @@ export interface ISession {
   username: string,
   iat: number,
   exp: number,
-  avatar: {
-    id: string,
-    provider: string,
-  },
   rights: [{
     right: string,
     streamId?: string,
   }],
+  providers: [{
+    provider: string,
+    avatarId: string,
+    active: boolean,
+  }]
 }

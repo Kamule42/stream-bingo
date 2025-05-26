@@ -41,6 +41,9 @@ export class AuthGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
         if(socketKey !== undefined){
           this.namespace.sockets.get(socketKey)?.emit('refreshToken', token)
         }
+        else{
+          console.error('missing socket for', socketKey)
+        }
       }
     })
   }

@@ -1,0 +1,14 @@
+@switch (avatar().provider) {
+  @case('discord'){
+  <p-avatar [image]="`//cdn.discordapp.com/avatars/${avatar().avatarId}`" [size]="size()"
+    shape="circle" />
+  }
+  @case('google'){
+  <p-avatar [image]="avatar().avatarId" [size]="size()"
+    shape="circle" />
+  }
+  @default {
+    <p-avatar shape="circle" [label]="session()?.username?.slice(0,1)" [size]="size()"
+      [style]="{'background-color': 'var(--secondary-color)'}" />
+  }
+}

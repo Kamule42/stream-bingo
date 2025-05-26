@@ -3,6 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm'
 import { StreamEntity } from 'src/stream/entities/stream.entity'
 import { UserEntity } from 'src/user/entities/user.entity'
 import { DeleteResult, ILike, Repository } from 'typeorm'
+import { AuthService } from '../../auth/auth.service'
 @Injectable()
 export class UserService {
  public constructor(
@@ -38,5 +39,40 @@ export class UserService {
 
   deleteUser(id: string) : Promise<DeleteResult>{
     return this.usersRepository.delete({ id })
+  }
+
+  async updateUsername(id: string, username: string): Promise<UserEntity> {
+     const user = await this.usersRepository.findOne({
+      where: {id},
+      relations: ['providers', 'rights']
+     })
+    if(!user){
+      throw new Error('unknown user in session')
+    }
+    const updated =  {
+      ...user,
+      username
+    }
+    await  this.usersRepository.save(updated)
+    return updated
+  }
+
+  async setActiveIcon(id: string, provider: string): Promise<UserEntity> {
+     const user = await this.usersRepository.findOne({
+      where: {id},
+      relations: ['providers', 'rights']
+     })
+    if(!user){
+      throw new Error('unknown user in session')
+    }
+    if(user.providers?.find(p => p.provider === provider) ===  null){
+      throw new Error('unknown provider')
+    }
+    const updated =  {
+      ...user,
+      avatarProvider: provider
+    }
+    await  this.usersRepository.save(updated)
+    return updated
   }
 }

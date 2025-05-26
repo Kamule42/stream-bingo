@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core'
 import { Socket, io } from 'socket.io-client'
-import { fromEvent, shareReplay,} from 'rxjs'
+import { fromEvent, map, merge, shareReplay, Subject,} from 'rxjs'
 import { ISeachResult } from './users.interface'
 import { WebsocketService } from '../ws/websocket.service'
 
@@ -34,5 +34,23 @@ export class UsersService extends WebsocketService {
 
   public delete(){
     this.sendMessage('deleteAccount')
+  }
+
+  private readonly updateUsername$$ = new Subject<string>()
+  private readonly updateUsernameSubscription = this.updateUsername$$.subscribe({
+    next: (username) => this.sendMessage('updateUsername', { username })
+  })
+  private readonly usernameUpdated$ = fromEvent<boolean>(this.socket, 'usernameUpdated')
+  public readonly updateUsernameLoading$ = merge([
+    this.updateUsername$$.pipe(map(() => true)),
+    this.usernameUpdated$.pipe(map(() => false))
+  ])
+  public updateUsername(username: string){
+    this.updateUsername$$.next(username)
+  }
+  public setActiveIcon(provider: string) {
+    this.sendMessage('setActiveIcon', {
+      provider
+    })
   }
 }

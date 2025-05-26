@@ -23,7 +23,7 @@ export class AuthService {
   private readonly _newToken$$ = new BehaviorSubject<{token: string; socketId} | null>(null)
   private readonly _newToken$ = this._newToken$$.asObservable().pipe(
     filter(val => val != null),
-    throttleTime(10000),
+    throttleTime(1000),
   )
 
   public constructor(
@@ -50,40 +50,24 @@ export class AuthService {
     if(existingUser == null){
       throw new Error('unknown user')
     }
-    const avatarProvider = existingUser.providers?.find(({provider}) => provider == existingUser.avatarProvider) ?? existingUser.providers?.at(0)
-    if(existingUser.avatarProvider !== 'discord'){
-      console.log(avatarProvider)
-      console.trace()
-    }
-    const avatar = this.avatar(avatarProvider)
 
     return this.jwtService.signAsync({
       sub: existingUser.id,
       username: existingUser.username,
-      avatar,
       rights: existingUser.rights?.map(val => {
         return val
       })?.map(({rightKey, stream}) => ({
         right: rightKey,
         streamId: stream?.id
-      }))
+      })),
+      providers: existingUser.providers?.map(({provider, reference, avatarReference, }) => ({
+        provider,
+        avatarId: provider === 'discord' ?
+          reference+'/'+avatarReference :
+          avatarReference,
+        active: existingUser.avatarProvider === provider
+      })) ?? []
     })
-  }
-
-  private avatar(avatarProvider: ProviderEntity | undefined){
-    if(!avatarProvider){
-      return {provider: 'none', id: 'none'}
-    }
-    switch(avatarProvider.provider){
-      case 'discord': return {
-        provider: avatarProvider.provider,
-        id: avatarProvider.reference+'/'+avatarProvider.avatarReference
-      }
-    }
-    return {
-      provider: avatarProvider.provider,
-      id: avatarProvider.avatarReference,
-    }
   }
 
   validateToken(token: string): ISession {
@@ -141,7 +125,6 @@ export class AuthService {
           }
         ]
       })
-    console.log(data, result)
     return result
   }
   

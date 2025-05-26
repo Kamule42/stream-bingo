@@ -40,20 +40,7 @@
           @if (session(); as session) {
           <a pRipple routerLink="/@me" class="flex items-center p-menubar-item-link">
             <span>{{ session.username }}</span>
-            @switch (session.avatar.provider) {
-              @case('discord'){
-              <p-avatar [image]="`//cdn.discordapp.com/avatars/${session.avatar.id}`"
-                shape="circle" />
-              }
-              @case('google'){
-              <p-avatar [image]="session.avatar.id"
-                shape="circle" />
-              }
-              @default {
-                <p-avatar shape="circle" [label]="session.username.slice(0,1)"
-                  [style]="{'background-color': 'var(--secondary-color)'}" />
-              }
-            }
+            <app-provider-icon [avatar]="avatar$()" />
           </a>
           }
           @else if(isDisconnected()){

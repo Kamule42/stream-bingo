@@ -10,6 +10,7 @@ import { Ripple } from 'primeng/ripple'
 import { SessionService } from '../../services/session/session.service'
 import { AuthService } from '../../services/auth'
 import { SettingsComponent } from "../settings/settings.component"
+import { ProviderIconComponent } from "../provider-icon/provider-icon.component";
 
 @Component({
   selector: 'app-top-menu',
@@ -18,7 +19,8 @@ import { SettingsComponent } from "../settings/settings.component"
     MenubarModule,
     AvatarModule, ButtonModule, RouterLink,
     DialogModule, Ripple,
-    SettingsComponent
+    SettingsComponent,
+    ProviderIconComponent
 ],
   templateUrl: './top-menu.component.html',
   styleUrl: './top-menu.component.scss',
@@ -34,6 +36,10 @@ export class TopMenuComponent {
 
   readonly showSettingDialog = signal(false)
 
+  public readonly avatar$ = computed(() => {
+    const session = this.session()
+    return session?.providers?.find(({active}) => active) ?? { provider: 'none', avatarId: 'none', active: false }
+  })
 
   readonly items = computed(() => {
     const result: MenuItem[] = [

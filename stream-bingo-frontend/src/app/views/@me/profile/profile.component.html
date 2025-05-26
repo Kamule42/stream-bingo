@@ -1,6 +1,58 @@
 <div class="container">
+    <div id="username">
+    @if(editUsername$()){
+      <p-inputgroup>
+          <input
+            id="search-stream"
+            [(ngModel)]="username$"
+            pInputText />
+          <p-inputgroup-addon>
+            <p-button icon="mdi mdi-content-save-outline" (onClick)="updateUsername()" />
+            <p-button icon="mdi mdi-cancel" severity="secondary" (onClick)="cancelUsernameEdit()" />
+          </p-inputgroup-addon>
+        </p-inputgroup>
+    }
+    @else {
+      <h4 class="title is-4">{{ username$() }}</h4>
+      <p-button icon="mdi mdi-pencil-outline" [rounded]="true" [text]="true" (onClick)="editUsername$.set(true)" />
+    }
+    </div>
+
   <div class="box">
-    <h4 class="title is-4">Gestion</h4>
+    <h5 class="title is-5">Connexion</h5>
+    @if(activeProviders$().length > 0){
+    <span>Comptes reliés</span>
+    <div id="providers">
+      @for(provider of activeProviders$(); track provider.provider){
+        <div class="provider" [class.active]="provider.provider === activeProvider()"
+        (click)="setActive(provider.provider)"
+        (keyup)="setActive(provider.provider)">
+          <app-provider-icon [avatar]="provider" size="xlarge" />
+          <div class="label">
+            <span class="icon is-small">
+              <img [src]="`/assets/providers/${provider.provider}_colored.svg`" [alt]="`${provider.provider} logo`" />
+            </span>
+            <span>{{ formatLabel(provider.provider) }}</span>
+          </div>
+        </div>
+      }
+    </div>
+    }
+    @if(inactiveProviders$().length > 0){
+    <span>Ajouter</span>
+    <div id="innactive-providers">
+    @for(provider of inactiveProviders$();  track provider){
+      <a [href]="`/api/auth/${provider}`" [class]="`button ${provider}`">
+        <span class="icon is-small">
+          <img [src]="`/assets/providers/${provider}.svg`" [alt]="`${provider} logo`" />
+        </span>
+        <span>{{ formatLabel(provider) }}</span>
+      </a>
+    }
+    </div>
+    }
+  </div>
+  <div id="logbuttons" class="box">
     <p-button
       label="Déconnexion"
       icon="mdi mdi-logout"
