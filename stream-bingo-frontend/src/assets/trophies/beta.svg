@@ -1,0 +1,5 @@
+<svg version="1.1" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+ <rect width="24" height="24" fill="#fff" fill-rule="evenodd" stroke-linecap="round" stroke-linejoin="round" style="paint-order:markers fill stroke"/>
+ <path d="m0 0v24h24v-24h-24zm1.84 1h20.3l0.842 0.842v20.3l-0.842 0.842h-20.3l-0.842-0.842v-20.3l0.842-0.842z" fill="#ffc000" fill-rule="evenodd" stroke-linecap="round" stroke-linejoin="round" style="paint-order:markers fill stroke"/>
+ <text x="7.2236953" y="17.172682" font-family="'Yu Gothic UI'" font-size="24px" font-weight="bold" style="line-height:1.25" xml:space="preserve"><tspan transform="translate(.866 -1.19)" x="7.2236953" y="17.172682" fill="#097679" font-family="'Yu Gothic UI'" font-size="18.7px" font-weight="bold">β</tspan></text>
+</svg>
