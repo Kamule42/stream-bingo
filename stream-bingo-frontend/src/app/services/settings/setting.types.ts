@@ -6,6 +6,7 @@ export enum CheckType {
     SCRIBBLE = "scribble",
     STAR = "star",
     BRUSH_CIRCLE = "brush_circle",
+    DAISY = "daisy",
 }
 
 export enum BingoMode {

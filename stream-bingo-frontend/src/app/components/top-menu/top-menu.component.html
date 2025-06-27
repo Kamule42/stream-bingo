@@ -1,6 +1,9 @@
 <nav class="navbar is-fixed-top" role="navigation" aria-label="main navigation">
   <div class="container">
     <p-menubar [model]="items()" [autoDisplay]="true" [autoHide]="true" [autoHideDelay]="500">
+      <!-- <ng-template #start>
+        <img src="/assets/logo.svg" alt="logo" class="logo" />
+      </ng-template> -->
       <ng-template #item let-item let-root>
         @if(item.route){
         <a [routerLink]="item.route" class="p-menubar-item-link">
