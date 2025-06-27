@@ -43,6 +43,7 @@ export class GridGateway {
           cells: cells.map(cell => ({
             cellId: cell.cellId,
             valide: cell.valide,
+            at: cell.updatedAt ?? cell.createdAt
           }))
         }
       }))

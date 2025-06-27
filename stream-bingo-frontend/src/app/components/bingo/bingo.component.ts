@@ -1,6 +1,7 @@
 import { Component, ViewChild, computed, effect, inject, input, signal } from '@angular/core'
 import { toSignal } from '@angular/core/rxjs-interop'
 import { ButtonModule } from 'primeng/button'
+import { SpeedDialModule } from 'primeng/speeddial';
 import { Popover, PopoverModule } from 'primeng/popover'
 import { debounceTime, delay, filter, map, of, pairwise, startWith, switchMap, tap, throttleTime } from 'rxjs'
 import { ActivatedRoute, Router } from '@angular/router'
@@ -20,12 +21,13 @@ import { IGridCell } from '../../services/grids/grid.interface'
 import { DialogModule } from 'primeng/dialog'
 import { StreamsService } from '../../services/streams/streams.service'
 import html2canvas from 'html2canvas'
+import { DateTime } from 'luxon'
 
 @Component({
   selector: 'app-bingo',
   imports: [
     ButtonModule, PopoverModule, StrokeComponent, StripeComponent,
-    DialogModule,
+    DialogModule, SpeedDialModule,
   ],
   templateUrl: './bingo.component.html',
   styleUrl: './bingo.component.scss'
@@ -42,6 +44,37 @@ export class BingoComponent {
   private readonly streamService = inject(StreamsService)
   private readonly router = inject(Router)
   private readonly route = inject(ActivatedRoute)
+
+  readonly sortItems = [
+    {
+      icon: 'mdi mdi-sort-alphabetical-ascending',
+      command: () => {
+        this.sortMethod$.set('alph')
+        this.sortOrder$.set('asc')
+      }
+    },
+    {
+      icon: 'mdi mdi-sort-alphabetical-descending',
+      command: () => {
+        this.sortMethod$.set('alph')
+        this.sortOrder$.set('desc')
+      }
+    },
+    {
+      icon: 'mdi mdi-sort-calendar-ascending',
+      command: () => {
+        this.sortMethod$.set('date')
+        this.sortOrder$.set('asc')
+      }
+    },
+    {
+      icon: 'mdi mdi-sort-calendar-descending',
+      command: () => {
+        this.sortMethod$.set('date')
+        this.sortOrder$.set('desc')
+      }
+    },
+  ]
 
   private readonly bingoId = toSignal(this.route.paramMap.pipe(
     map(m => m.get('bingoId')),
@@ -104,7 +137,9 @@ export class BingoComponent {
           .map(cell => ({
             ...cell,
             checked:
-              this.bingoMode$() == BingoMode.AUTO_COMPLETE && this.validatedCells$()?.includes(cell.cellId) ||
+              this.bingoMode$() == BingoMode.AUTO_COMPLETE &&
+              this.validatedCells$()?.find(v => v.cellId === cell.cellId) != null
+              ||
               this.bingoMode$() == BingoMode.MANUAL && cell.checked
           }))
           .toSorted((a, b) => a.index - b.index),
@@ -113,12 +148,15 @@ export class BingoComponent {
   })
 
   readonly selectedCellDescr = signal<string | null>(null)
+  readonly sortMethod$ = signal<'alph' | 'date'>('date')
+  readonly sortOrder$ = signal<'asc' | 'desc'>('desc')
 
   readonly validatedCells$ = toSignal(this.gridService.validatedCells$.pipe(
     filter(val => val != null && val.roundId === this.grid$()?.roundId),
     map(val => val!.cells
       .filter(({ valide }) => valide === true)
-      .map(cell => cell.cellId)),
+      // .map(cell => cell.cellId)
+    ),
     // Wait for the tab to be active to trigger the update
     switchMap(cells => this.visibilityService.isVisible$.pipe(
       startWith(true),
@@ -140,11 +178,27 @@ export class BingoComponent {
     if(validatedCells === undefined || availableCells === undefined){
       return undefined
     }
-    return validatedCells.map(id => ({
-      id,
-      name: availableCells.find(c => c.id === id)?.name
-    }))
+    return validatedCells.map(validatedCell => {
+      const cell = availableCells.find(c => c.id === validatedCell.cellId)
+      return {
+        id: validatedCell.cellId,
+        name: cell?.name,
+        at: validatedCell.at
+      }
+    })
     .filter(c => c.name !== undefined)
+    .sort((left, right) => {
+      const sortOrder = this.sortOrder$()
+      const dateCompare = left.at.toMillis() - right.at.toMillis()
+      switch(this.sortMethod$()){
+        case 'alph': 
+          return sortOrder === 'asc' ?
+            left.name?.localeCompare(right.name ?? '') ?? 0 :
+            right.name?.localeCompare(left.name ?? '') ?? 0
+        case 'date': 
+          return sortOrder === 'asc' ? dateCompare : -1 * dateCompare
+      }
+    })
   })
 
   readonly bingos$ = computed<{ type: 'row' | 'col' | 'diag_down' | 'diag_up', index?: number, class: string }[]>(() => {

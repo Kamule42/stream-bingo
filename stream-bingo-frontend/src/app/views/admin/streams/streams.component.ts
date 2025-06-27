@@ -1,6 +1,4 @@
 import { Component, WritableSignal, computed, effect, inject, signal } from '@angular/core';
-import { map, tap } from 'rxjs';
-import { DateTime, Interval } from 'luxon';
 import { toSignal } from '@angular/core/rxjs-interop'
 import { TableModule } from 'primeng/table'
 import { PaginatorModule, PaginatorState } from 'primeng/paginator'

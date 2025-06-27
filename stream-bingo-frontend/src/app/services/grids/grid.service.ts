@@ -6,6 +6,7 @@ import { WebsocketService } from '../ws/websocket.service';
 import { IWsError } from '../../shared/models/ws-errors.interface'
 import { toSignal } from '@angular/core/rxjs-interop'
 import { IPaginated, IPagination } from '../../shared/models/pagination.interface'
+import { DateTime } from 'luxon'
 
 @Injectable({
   providedIn: 'root'
@@ -38,8 +39,19 @@ export class GridService extends WebsocketService{
     ).pipe(
     shareReplay(1),
   )
-  public readonly validatedCells$ = fromEvent<{ roundId: string, cells: IValidatedCell[]} | null>(this.socket, 'validatedcells').pipe(
-    shareReplay(1)
+  public readonly validatedCells$ = fromEvent<{
+    roundId: string
+    cells: (Omit<IValidatedCell, 'at'>  & {at: string})[]
+  } | null>(this.socket, 'validatedcells')
+  .pipe(
+    shareReplay(1),
+    map(val => ({
+      ...val,
+      cells: val?.cells.map(cell => ({
+        ...cell,
+        at: DateTime.fromISO(cell.at)
+      }))  ?? [],
+    })),
   )
 
 

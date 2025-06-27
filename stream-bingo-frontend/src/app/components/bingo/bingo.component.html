@@ -97,7 +97,7 @@
   [header]="`Cases validée${(validatedCells?.length ?? 1) > 0 ? 's' : ''}`"
   [(visible)]="showResults$"
   [modal]="true">
-  <div class="content">
+  <div>
     @if(validatedCells === undefined){
       Non disponible
     }
@@ -105,11 +105,26 @@
       Aucune validée pour l'instant
     }
     @else{
-      <ul>
-        @for(validatedCell of validatedCells; track validatedCell.id){
-          <li>{{ validatedCell.name }}</li>
-        }
-      </ul>
+      <div id="validated-info">
+        <div class="content">
+          <ul>
+            @for(validatedCell of validatedCells; track validatedCell.id){
+              <li>{{ validatedCell.name }}</li>
+            }
+          </ul>
+        </div>
+        
+        <p-speeddial 
+          [model]="sortItems"
+          [radius]="75"
+          direction="down"
+          [style]="{ position: 'relative', }"
+          >
+          <ng-template #icon>
+            <i class="mdi mdi-sort"></i>
+          </ng-template>
+        </p-speeddial>
+      </div>
     }
   </div>
 </p-dialog>

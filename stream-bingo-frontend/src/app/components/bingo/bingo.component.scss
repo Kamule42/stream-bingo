@@ -263,4 +263,16 @@
 			}
 		}
 	}
+
+	#validated-info{
+		display: flex;
+		flex-direction: row;
+		:nth-child(1){
+			flex: 1;
+		}
+
+		li{
+			
+		}
+	}
 }

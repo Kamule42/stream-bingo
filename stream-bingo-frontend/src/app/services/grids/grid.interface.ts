@@ -20,6 +20,7 @@ export interface IGrid{
 export interface IValidatedCell{
     cellId: string
     valide: boolean
+    at: Date
 }
 
 export type IGridSummary = Pick<IGrid, 'id' | 'streamId' | 'streamName' | 'roundName' | 'streamStartAt'>
