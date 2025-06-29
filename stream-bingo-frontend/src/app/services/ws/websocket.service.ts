@@ -1,10 +1,13 @@
 import { inject, } from "@angular/core"
-import { Socket } from "socket.io-client"
+import { io, Socket } from "socket.io-client"
 import { toSignal } from "@angular/core/rxjs-interop"
-import { Subject,  distinctUntilChanged, filter, pairwise, } from "rxjs"
+import { Subject,  distinctUntilChanged, filter, fromEvent, pairwise, } from "rxjs"
 import { AuthService } from "../auth"
 
+
 export abstract class WebsocketService {
+
+  
   protected readonly authService = inject(AuthService)
   protected readonly authorization = toSignal(this.authService.authorization$.pipe(
     distinctUntilChanged(),
@@ -14,9 +17,22 @@ export abstract class WebsocketService {
     filter(toSend => toSend != null),
   )
 
-  constructor(){
+  protected readonly socket: Socket
+
+  constructor(socketUri: string){
+    this.socket = io(socketUri, {
+      reconnection: true,
+      reconnectionDelay: 1000,
+      reconnectionAttempts: 5,
+      transports: ['websocket', 'polling'],
+      withCredentials: true,
+      auth: this.auth,
+    })
+
     this.onSend.subscribe({
-      next: ({id, payload}) => this.socket.emit(id, payload)
+      next: ({id, payload}) => {
+        this.socket.emit(id, payload)
+      }
     })
     this.authService.rawAuthorization$.pipe(
       pairwise(),
@@ -30,9 +46,13 @@ export abstract class WebsocketService {
         this.socket.connect()
       }
     })
+
+    fromEvent<boolean>(this.socket, 'logout')
+    .subscribe({
+      next: ()  => this.authService.logout()
+    })
   }
 
-  abstract get socket() : Socket
 
   protected sendMessage(id: string, payload?: unknown): void {
     this.messageToSend$.next({id, payload})

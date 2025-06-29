@@ -1,6 +1,7 @@
 import { Entity, Column, PrimaryColumn, ManyToOne, JoinColumn, OneToMany } from 'typeorm'
 import { StreamEntity } from './stream.entity'
 import { GridEntity } from 'src/grid/entities/grid.entity'
+import { SeasonEntity } from './season.entity'
 
 export enum RoundStatus{
   CREATED= 'CREATED',
@@ -29,6 +30,9 @@ export class RoundEntity {
   @JoinColumn({name: 'stream_id'})
   stream: StreamEntity
 
+  @ManyToOne(() => SeasonEntity, (season) => season.rounds, { onDelete: 'CASCADE', onUpdate: 'CASCADE' })
+  @JoinColumn({name: 'season_id'})
+  season: SeasonEntity
   
   @OneToMany(() => GridEntity, (grid) => grid.round,)
   @JoinColumn({name: 'round_id'})

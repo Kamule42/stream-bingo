@@ -21,7 +21,6 @@ import { IGridCell } from '../../services/grids/grid.interface'
 import { DialogModule } from 'primeng/dialog'
 import { StreamsService } from '../../services/streams/streams.service'
 import html2canvas from 'html2canvas'
-import { DateTime } from 'luxon'
 
 @Component({
   selector: 'app-bingo',

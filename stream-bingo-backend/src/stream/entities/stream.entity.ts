@@ -3,6 +3,7 @@ import { RoundEntity } from './round.entity'
 import { RightEntity } from 'src/user/entities/right.entity'
 import { CellEntity } from 'src/stream/entities/cell.entity'
 import { UserEntity } from 'src/user/entities/user.entity'
+import { SeasonEntity } from './season.entity'
 
 @Entity({ name: 'streams', schema: 'bingo' })
 export class StreamEntity {
@@ -29,6 +30,10 @@ export class StreamEntity {
 
   @Column({ name: 'deleted_at' })
   deletedAt: Date
+
+  @OneToMany(() => SeasonEntity, (season) => season.stream, { cascade: true })
+  @JoinColumn({name: 'stream_id'})
+  seasons: Array<SeasonEntity>
 
   @OneToMany(() => RoundEntity, (round) => round.stream, { cascade: true })
   @JoinColumn({name: 'stream_id'})

@@ -1,6 +1,5 @@
 import { Injectable, signal } from '@angular/core'
-import { Subject, debounceTime, filter, fromEvent, map, merge, shareReplay, startWith, switchMap, tap, zip, } from 'rxjs'
-import { Socket, io } from 'socket.io-client'
+import { Subject, debounceTime, filter, fromEvent, map, merge, shareReplay, startWith, tap, zip, } from 'rxjs'
 import { toSignal } from '@angular/core/rxjs-interop'
 import { ICell, IRight, IStream, } from './stream.interface'
 import { IPaginated, IPagination } from '../../shared/models/pagination.interface'
@@ -12,16 +11,8 @@ import { IFav } from '../users/users.interface'
   providedIn: 'root'
 })
 export class StreamsService extends WebsocketService {
-  private readonly _socket = io('/streams', {
-    reconnection: true,
-    reconnectionDelay: 1000,
-    reconnectionAttempts: 5,
-    transports: ['websocket', 'polling'],
-    withCredentials: true,
-    auth: this.auth,
-  })
-  override get socket(): Socket {
-    return this._socket
+  constructor(){
+    super('/streams' )
   }
 
   

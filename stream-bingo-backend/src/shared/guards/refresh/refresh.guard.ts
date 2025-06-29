@@ -27,7 +27,18 @@ export class RefreshGuard implements CanActivate {
   }
 
   private async handleWsRequest(client: Socket): Promise<void>{
-    if(!client.handshake.headers.cookie){
+    if(client.handshake.headers.cookie == null){
+      if(
+        (
+          client.handshake.auth.token &&
+          client.handshake.auth.token !== 'Bearer null'
+        ) ||
+        client.handshake.auth.user
+      ){
+        delete client.handshake.auth.token
+        delete client.handshake.auth.user
+        client.emit('logout')
+      }
       return
     }
     const cookies = fastifyCookie.parse(client.handshake.headers.cookie)

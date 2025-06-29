@@ -1,7 +1,6 @@
 import { ExecutionContext, Injectable, Logger } from '@nestjs/common'
 import { Reflector } from '@nestjs/core'
 import { AuthGuard } from '@nestjs/passport'
-import { FastifyRequest } from 'fastify'
 import { Socket } from 'socket.io'
 import { Roles } from 'src/shared/decorators/auth/roles.decorator'
 import { IRole } from 'src/shared/interfaces/auth.interface'

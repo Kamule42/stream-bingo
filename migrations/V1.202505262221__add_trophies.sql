@@ -3,7 +3,10 @@ SET ROLE role_bingo_admin;
 CREATE TABLE IF NOT EXISTS bingo.trophies(
   id UUID PRIMARY KEY,
   image_key varchar(50),
-  name text
+  name text,
+  created_at timestamp with time zone DEFAULT now(),
+  updated_at timestamp with time zone DEFAULT null,
+  deleted_at timestamp with time zone DEFAULT null
 );
 GRANT select, update, insert, delete ON bingo.trophies TO role_bingo_app;
 

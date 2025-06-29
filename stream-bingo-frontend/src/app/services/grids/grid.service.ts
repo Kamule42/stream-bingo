@@ -1,5 +1,4 @@
-import { Injectable, signal } from '@angular/core';
-import { Socket, io } from 'socket.io-client';
+import { Injectable, signal } from '@angular/core'
 import { distinctUntilChanged, filter, fromEvent, map, merge, shareReplay, Subject, tap, throttleTime,  } from 'rxjs';
 import { IGrid, IGridSummary, IValidatedCell } from './grid.interface';
 import { WebsocketService } from '../ws/websocket.service';
@@ -12,17 +11,9 @@ import { DateTime } from 'luxon'
   providedIn: 'root'
 })
 export class GridService extends WebsocketService{
-  private readonly _socket = io('/grids', {
-    reconnection: true,
-    reconnectionDelay: 1000,
-    reconnectionAttempts: 5,
-    transports: ['websocket', 'polling'],
-    auth: this.auth,
-    withCredentials: true,
-  })
-  
-  override get socket(): Socket {
-    return this._socket
+
+  constructor(){
+    super('/grids' )
   }
 
   private readonly currentStream$ = signal<string | null>(null)

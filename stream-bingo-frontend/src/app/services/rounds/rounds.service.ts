@@ -1,27 +1,20 @@
 import { inject, Injectable } from '@angular/core'
-import { Socket, io } from 'socket.io-client'
-import { distinctUntilChanged, filter, fromEvent, map, merge, pairwise, shareReplay, startWith, Subject, tap } from 'rxjs'
+import { distinctUntilChanged, filter, fromEvent, map, merge, mergeMap, pairwise, shareReplay, startWith, Subject, tap } from 'rxjs'
 import { IEditRound, IRound, RoundStatus } from './round.interface'
 import { WebsocketService } from '../ws/websocket.service'
 import { toSignal } from '@angular/core/rxjs-interop'
 import { GridService } from '../grids/grid.service'
+import { VisibilityService } from '../visibility/visibility.service'
 
 
 @Injectable({
   providedIn: 'root'
 })
 export class RoundsService extends WebsocketService{
-  private readonly _socket = io('/rounds', {
-    reconnection: true,
-    reconnectionDelay: 1000,
-    reconnectionAttempts: 5,
-    transports: ['websocket', 'polling'],
-    auth: this.auth,
-    withCredentials: true,
-  })
-  
-  override get socket(): Socket {
-    return this._socket
+  protected readonly visibilityService = inject(VisibilityService)
+
+  constructor(){
+    super('/rounds' )
   }
 
   private readonly gridService = inject(GridService)
@@ -38,7 +31,16 @@ export class RoundsService extends WebsocketService{
     shareReplay(1),
   )
 
-  private readonly _roundSubscription = this.currentRound$.pipe(
+  protected readonly reconnectToRound$ =  this.visibilityService.isVisible$.pipe(
+    distinctUntilChanged(),
+    filter(val => val),
+    mergeMap(() => this.currentRound$),
+  )
+
+  private readonly _roundSubscription = merge(
+    this.currentRound$,
+    this.reconnectToRound$,
+  ).pipe(
     startWith(null),
     pairwise(),
   ).subscribe({
@@ -51,6 +53,8 @@ export class RoundsService extends WebsocketService{
       }
     }
   })
+
+
 
   readonly streamNexRouds$ = fromEvent<IRound[]>(this.socket, 'streamRounds').pipe(
     map(rounds => rounds),

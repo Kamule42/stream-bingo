@@ -3,6 +3,8 @@ import { RightEntity } from "src/user/entities/right.entity";
 import { ICell, INextStream, IStream } from "./stream.interface";
 import { NextStreamEntity } from "src/stream/entities/next-stream.entity";
 import { CellEntity } from "src/stream/entities/cell.entity";
+import { SeasonEntity } from "src/stream/entities/season.entity"
+import { ISeason } from "src/stream/poto"
 
 export const streamMapper = ({id, name, twitchLogin, twitchId, enabled, rights}: StreamEntity, extended: boolean = false): IStream => ({
     id, 
@@ -41,3 +43,9 @@ export const cellsMapper = (cells?: Array<CellEntity>): Array<ICell> => cells
   ?.map(({id, name, description, active}) => ({
   id, name, description, active,
 })) ?? []
+
+export const seasonMapper = (season: SeasonEntity): ISeason =>  ({
+    id: season.id,
+    name: season.name,
+    date: season.createdAt
+})

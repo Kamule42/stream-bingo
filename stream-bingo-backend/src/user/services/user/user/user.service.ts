@@ -3,7 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm'
 import { StreamEntity } from 'src/stream/entities/stream.entity'
 import { UserEntity } from 'src/user/entities/user.entity'
 import { DeleteResult, ILike, Repository } from 'typeorm'
-import { AuthService } from '../../auth/auth.service'
+
 @Injectable()
 export class UserService {
  public constructor(

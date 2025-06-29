@@ -29,3 +29,4 @@ export interface ICell{
     description: string
     active: boolean
 }
+

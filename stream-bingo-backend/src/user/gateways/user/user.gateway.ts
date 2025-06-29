@@ -1,4 +1,4 @@
-import fastifyCookie, { Signer } from '@fastify/cookie'
+import fastifyCookie from '@fastify/cookie'
 import { UseGuards } from '@nestjs/common'
 import { ConnectedSocket, MessageBody, SubscribeMessage, WebSocketGateway, WsException, WsResponse, } from '@nestjs/websockets'
 import { Roles } from 'src/shared/decorators/auth/roles.decorator'

@@ -1,8 +1,7 @@
 import { MessageBody, SubscribeMessage, WebSocketGateway, WsResponse } from '@nestjs/websockets'
-import { map, Observable } from 'rxjs'
 import { StreamService } from 'src/stream/services/stream/stream.service'
 import { ICell, INextStream, IRight, IStream } from './stream.interface' 
-import { cellsMapper, nextStreamMapper, streamMapper } from './stream.mappers'
+import { cellsMapper, nextStreamMapper, seasonMapper, streamMapper } from './stream.mappers'
 import { Paginate, PaginateQuery } from 'nestjs-paginate'
 import { UseGuards } from '@nestjs/common'
 import { Roles } from 'src/shared/decorators/auth/roles.decorator'
@@ -15,6 +14,8 @@ import { Session } from 'src/shared/decorators/auth/session.decorator'
 import { JwtAuthGuard } from 'src/shared/guards/jwt-auth/jwt-auth.guard'
 import { RefreshGuard } from 'src/shared/guards/refresh/refresh.guard'
 import { UserRoles } from 'src/shared/roles'
+import { SeasonService } from 'src/stream/services/season/season.service'
+import { ISeason } from 'src/stream/poto'
 
 @WebSocketGateway({
   namespace: 'streams',
@@ -25,6 +26,7 @@ export class StreamGateway {
   constructor(
     private readonly streamService: StreamService,
     private readonly cellService: CellService,
+    private readonly seasonService: SeasonService,
   ){}
 
   @SubscribeMessage('getList')
@@ -146,5 +148,20 @@ export class StreamGateway {
         data:  result.map(s => streamMapper(s, false)),
       })
     )
+  }
+
+  @SubscribeMessage('getStreamSeasons')
+  async getStreamSeasons(
+    @Paginate() query: PaginateQuery,
+    @MessageBody('streamId') streamId: string
+  ): Promise<IPaginatedResponse<ISeason>>{
+    return this.seasonService.getStreamSeasons(query, streamId)
+    .then(result => ({
+      event: 'streamcells',
+      data:  {
+        data: result.data.map(seasonMapper),
+        meta: toPaginationMeta(result.meta),
+      }
+    }))
   }
 }

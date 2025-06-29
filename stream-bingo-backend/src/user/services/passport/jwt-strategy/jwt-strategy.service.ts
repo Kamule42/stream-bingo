@@ -2,7 +2,6 @@ import { ExtractJwt, Strategy } from 'passport-jwt'
 import { PassportStrategy } from '@nestjs/passport'
 import { Injectable } from '@nestjs/common'
 import { ConfigService } from '@nestjs/config'
-import { Reflector } from '@nestjs/core'
 import { Socket } from 'socket.io'
 import { ISession } from 'src/user/interfaces/session.interface'
 import { FastifyRequest } from 'fastify'
@@ -26,8 +25,7 @@ const extractToken = (request) => {
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
   constructor(
-    private readonly configService: ConfigService,
-    private readonly reflector: Reflector,
+    readonly configService: ConfigService,
   ) {
     super({
       jwtFromRequest: ExtractJwt.fromExtractors([extractToken]),

@@ -1,5 +1,4 @@
 import { Injectable, Logger } from '@nestjs/common'
-import { ConfigService } from '@nestjs/config'
 import { BehaviorSubject, filter, throttleTime, } from 'rxjs'
 import { v7 as uuid } from 'uuid'
 import { UserEntity } from '../../entities/user.entity'
@@ -30,7 +29,6 @@ export class AuthService {
     private readonly jwtService: JwtService,
     @InjectRepository(UserEntity)
     private readonly usersRepository: Repository<UserEntity>,
-    private readonly configService: ConfigService,
   ) {}
 
   public get newToken$(){
