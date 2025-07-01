@@ -1,17 +1,18 @@
 export enum CheckType {
-    CHECK = "check",
-    CIRCLE = "circle",
-    DISC = "disc",
-    SCRATCH = "scratch",
-    SCRIBBLE = "scribble",
-    STAR = "star",
-    BRUSH_CIRCLE = "brush_circle",
-    DAISY = "daisy",
+    CHECK = 'check',
+    CIRCLE = 'circle',
+    DISC = 'disc',
+    SCRATCH = 'scratch',
+    SCRIBBLE = 'scribble',
+    STAR = 'star',
+    BRUSH_CIRCLE = 'brush_circle',
+    DAISY = 'daisy',
+    OWL = 'owl',
 }
 
 export enum BingoMode {
-    AUTO_COMPLETE = "auto_complete",
-    MANUAL = "manual",
+    AUTO_COMPLETE = 'auto_complete',
+    MANUAL = 'manual',
 }
 
 export interface ISaveParams {

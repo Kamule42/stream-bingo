@@ -9,6 +9,7 @@ import { ScribbleComponent } from './scribble/scribble.component'
 import { StarComponent } from './star/star.component'
 import { BrushCircleComponent } from './brush-circle/brush-circle.component'
 import { DaisyComponent } from './daisy/daisy.component'
+import { OwlComponent } from './owl/owl.component'
 
 @Component({
   selector: 'app-stroke',
@@ -30,6 +31,7 @@ export class StrokeComponent {
       case CheckType.STAR: return StarComponent
       case CheckType.BRUSH_CIRCLE: return BrushCircleComponent
       case CheckType.DAISY: return DaisyComponent
+      case CheckType.OWL: return OwlComponent
     }
   })
   readonly params$ = computed(() => {
