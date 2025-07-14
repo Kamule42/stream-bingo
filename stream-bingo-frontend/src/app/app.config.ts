@@ -9,7 +9,6 @@ import { routes } from './app.routes'
 import { httpInterceptor } from './interceptors/http/http.interceptor'
 import { primeNgConfig } from './config/primeng.config'
 
-
 export const appConfig: ApplicationConfig = {
   providers: [
     provideZonelessChangeDetection(),
@@ -26,5 +25,5 @@ export const appConfig: ApplicationConfig = {
     ),
     MessageService,
     ConfirmationService,
-  ]
+  ],
 };

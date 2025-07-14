@@ -7,6 +7,8 @@ export interface IRound{
     status: RoundStatus
     streamId: string
     streamName: string
+    seasonId?: string
+    seasonName?: string
 }
 
-export type IRoundEdit = Omit<IRound, 'streamId'|'streamName'> & { toBeDeleted?: boolean }
+export type IRoundEdit = Omit<IRound, 'streamId'|'streamName'|'seasonName'> & { toBeDeleted?: boolean }

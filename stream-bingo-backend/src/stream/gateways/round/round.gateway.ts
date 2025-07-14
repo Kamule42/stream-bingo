@@ -10,6 +10,7 @@ import { UserRoles } from 'src/shared/roles'
 import { RoundStatus } from 'src/stream/entities/round.entity'
 import { ISession } from 'src/user/interfaces/session.interface'
 import { Session } from 'src/shared/decorators/auth/session.decorator'
+import { ISeason } from 'src/stream/poto'
 
 @WebSocketGateway({
   namespace: 'rounds',
@@ -74,5 +75,19 @@ export class RoundGateway {
         data: roundMapper(updated)
       }
     }
+  }
+
+  
+
+  @Roles([
+    {id: UserRoles.stream.plan, streamKey: 'streamId'}
+  ])
+  @SubscribeMessage('createRound')
+  createRound(
+    @MessageBody('streamId') streamId: string,
+    @MessageBody('round') round: IRoundEdit,
+    @MessageBody('newSeason') newSeason?: ISeason,
+  ): void {
+    this.roundService.createStreamRound(streamId, round, newSeason)
   }
 }

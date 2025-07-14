@@ -3,7 +3,9 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { DateTime } from 'luxon';
 import { RoundEntity, RoundStatus } from 'src/stream/entities/round.entity';
 import { IRoundEdit } from 'src/stream/gateways/round/round.interface';
+import { ISeason } from 'src/stream/poto'
 import { Brackets, DataSource, IsNull, MoreThanOrEqual, Repository, Not } from 'typeorm';
+import { SeasonService } from '../season/season.service'
 
 type NewStatus = null | {newStatus: RoundStatus, delay: boolean }
 
@@ -12,6 +14,7 @@ export class RoundService {
   constructor(
     @InjectRepository(RoundEntity)
     private readonly roundRepository: Repository<RoundEntity>,
+    private readonly seasonService: SeasonService,
     private readonly dataSource: DataSource,
   ) { }
 
@@ -27,11 +30,11 @@ export class RoundService {
   getStreamCurrentRound(streamId: string): Promise<RoundEntity | null> {
     return this.roundRepository.createQueryBuilder('round')
       .addSelect(`
-                CASE
-                    WHEN round.status='STARTED' THEN 0
-                    ELSE 1
-                END as statusOrder
-            `)
+        CASE
+            WHEN round.status='STARTED' THEN 0
+            ELSE 1
+        END as statusOrder
+      `)
       .leftJoinAndSelect('round.stream', 'stream')
       .where('round.stream.id=:streamId', { streamId })
       .andWhere(new Brackets((qb) => {
@@ -175,5 +178,21 @@ export class RoundService {
       case RoundStatus.FINISHED: return null
     }
     throw new Error('Illegal status update')
+  }
+
+  async createStreamRound(streamId: string, round: IRoundEdit, newSeason?: ISeason): Promise<void> {
+    let seasonId: string | undefined = round.seasonId
+    if(newSeason){
+      await this.seasonService.createSeason({
+        id: newSeason.id,
+        name: newSeason.name,
+      }, streamId)
+      seasonId = newSeason.id
+    }
+    await this.roundRepository.save({
+      ...round,
+      ...(seasonId ? {season: { id: seasonId }} : {}),
+      stream: { id: streamId },
+    })
   }
 }

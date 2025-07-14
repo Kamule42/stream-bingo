@@ -153,11 +153,12 @@ export class StreamGateway {
   @SubscribeMessage('getStreamSeasons')
   async getStreamSeasons(
     @Paginate() query: PaginateQuery,
-    @MessageBody('streamId') streamId: string
+    @MessageBody('streamId') streamId: string,
+    @MessageBody('searchTerm') searchTerm: string,
   ): Promise<IPaginatedResponse<ISeason>>{
-    return this.seasonService.getStreamSeasons(query, streamId)
+    return this.seasonService.getStreamSeasons(query, streamId, searchTerm)
     .then(result => ({
-      event: 'streamcells',
+      event: 'streamSeasons',
       data:  {
         data: result.data.map(seasonMapper),
         meta: toPaginationMeta(result.meta),

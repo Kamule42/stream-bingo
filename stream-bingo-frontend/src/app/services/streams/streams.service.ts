@@ -1,10 +1,11 @@
 import { Injectable, signal } from '@angular/core'
-import { Subject, debounceTime, filter, fromEvent, map, merge, shareReplay, startWith, tap, zip, } from 'rxjs'
+import { Subject, debounceTime, filter, fromEvent, map, merge, shareReplay, startWith, tap, throttleTime, zip, } from 'rxjs'
 import { toSignal } from '@angular/core/rxjs-interop'
 import { ICell, IRight, IStream, } from './stream.interface'
 import { IPaginated, IPagination } from '../../shared/models/pagination.interface'
 import { WebsocketService } from '../ws/websocket.service'
 import { IFav } from '../users/users.interface'
+import { paginationParam } from '../../shared/helpers/pagination.helper'
 
 
 @Injectable({
@@ -90,14 +91,7 @@ export class StreamsService extends WebsocketService {
       })
   }
   public getNextStreams(pagination?: IPagination): void {
-    this.sendMessage('getNexts', pagination ?
-      {
-        ...pagination,
-        page: (pagination.page ?? 0) + 1
-      } : {
-        page: 1,
-        limit: 10,
-      })
+    this.sendMessage('getNexts', paginationParam(pagination))
   }
 
   private readonly _fetchDetail$ = this._fetchDetail$$.asObservable().subscribe({
@@ -154,4 +148,23 @@ export class StreamsService extends WebsocketService {
   searchByName(name: string): void {
     this.sendMessage('searchByName', { name })
   }
+
+  private readonly _fetchStreamSeasons$$ = new Subject<{streamId: string, searchTerm: string, pagination: IPagination}>()
+  private readonly _fetchStreamSeasons$ = this._fetchStreamSeasons$$.asObservable().pipe(
+    throttleTime(100),
+  ).subscribe({
+    next: (params) => this.sendMessage('getStreamSeasons', params)
+  })
+  public fetchStreamSeasons(streamId: string, searchTerm: string, pagination?: IPagination): void {
+    this._fetchStreamSeasons$$.next({
+      streamId,
+      searchTerm,
+      pagination: paginationParam(pagination)
+    })
+  }
+  private readonly _streamSeasons$ = fromEvent<IPaginated<{id: string, name: string}>>(this.socket, 'streamSeasons')
+  public readonly streamSeasons$ = this._streamSeasons$.pipe(
+    map(({ data }) => data),
+    shareReplay(1),
+  )
 }

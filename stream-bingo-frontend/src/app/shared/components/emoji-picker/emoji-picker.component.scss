@@ -1,0 +1,16 @@
+unicode-emoji-picker {
+  --box-shadow: none;
+  --fill-color: transparent;
+}
+
+.emoji-picker-icon{
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 50%;
+  &:hover{
+    background-color: var(--p-neutral-100);
+  }
+  &:active{
+    background-color: var(--p-neutral-200);
+  }
+}

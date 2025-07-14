@@ -1,6 +1,5 @@
 import { Entity, Column, PrimaryColumn, ManyToOne, JoinColumn, OneToMany } from 'typeorm'
 import { StreamEntity } from './stream.entity'
-import { GridEntity } from 'src/grid/entities/grid.entity'
 import { RoundEntity } from './round.entity'
 
 

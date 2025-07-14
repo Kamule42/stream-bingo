@@ -1,0 +1,12 @@
+<!-- eslint-disable @angular-eslint/template/interactive-supports-focus -->
+<span
+ (click)="op.toggle($event)"
+ (keydown)="op.toggle($event)"
+ class="emoji-picker-icon"
+>
+  {{ randomEmoji()}}
+</span>
+<p-popover #op>
+    <unicode-emoji-picker #emojiList 
+      version="15.0" />
+</p-popover>

@@ -2,46 +2,89 @@
   <h4 class="title is-4">Planification</h4>
   <p-card>
     <div id="plan-content">
-      <p-table [value]="toEdit$()" dataKey="id" stripedRows>
-        <ng-template #emptymessage>
-          Aucune partie de prévue
-        </ng-template>
-        <ng-template #caption>
-          <div class="is-flex is-flex-direction-row is-justify-content-end">
-            <p-button
-              label="Ajouter" icon="mdi mdi-plus" text
-              [disabled]="!canAddRound$()"
-              (onClick)="addNewRound()" />
+      @if(toEdit$(); as toEdit){
+        <form #editStreamForm="ngForm" (ngSubmit)="validateRoundCreation()">
+          <div id="plan-edit">
+             <p-floatlabel>
+                <p-iconfield iconPosition="right">
+                    <input
+                      pInputText 
+                      type="text"
+                      id="round-name"
+                      name="round-name"
+                      [(ngModel)]="toEdit.name"
+                      #roundName="ngModel"
+                      [invalid]="roundName.invalid && (roundName.touched || editStreamForm.submitted)"
+                      required 
+                      minlength="2"
+                      size="50"
+                    />
+                    <p-inputicon>
+                      <app-emoji-picker (emojiSelected)="addEmoji($event)"/>
+                    </p-inputicon>
+                </p-iconfield>
+                <label for="round-name">Nom du stream</label>
+            </p-floatlabel>
+
+            <p-floatlabel variant="on">
+              <p-inputnumber
+                type="text"
+                id="grid-size"
+                name="grid-size"
+                [(ngModel)]="toEdit.size"
+                #roundSize="ngModel"
+                [invalid]="roundSize.invalid && (roundSize.touched || editStreamForm.submitted)"
+                required 
+                [inputSize]="43"
+                [min]="2"
+                [showButtons]="true" buttonLayout="horizontal" spinnerMode="horizontal"
+              >
+                <ng-template #incrementbuttonicon>
+                  <span class="pi pi-plus"></span>
+                </ng-template>
+                <ng-template #decrementbuttonicon>
+                  <span class="pi pi-minus"></span>
+                </ng-template>
+              </p-inputnumber>
+              <label for="grid-size">Taille de la grille</label>
+            </p-floatlabel>
+            <p-floatlabel variant="on">
+              <p-autocomplete
+                [(ngModel)]="toEdit.seasonId"
+                name="round-season"
+                [suggestions]="seasonsFiltered$()"
+                [forceSelection]="true"
+                [inputSize]="49"
+                  [dropdown]="true"
+                  (completeMethod)="searchSeason($event)"
+                optionLabel="name"
+                optionValue="id"
+              >
+                <ng-template #footer>
+                  <div class="px-3 py-3">
+                    <p-button label="Créer une saison" fluid severity="secondary" text size="small" icon="pi pi-plus" (onClick)="createSeason()" />
+                  </div>
+                </ng-template>
+              </p-autocomplete>
+              <label for="round-id">Saison</label>
+            </p-floatlabel>
           </div>
-        </ng-template>
-        <ng-template #header>
-          <tr>
-            <th pSortableColumn="name">Nom <p-sortIcon field="name" /></th>
-            <th>Status <p-sortIcon field="status" /></th>
-          </tr>
-        </ng-template>
-        <ng-template #body let-round>
-          <tr>
-            <td [pEditableColumn]="round.name" pEditableColumnField="name">
-              <p-cellEditor>
-                <ng-template #input>
-                  <input pInputText type="text" [(ngModel)]="round.name" (keydown)="stopNavigation($event)" />
-                </ng-template>
-                <ng-template #output>
-                  {{ round.name }}
-                </ng-template>
-              </p-cellEditor>
-            </td>
-            <td>
-              {{ round.status}}
-            </td>
-          </tr>
-        </ng-template>
-      </p-table>
-      <div id="plan-actions">
-        <p-button label="Annuler" severity="secondary" (onClick)="cancel()" />
-        <p-button label="Sauvegarder" (onClick)="saveTimeline()" />
-      </div>
+          <div id="plan-actions">
+            <p-button label="Annuler" severity="secondary" (onClick)="cancel()" />
+            <p-button label="Sauvegarder" (onClick)="validateRoundCreation()" />
+          </div>
+        </form>
+      }
+      @else {
+        @if(currentRound$(); as currentRound){
+        }
+        @else{
+          <p class="has-text-centered">
+            Aucune partie en cours
+            <p-button label="en créer une" (onClick)="createRound()"/>
+          </p>
+        }
+      }
     </div>
   </p-card>
 </div>

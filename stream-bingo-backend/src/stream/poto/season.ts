@@ -4,4 +4,4 @@ export interface ISeason{
     date: Date
 }
 
-export type ICreateSeason = Pick<ISeason,'id' | 'name' > & { streamId: string }
+export type ICreateSeason = Pick<ISeason,'id' | 'name' >

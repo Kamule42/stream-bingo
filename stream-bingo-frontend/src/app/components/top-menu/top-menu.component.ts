@@ -54,11 +54,6 @@ export class TopMenuComponent {
         label: 'Mes favoris',
         icon: 'mdi mdi-star-outline',
         route: '/@me/favs',
-        items: this.favs()
-          ?.map(fav => ({
-            label: fav.streamName,
-            route: `/s/${fav.streamTwitchHandle}`
-          }))
       })
     }
     if(this.sessionService.isAdmin){

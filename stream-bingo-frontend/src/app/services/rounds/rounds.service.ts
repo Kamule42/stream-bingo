@@ -1,10 +1,11 @@
 import { inject, Injectable } from '@angular/core'
-import { distinctUntilChanged, filter, fromEvent, map, merge, mergeMap, pairwise, shareReplay, startWith, Subject, tap } from 'rxjs'
+import { distinctUntilChanged, filter, fromEvent, map, merge, mergeMap, pairwise, shareReplay, startWith, Subject, tap, throttle, throttleTime } from 'rxjs'
 import { IEditRound, IRound, RoundStatus } from './round.interface'
 import { WebsocketService } from '../ws/websocket.service'
 import { toSignal } from '@angular/core/rxjs-interop'
 import { GridService } from '../grids/grid.service'
 import { VisibilityService } from '../visibility/visibility.service'
+import { ISeason } from '../streams/stream.interface'
 
 
 @Injectable({
@@ -87,17 +88,21 @@ export class RoundsService extends WebsocketService{
 
   private readonly fetchRoundsForStream$$ = new Subject<string>()
   private readonly _fetchRoundForStream$ = toSignal(this.fetchRoundsForStream$$.asObservable().pipe(
-    distinctUntilChanged(),
+    throttleTime(100),
     tap(streamId => this.sendMessage('getRoundsForStream', {streamId})),
   ))
   public fetchRoundsForStream(streamId: string) {
     this.fetchRoundsForStream$$.next(streamId)
   }
 
-  public updateStreamRounds(streamId: string, rounds: IEditRound[], toDelete?: string[]) {
-    this.sendMessage('updateStreamRounds', { streamId, rounds, toDelete})
-  }
   public updateCurrentRoundStatus(roundId: string, streamId: string, status: RoundStatus){
     this.sendMessage('updateStreamStatus', { roundId, streamId, status})
+  }
+  public createRound(streamId: string, round: IEditRound, newSeason?: ISeason): void {
+    this.sendMessage('createRound', {
+      streamId,
+      round,
+      newSeason
+    })
   }
 }

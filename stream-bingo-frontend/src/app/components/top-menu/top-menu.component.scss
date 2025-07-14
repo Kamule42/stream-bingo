@@ -1,10 +1,8 @@
 :host{
     p-menubar{
         width: 100%;
-        ::ng-deep .p-menubar{
-            background: none;
-            border: none;
-        }
+        background: none;
+        border: none;
     }
     .navbar{
         background: none;
