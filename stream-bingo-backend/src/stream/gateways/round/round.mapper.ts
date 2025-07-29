@@ -4,7 +4,8 @@ export const roundMapper = round => ({
   streamStartAt: round.streamStartAt,
   streamId: round.stream.id,
   streamName: round.stream.name,
-  status: round.status
+  status: round.status,
+  gridSize: round.gridSize,
 })
 
 export const roundDetailMapper = (round) =>

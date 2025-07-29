@@ -98,11 +98,25 @@ export class RoundsService extends WebsocketService{
   public updateCurrentRoundStatus(roundId: string, streamId: string, status: RoundStatus){
     this.sendMessage('updateStreamStatus', { roundId, streamId, status})
   }
+
+  private readonly createRound$$ = new Subject<{streamId: string, round: IEditRound, newSeason?: ISeason}>()
+  private readonly _createRound$ = toSignal(this.createRound$$.asObservable().pipe(
+    distinctUntilChanged(),
+    filter(({ streamId }) => streamId != null),
+    tap(({ streamId, round, newSeason }) => {
+      this.sendMessage('createRound', { streamId, round, newSeason })
+    }),
+  ))
+  public readonly roundCreationError$ = fromEvent<{code: string, message: string}>(this.socket, 'roundCreationError')
+  public readonly roundCreated$ = fromEvent<IRound>(this.socket, 'roundCreated')
+
+  public readonly roundCreationLoading$ = merge(
+    this.createRound$$.pipe(map(() => true)),
+    this.roundCreated$.pipe(map(() => false)),
+    this.roundCreationError$.pipe(map(() => false)),
+  )
+
   public createRound(streamId: string, round: IEditRound, newSeason?: ISeason): void {
-    this.sendMessage('createRound', {
-      streamId,
-      round,
-      newSeason
-    })
+    this.createRound$$.next({ streamId, round, newSeason })
   }
 }

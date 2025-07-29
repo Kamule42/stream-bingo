@@ -1,5 +1,5 @@
 import { UseGuards } from '@nestjs/common'
-import { MessageBody, SubscribeMessage, WebSocketGateway, WsException, WsResponse } from '@nestjs/websockets'
+import { MessageBody, SubscribeMessage, WebSocketGateway, WsResponse } from '@nestjs/websockets'
 import { IRound, IRoundEdit } from './round.interface'
 import { RoundService } from 'src/stream/services/round/round.service'
 import { Roles } from 'src/shared/decorators/auth/roles.decorator'
@@ -11,6 +11,7 @@ import { RoundStatus } from 'src/stream/entities/round.entity'
 import { ISession } from 'src/user/interfaces/session.interface'
 import { Session } from 'src/shared/decorators/auth/session.decorator'
 import { ISeason } from 'src/stream/poto'
+import { BingoException } from 'src/shared/exception/bingo-exception'
 
 @WebSocketGateway({
   namespace: 'rounds',
@@ -83,11 +84,32 @@ export class RoundGateway {
     {id: UserRoles.stream.plan, streamKey: 'streamId'}
   ])
   @SubscribeMessage('createRound')
-  createRound(
+  async createRound(
     @MessageBody('streamId') streamId: string,
     @MessageBody('round') round: IRoundEdit,
     @MessageBody('newSeason') newSeason?: ISeason,
-  ): void {
-    this.roundService.createStreamRound(streamId, round, newSeason)
+  ): Promise<WsResponse<void | {code: string, message: string }>> {
+    try{
+      await this.roundService.createStreamRound(streamId, round, newSeason)
+      return {
+        event: 'roundCreated',
+        data: void 0
+      }
+    }
+    catch(e){
+      if(e instanceof BingoException){
+        return {
+          event: 'roundCreationError',
+          data: e
+        }
+      }
+      return {
+        event: 'roundCreationError',
+        data: {
+          code: 'UNKNOWN_ERROR',
+          message: 'An unknown error occurred while creating the round'
+        }
+      }
+    }
   }
 }

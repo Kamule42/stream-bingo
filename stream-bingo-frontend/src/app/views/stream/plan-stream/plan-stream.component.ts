@@ -1,6 +1,6 @@
 import { Component, Input, computed, effect, inject, signal } from '@angular/core'
 import { toSignal } from '@angular/core/rxjs-interop'
-import { BehaviorSubject, combineLatest, map,  } from 'rxjs'
+import { BehaviorSubject, combineLatest, concat, delay, map, mergeMap, of, switchMap, tap, throttle, throttleTime,  } from 'rxjs'
 import { TableModule } from 'primeng/table'
 import { ButtonModule } from 'primeng/button'
 import { IconFieldModule } from 'primeng/iconfield'
@@ -10,6 +10,8 @@ import { FormsModule } from '@angular/forms'
 import { InputTextModule } from 'primeng/inputtext'
 import { InputNumberModule } from 'primeng/inputnumber'
 import { FloatLabel } from 'primeng/floatlabel'
+import { ProgressSpinnerModule } from 'primeng/progressspinner'
+import { MessageModule } from 'primeng/message'
 import { AutoCompleteCompleteEvent, AutoCompleteModule  } from 'primeng/autocomplete'
 import { v7 as uuid} from 'uuid'
 import { Router } from '@angular/router'
@@ -27,7 +29,8 @@ import { ISeason } from '../../../services/streams/stream.interface'
     TableModule, ButtonModule, CardModule, FormsModule,
     InputTextModule, FloatLabel, EmojiPickerComponent,
     IconFieldModule, InputIconModule,
-    InputNumberModule, AutoCompleteModule ,
+    InputNumberModule, AutoCompleteModule,
+    ProgressSpinnerModule, MessageModule,
 ],
   templateUrl: './plan-stream.component.html',
   styleUrl: './plan-stream.component.scss'
@@ -46,7 +49,12 @@ export class PlanStreamComponent{
   }
 
   readonly streamId$ = toSignal(this.streamService.streamDetail$.pipe(
-    map(stream => stream?.id)
+    map(stream => stream?.id),
+    tap(streamId => {
+      if(streamId){
+        this.roundService.fetchCurrentRoundForStream(streamId)
+      }
+    }),
   ))
 
   readonly isStreamPlanificator$ = computed(() => {
@@ -94,8 +102,26 @@ export class PlanStreamComponent{
     })
   ), {initialValue: []})
 
+  readonly isLoading$ = toSignal(this.roundService.roundCreationLoading$)
+  readonly streamCreated$ = this.roundService.roundCreated$.subscribe({
+    next: () => this.router.navigate(['s', this._webhandle])
+  })
+  readonly roundCreationError$ = toSignal(this.roundService.roundCreationError$.pipe(
+    map(({code}) => {
+      switch(code){
+        case 'NO_CELLS': return 'Aucune cellule active trouvée pour le stream'
+        case 'NOT_ENOUGH_CELLS': return 'Pas assez de cellules actives pour la taille de la grille'
+        default: return 'Une erreur est survenue lors de la création du round'
+      }
+    }),
+    switchMap(error => concat(
+      of(null),
+      of(error).pipe(delay(10))
+    )),
+  ))
+
   createRound(): void{
-    this.toEdit$.set({ id: uuid(), name: '', size: 4, })
+    this.toEdit$.set({ id: uuid(), name: '', gridSize: 4, })
   }
 
   searchSeason(val: AutoCompleteCompleteEvent): void{
@@ -117,11 +143,6 @@ export class PlanStreamComponent{
       this.messageService.add({ severity: 'error', summary: 'Le nom du round est obligatoire'})
       return
     }
-    if(toEdit.size < 1 || toEdit.size > 100) {
-      this.messageService.add({ severity: 'error', summary: 'La taille du round doit être comprise entre 1 et 100'})
-      return
-    }
-    this.router.navigate(['s', this._webhandle])
     this.roundService.createRound(this.streamId$()!, toEdit, this.newSeason$.value ?? undefined)
   }
 

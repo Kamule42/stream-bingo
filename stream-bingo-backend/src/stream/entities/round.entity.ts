@@ -26,6 +26,12 @@ export class RoundEntity {
   })
   status: RoundStatus
 
+  @Column({ name: 'grid_size' })
+  gridSize: number
+
+  @Column('text', { name: 'cells', array: true })
+  cells: string[]
+
   @ManyToOne(() => StreamEntity, (stream) => stream.rounds, { onDelete: 'CASCADE', onUpdate: 'CASCADE' })
   @JoinColumn({name: 'stream_id'})
   stream: StreamEntity

@@ -1,11 +1,13 @@
-import { Injectable } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
-import { DateTime } from 'luxon';
-import { RoundEntity, RoundStatus } from 'src/stream/entities/round.entity';
-import { IRoundEdit } from 'src/stream/gateways/round/round.interface';
+import { Injectable } from '@nestjs/common'
+import { InjectRepository } from '@nestjs/typeorm'
+import { DateTime } from 'luxon'
+import { Brackets, DataSource, IsNull, MoreThanOrEqual, Repository, Not } from 'typeorm'
+import { RoundEntity, RoundStatus } from 'src/stream/entities/round.entity'
+import { IRoundEdit } from 'src/stream/gateways/round/round.interface'
 import { ISeason } from 'src/stream/poto'
-import { Brackets, DataSource, IsNull, MoreThanOrEqual, Repository, Not } from 'typeorm';
+import { CellService } from '../cell/cell.service'
 import { SeasonService } from '../season/season.service'
+import { BingoException } from 'src/shared/exception/bingo-exception'
 
 type NewStatus = null | {newStatus: RoundStatus, delay: boolean }
 
@@ -14,6 +16,7 @@ export class RoundService {
   constructor(
     @InjectRepository(RoundEntity)
     private readonly roundRepository: Repository<RoundEntity>,
+    private readonly cellService: CellService,
     private readonly seasonService: SeasonService,
     private readonly dataSource: DataSource,
   ) { }
@@ -182,6 +185,15 @@ export class RoundService {
 
   async createStreamRound(streamId: string, round: IRoundEdit, newSeason?: ISeason): Promise<void> {
     let seasonId: string | undefined = round.seasonId
+    const cells = (await this.cellService.getStreamCells(streamId))
+      .filter(({ active }) => active)
+      .map(cell => cell.id)
+    if(cells.length === 0){
+      throw new BingoException('NO_CELLS', 'No active cells found for the stream')
+    }
+    if(cells.length < round.gridSize * round.gridSize){
+      throw new BingoException('NOT_ENOUGH_CELLS', 'Not enough active cells for the grid size')
+    }
     if(newSeason){
       await this.seasonService.createSeason({
         id: newSeason.id,
@@ -193,6 +205,7 @@ export class RoundService {
       ...round,
       ...(seasonId ? {season: { id: seasonId }} : {}),
       stream: { id: streamId },
+      cells,
     })
   }
 }
