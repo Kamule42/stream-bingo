@@ -3,8 +3,22 @@
   <p-card>
     <div id="plan-content">
       @if(toEdit$(); as toEdit){
+        @if(isLoading$()){
+          <div class="progress-spinner">
+            <p-progressSpinner [style]="{width: '50px', height: '50px'}" />
+          </div>
+        }
+
         <form #editStreamForm="ngForm" (ngSubmit)="validateRoundCreation()">
           <div id="plan-edit">
+            @if(roundCreationError$(); as error){
+              <p-message severity="error"
+                [life]="10000"
+                closable>
+                {{error}}
+              </p-message>
+            }
+            
              <p-floatlabel>
                 <p-iconfield iconPosition="right">
                     <input
@@ -31,12 +45,13 @@
                 type="text"
                 id="grid-size"
                 name="grid-size"
-                [(ngModel)]="toEdit.size"
+                [(ngModel)]="toEdit.gridSize"
                 #roundSize="ngModel"
                 [invalid]="roundSize.invalid && (roundSize.touched || editStreamForm.submitted)"
                 required 
                 [inputSize]="43"
                 [min]="2"
+                [max]="15"
                 [showButtons]="true" buttonLayout="horizontal" spinnerMode="horizontal"
               >
                 <ng-template #incrementbuttonicon>
@@ -77,6 +92,12 @@
       }
       @else {
         @if(currentRound$(); as currentRound){
+          <h3 class="title is-3 has-text-centered">
+            {{currentRound.name}}
+          </h3>
+          <p>
+            Taille de la grille : {{currentRound.gridSize}}x{{currentRound.gridSize}}
+          </p>
         }
         @else{
           <p class="has-text-centered">

@@ -131,6 +131,11 @@ export class BingoComponent {
   readonly cells$ = signal<IGridCell[][]>([])
   private readonly _cellEffect = effect(() => {
       const grid = this.grid$()
+      const round = this.round$()
+      if(!grid || !round){
+        this.cells$.set([])
+        return
+      }
       this.cells$.set(grid != null ?
         toChunk(grid.cells
           .map(cell => ({
@@ -142,7 +147,7 @@ export class BingoComponent {
               this.bingoMode$() == BingoMode.MANUAL && cell.checked
           }))
           .toSorted((a, b) => a.index - b.index),
-          4) : []
+          round.gridSize) : []
       )
   })
 
@@ -154,7 +159,6 @@ export class BingoComponent {
     filter(val => val != null && val.roundId === this.grid$()?.roundId),
     map(val => val!.cells
       .filter(({ valide }) => valide === true)
-      // .map(cell => cell.cellId)
     ),
     // Wait for the tab to be active to trigger the update
     switchMap(cells => this.visibilityService.isVisible$.pipe(
@@ -202,17 +206,23 @@ export class BingoComponent {
 
   readonly bingos$ = computed<{ type: 'row' | 'col' | 'diag_down' | 'diag_up', index?: number, class: string }[]>(() => {
     const cells = this.cells$()
+    const round = this.round$()
+    if (cells.length === 0 || round == null) {
+      return []
+    }
+
+    const indexesArray = Array.from(Array(round.gridSize).keys())
     return [
       // Rows
       ...cells
         .filter(row => row.every(({ checked }) => checked === true))
         .map((row) => ({
           type: 'row',
-          index: Math.floor(row[0].index / 4),
+          index: Math.floor(row[0].index / round.gridSize),
           class: `row is-${Math.floor(row[0].index / 4)}`
         })),
       // Cols
-      ...[0, 1, 2, 3]
+      ...indexesArray
         .filter(col => cells.every(row => row[col].checked === true))
         .map((index) => ({
           type: 'col',
@@ -220,23 +230,17 @@ export class BingoComponent {
           class: `col is-${index}`
         })),
       // Diagonal Down
-      ...[
-        [0, 1, 2, 3].every(index => cells[index][index].checked)
-      ]
-        .filter(val => val)
-        .map(() => ({
-          type: 'diag_down',
-          class: 'diag_down',
-        })),
+      ...(indexesArray.every(index => cells[index][index].checked) ? [{
+        type: 'diag_down',
+        class: 'diag_down',
+      }] : []),
       // Diagonal Up
-      ...[
-        [0, 1, 2, 3].every(index => cells[3 - index][index].checked)
-      ]
-        .filter(val => val)
-        .map(() => ({
+      ...(
+        indexesArray.every(index =>cells[round.gridSize - 1 - index][index].checked) ? [{
           type: 'diag_up',
           class: 'diag_up',
-        })),
+        }] : []
+      ),
     ] as { type: 'row' | 'col' | 'diag_down' | 'diag_up', index?: number, class: string }[]
   })
 

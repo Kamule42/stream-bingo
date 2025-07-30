@@ -9,10 +9,10 @@ export interface IRound{
     name: string
     streamId?: string
     streamName?: string
-    status: RoundStatus,
-    size: number,
+    status: RoundStatus
     seasonId?: string
-    seasonName?: string,
+    seasonName?: string
+    gridSize: number
 }
 
 export type IEditRound = Omit<IRound, 'status' | 'streamId' | 'streamName' | 'seasonName'> & { status?: RoundStatus}

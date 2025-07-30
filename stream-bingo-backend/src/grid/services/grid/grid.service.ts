@@ -4,7 +4,6 @@ import { paginate, Paginated, PaginateQuery } from 'nestjs-paginate'
 import { GridCellEntity } from 'src/grid/entities/grid-cell.entity'
 import { GridEntity } from 'src/grid/entities/grid.entity'
 import { RoundStatus } from 'src/stream/entities/round.entity'
-import { CellService } from 'src/stream/services/cell/cell.service'
 import { RoundService } from 'src/stream/services/round/round.service'
 import { DeepPartial, IsNull, Repository } from 'typeorm'
 import { v7 as uuid } from 'uuid'
@@ -14,7 +13,6 @@ export class GridService {
   constructor(
     @InjectRepository(GridEntity)
     private readonly gridRepository: Repository<GridEntity>,
-    private readonly cellService: CellService,
     private readonly roundService: RoundService,
   ) { }
 
@@ -47,13 +45,13 @@ export class GridService {
   }
 
   async createGrid(streamId: string, userId?: string): Promise<GridEntity> {
-    const availableCells = await this.cellService.getStreamCells(streamId)
-    let cellIds = availableCells
-      .filter(({ active }) => active)
-      .map(({ id }) => id)
     const round = await this.roundService.getStreamCurrentRound(streamId)
     if (round == null) {
       throw new Error('No active round')
+    }
+    let cellIds = round.cells
+    if(round.gridSize*round.gridSize > cellIds.length) {
+      throw new Error('Not enough cells for grid size')
     }
     if(
       round.status !== RoundStatus.CREATED && 
@@ -62,7 +60,7 @@ export class GridService {
       throw new Error('Cannot create round')
     }
     const gridId = uuid()
-    const cells: Array<DeepPartial<GridCellEntity>> = Array.from(Array(16).keys()).map(index => {
+    const cells: Array<DeepPartial<GridCellEntity>> = Array.from(Array(round.gridSize * round.gridSize).keys()).map(index => {
       const cellId = cellIds.at(Math.floor(Math.random() * cellIds.length))!
       cellIds = cellIds.filter(id => id != cellId)
       return {

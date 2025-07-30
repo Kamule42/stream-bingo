@@ -9,6 +9,7 @@ export interface IRound{
     streamName: string
     seasonId?: string
     seasonName?: string
+    gridSize: number
 }
 
 export type IRoundEdit = Omit<IRound, 'streamId'|'streamName'|'seasonName'> & { toBeDeleted?: boolean }
