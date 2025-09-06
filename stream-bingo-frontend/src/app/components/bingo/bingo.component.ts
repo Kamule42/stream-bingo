@@ -219,7 +219,7 @@ export class BingoComponent {
         .map((row) => ({
           type: 'row',
           index: Math.floor(row[0].index / round.gridSize),
-          class: `row is-${Math.floor(row[0].index / 4)}`
+          class: `row is-${Math.ceil(row[0].index / round.gridSize)+1}-of-${round.gridSize}`
         })),
       // Cols
       ...indexesArray
@@ -227,7 +227,7 @@ export class BingoComponent {
         .map((index) => ({
           type: 'col',
           index: index,
-          class: `col is-${index}`
+          class: `col is-${index+1}-of-${round.gridSize}`
         })),
       // Diagonal Down
       ...(indexesArray.every(index => cells[index][index].checked) ? [{
@@ -279,10 +279,14 @@ export class BingoComponent {
     if(!this.isManual$()){
       return
     }
+    const round = this.round$()
+    if(!round){
+      return
+    }
     const cells = this.cells$()
     cells[y][x].checked = !(cells[y][x].checked ?? false)
     this.cells$.set(cells)
-    this.gridService.flipGridCell(this.grid$()!.id, x+y*4)
+    this.gridService.flipGridCell(this.grid$()!.id, x+y*round.gridSize)
   }
 
   public async screenshot(){
