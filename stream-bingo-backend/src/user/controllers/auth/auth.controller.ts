@@ -44,7 +44,7 @@ export class AuthController {
       throw 'No user'
     }
     const user = await this.authService.validatePassport(passportData, session)
-    const expires = DateTime.now().plus({week: 4}).endOf('day').toJSDate()
+    const expires = DateTime.now().plus({week: 4}).endOf('day')
     response.setCookie(
       'refresh_token',
       JSON.stringify({
@@ -57,10 +57,10 @@ export class AuthController {
         httpOnly: true,
         secure: true,
         sameSite: true,
-        expires
+        expires: expires.toJSDate(),
       })
       return {
-        access_token: await this.authService.signSession(user)
+        access_token: await this.authService.signSession(user, expires)
       }
   }
 }

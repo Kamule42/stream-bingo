@@ -50,11 +50,11 @@ export class RefreshGuard implements CanActivate {
     let session:ISession | null = client.handshake.auth.token ? 
       this.authService.validateToken(client.handshake.auth.token) :
       null
-    const exp = session?.exp ? DateTime.fromSeconds(session.exp) : null
+    const exp = session?.exp ? DateTime.fromSeconds(session.exp) : undefined
     const refreshTokenStr = refreshTokenCookie.value
-    if((exp == null || exp < DateTime.now().plus({ seconds: 60}) || client.handshake.auth.user == null) && refreshTokenStr != null){
-      const refreshToken = JSON.parse(refreshTokenStr) as {sub: string}
-      const token = await this.authService.signSession(refreshToken.sub)
+    if((exp == undefined || exp < DateTime.now().minus({ seconds: 60}) || client.handshake.auth.user == null) && refreshTokenStr != null){
+      const refreshToken = JSON.parse(refreshTokenStr) as {sub: string, expires?: string}
+      const token = await this.authService.signSession(refreshToken.sub, refreshToken.expires ? DateTime.fromISO(refreshToken.expires) : undefined)
       session = this.authService.validateToken(token)
       client.handshake.auth.user = session
       client.handshake.auth.token = `Bearer ${token}`

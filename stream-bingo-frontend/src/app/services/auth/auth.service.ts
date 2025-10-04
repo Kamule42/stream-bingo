@@ -56,13 +56,15 @@ export class AuthService {
       )
   }
 
-  public logout(){
+  public logout(navigate = true){
     this.authorization$ = null
     this.http.get('/api/auth/logout').subscribe()
     const url = this.router.url
-    this.router.navigate(['/']).then(() => {
-      this.router.navigate([url])
-    })
+    if(navigate){
+      this.router.navigate(['/']).then(() => {
+        this.router.navigate([url])
+      })
+    }
   }
 
   public hasRight(r: string): Observable<boolean>{

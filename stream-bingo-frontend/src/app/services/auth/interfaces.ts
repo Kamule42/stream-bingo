@@ -3,17 +3,18 @@ export interface IValidateCodeResponse {
 }
 
 export interface ISession {
-  sub: string,
-  username: string,
-  iat: number,
-  exp: number,
+  sub: string
+  username: string
+  iat: number
+  exp: number
   rights: [{
-    right: string,
-    streamId?: string,
+    right: string
+    streamId?: string
   }],
   providers: [{
-    provider: string,
-    avatarId: string,
-    active: boolean,
+    provider: string
+    avatarId: string
+    active: boolean
   }]
+  sessionExpires?: number
 }

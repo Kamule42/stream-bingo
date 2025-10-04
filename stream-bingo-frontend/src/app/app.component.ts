@@ -6,11 +6,14 @@ import { ConsentComponent } from './components/consent/consent.component'
 import { VisibilityService } from './services/visibility/visibility.service'
 import { ConfirmDialogModule } from 'primeng/confirmdialog'
 import { AuthWsService } from './services/auth/auth-ws.service'
+import { SessionWatcherComponent } from "./components/session-watcher/session-watcher.component";
 
 
 @Component({
     selector: 'app-root',
-    imports: [RouterOutlet, TopMenuComponent, ToastModule, ConsentComponent, ConfirmDialogModule],
+    imports: [
+      RouterOutlet, TopMenuComponent, ToastModule,
+      ConsentComponent, ConfirmDialogModule, SessionWatcherComponent],
     templateUrl: './app.component.html',
     styleUrl: './app.component.scss',
 })
