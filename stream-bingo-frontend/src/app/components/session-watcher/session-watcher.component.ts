@@ -1,11 +1,12 @@
 import { Component, inject } from '@angular/core'
 import { toSignal } from '@angular/core/rxjs-interop'
-import { map, of, switchMap, tap, timer } from 'rxjs'
+import { of, switchMap,timer, map, tap } from 'rxjs'
 import { DialogModule } from 'primeng/dialog'
 import { ButtonModule } from 'primeng/button'
 import { DateTime, Duration } from 'luxon'
 import { AuthService } from '../../services/auth'
 import { Router } from '@angular/router'
+import { safeTimer } from '../../shared/rxjs/safeTimer'
 
 @Component({
   selector: 'app-session-watcher',
@@ -23,14 +24,13 @@ export class SessionWatcherComponent {
 
   public showrelog$ = toSignal(this.authService.session$.pipe(
     switchMap(session =>  {
-      if(session  == null){
+      if(session?.sessionExpires == null){
         return of(false)
       }
-      const delay = DateTime.fromSeconds(session.sessionExpires!)
+      const dueDate = DateTime.fromSeconds(session.sessionExpires)
         .minus(Duration.fromISO('PT5M'))
-      return timer(delay.toJSDate()).pipe(
+      return safeTimer(dueDate.diffNow().toMillis()).pipe(
         map(() => true),
-        tap(() => console.log('Session expiring soon')),
       )
     }),
   ), { initialValue: false })

@@ -108,10 +108,14 @@ export class BingoComponent {
 
   private gridRedirect = this.gridService.gridForStream$.pipe(
     debounceTime(250),
-    filter(grid => grid != null && this.bingoId() == null),
   ).subscribe({
     next: grid =>  {
-      this.router.navigate(['./b', grid!.id], { relativeTo: this.route })
+      if(grid != null && this.bingoId() == null){
+        this.router.navigate(['./b', grid!.id], { relativeTo: this.route })
+      }
+      else if(grid == null && this.bingoId() != null){
+        this.router.navigate(['../../'], { relativeTo: this.route })
+      }
     }
   })
   
