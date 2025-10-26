@@ -8,6 +8,7 @@ import { JwtService } from '@nestjs/jwt'
 import { ISession } from 'src/user/interfaces/session.interface'
 import { PassportData } from 'src/user/interfaces/passport-data.interface'
 import { ProviderEntity } from 'src/user/entities/provider.entity'
+import { DateTime } from 'luxon'
 
 interface ITokens {
   access_token: string;
@@ -38,7 +39,7 @@ export class AuthService {
     this._newToken$$.next(newToken)
   }
 
-  public async signSession(param: string | UserEntity): Promise<string>{
+  public async signSession(param: string | UserEntity, expires?: DateTime): Promise<string>{
     const existingUser = typeof param === 'string' ?
       await this.usersRepository.findOne({
         where: {id: param,},
@@ -64,7 +65,8 @@ export class AuthService {
           reference+'/'+avatarReference :
           avatarReference,
         active: existingUser.avatarProvider === provider
-      })) ?? []
+      })) ?? [],
+      sessionExpires: expires?.toSeconds() ?? undefined,
     })
   }
 
