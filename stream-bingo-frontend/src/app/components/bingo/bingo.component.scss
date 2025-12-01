@@ -223,9 +223,11 @@
 			left: 0;
 			width: 100%;
 
-			@for $i from 0 through 3 {
-				&.is-#{$i} {
-					top: math.percentage(($i)*0.25);
+			@for $y from 1 through 10{
+				@for $x from 1 through $y {
+					&.is-#{$x}-of-#{$y} {
+						top: math.percentage((($x)-1)*1/($y)-0.025);
+					}
 				}
 			}
 		}
@@ -234,9 +236,11 @@
 			top: 37.5%;
 			width: 100%;
 
-			@for $i from 0 through 3 {
-				&.is-#{$i} {
-					left: math.percentage(($i)*0.25 - 0.375);
+			@for $y from 1 through 10{
+				@for $x from 1 through $y {
+					&.is-#{($x)}-of-#{$y} {
+						left: math.percentage((($x - 0.5 - $y/2)/$y) );
+					}
 				}
 			}
 
@@ -269,10 +273,6 @@
 		flex-direction: row;
 		:nth-child(1){
 			flex: 1;
-		}
-
-		li{
-			
 		}
 	}
 }
