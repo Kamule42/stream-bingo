@@ -6,11 +6,13 @@ import { toSignal } from '@angular/core/rxjs-interop'
 import { TableModule } from 'primeng/table'
 import { PaginatorModule, PaginatorState } from 'primeng/paginator'
 import { IPagination } from '../../../shared/models/pagination.interface'
+import { SeasonPickerComponent } from '../../../shared/components/season-picker/season-picker.component'
 
 @Component({
   selector: 'app-leaderboard',
   imports: [
-    TableModule, PaginatorModule
+    TableModule, PaginatorModule,
+    SeasonPickerComponent,
   ],
   templateUrl: './leaderboard.component.html',
   styleUrl: './leaderboard.component.scss'
@@ -19,7 +21,7 @@ export class LeaderboardComponent {
   private readonly streamService = inject(StreamsService)
   private readonly leaderboardService = inject(LeaderboardService)
 
-  private readonly streamId = toSignal(this.streamService.streamDetail$.pipe(
+  readonly streamId$ = toSignal(this.streamService.streamDetail$.pipe(
     filter((stream) => stream != null),
     map(stream => stream.id)
   ))
@@ -29,6 +31,8 @@ export class LeaderboardComponent {
     tap(stream => this.leaderboardService.getLeaderBoardForStream(stream.id))
   )
   private readonly stream$ = toSignal(this._stream$)
+
+  readonly selectedSeason = signal<string | null>(null)
 
   private readonly _leaderboard$ = this.leaderboardService.leaderboard$
   public readonly leaderboard$ = toSignal(this._leaderboard$)
@@ -60,7 +64,12 @@ export class LeaderboardComponent {
   })
 
   private readonly reloadEffect = effect(() => {
-    this.leaderboardService.getLeaderBoardForStream(this.streamId()!, this.pagination())
+    const selectedSeason = this.selectedSeason()
+    const streamId = this.streamId$()
+    if(!streamId){
+      return
+    }
+    this.leaderboardService.getLeaderBoardForStream(streamId, selectedSeason, this.pagination())
   })
   
   updatePagination($event: PaginatorState) {

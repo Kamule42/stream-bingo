@@ -22,9 +22,10 @@ export class ScoringGateway {
   @SubscribeMessage('getLeaderBoardForStream')
   getLeaderBoardForStream(
     @Paginate() query: PaginateQuery,
-    @MessageBody('streamId') streamId: string
+    @MessageBody('streamId') streamId: string,
+    @MessageBody('seasonId') seasonId: string
   ): Promise<IPaginatedResponse<IScore>> {
-    return this.scoringService.getLeaderBoardForStream(streamId, query)
+    return this.scoringService.getLeaderBoardForStream({streamId, seasonId}, query)
     .then(result => ({
       event: 'leaderBoardForStream',
       data: {

@@ -226,7 +226,7 @@
 			@for $y from 1 through 10{
 				@for $x from 1 through $y {
 					&.is-#{$x}-of-#{$y} {
-						top: math.percentage((($x)-1)*1/($y)-0.025);
+						top: math.percentage(calc((($x) - 1) * 1 / ($y) - 0.025));
 					}
 				}
 			}
@@ -239,7 +239,7 @@
 			@for $y from 1 through 10{
 				@for $x from 1 through $y {
 					&.is-#{($x)}-of-#{$y} {
-						left: math.percentage((($x - 0.5 - $y/2)/$y) );
+						left: math.percentage(calc(($x - 0.5 - $y/2)/$y) );
 					}
 				}
 			}

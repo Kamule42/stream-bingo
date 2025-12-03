@@ -155,7 +155,7 @@ export class StreamsService extends WebsocketService {
   ).subscribe({
     next: (params) => this.sendMessage('getStreamSeasons', params)
   })
-  public fetchStreamSeasons(streamId: string, searchTerm: string, pagination?: IPagination): void {
+  public fetchStreamSeasons(streamId: string, searchTerm = '', pagination?: IPagination): void {
     this._fetchStreamSeasons$$.next({
       streamId,
       searchTerm,

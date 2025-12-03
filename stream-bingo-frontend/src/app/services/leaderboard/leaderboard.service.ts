@@ -25,7 +25,7 @@ export class LeaderboardService extends WebsocketService{
       shareReplay(1),
     )
 
-  public getLeaderBoardForStream(streamId: string, pagination?: IPagination) {
+  public getLeaderBoardForStream(streamId: string, seasonId: string | null = null, pagination?: IPagination) {
     this.sendMessage('getLeaderBoardForStream', {
       ...(
         pagination ? {
@@ -37,6 +37,7 @@ export class LeaderboardService extends WebsocketService{
         }
       ),
       streamId,
+      seasonId,
     })
   }
 }

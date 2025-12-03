@@ -1,3 +1,4 @@
+import { SeasonEntity } from "src/stream/entities/season.entity"
 import { StreamEntity } from "src/stream/entities/stream.entity"
 import { Column, Entity, JoinColumn, ManyToOne, PrimaryColumn } from "typeorm"
 
@@ -16,4 +17,8 @@ export class StreamLeaderboardEntity{
     @ManyToOne(() => StreamEntity, { onDelete: 'CASCADE' })
     @JoinColumn({name: 'stream_id'})
     stream: StreamEntity
+
+    @ManyToOne(() => SeasonEntity, { onDelete: 'CASCADE' })
+    @JoinColumn({name: 'season_id'})
+    season: SeasonEntity
 }

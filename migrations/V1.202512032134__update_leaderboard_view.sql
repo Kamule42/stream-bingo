@@ -1,0 +1,26 @@
+SET ROLE role_bingo_admin;
+
+CREATE OR REPLACE VIEW bingo.v_stream_leaderboard AS 
+
+SELECT 
+  l.user_id,
+  l.username,
+  r.stream_id as stream_id,
+  SUM(l.score) as score,
+  r.season_id as season_id
+FROM  bingo.v_leaderboard l
+LEFT JOIN bingo.rounds r ON r.id = l.round_id
+GROUP BY l.user_id, l.username, r.stream_id, r.season_id
+UNION
+SELECT 
+  l.user_id,
+  l.username,
+  r.stream_id as stream_id,
+  SUM(l.score) as score,
+  null as season_id
+FROM  bingo.v_leaderboard l
+LEFT JOIN bingo.rounds r ON r.id = l.round_id
+GROUP BY l.user_id, l.username, r.stream_id;
+
+
+GRANT select ON bingo.v_stream_leaderboard TO role_bingo_app;

@@ -1,5 +1,12 @@
 <div class="container">
   <h5 class="title is-5">Classement</h5>
+  <div class="lb-actions">
+    @if(streamId$(); as streamId){
+      <app-season-picker 
+        [streamId]="streamId" 
+        [(selectedSeason)]="selectedSeason" />
+    }
+  </div>
   <p-table [value]="rows$()" [tableStyle]="{ 'min-width': '50rem' }">
     <ng-template #header>
       <tr>

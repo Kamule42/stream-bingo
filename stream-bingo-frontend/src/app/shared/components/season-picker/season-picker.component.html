@@ -1,0 +1,16 @@
+<div class="season-picker">
+  @if(seasons$(); as seasons){
+    @for(season of seasons; track season.id){
+      <button 
+        class="button mr-2 mb-2" 
+        [class.is-primary]="season.id === selectedSeason()"
+        (click)="flip(season.id)"
+      >
+          {{ season.name }}
+      </button>
+    }
+  }
+  @else {
+    loading...
+  }
+</div>

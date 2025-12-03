@@ -22,7 +22,7 @@ export class AppComponent {
   private readonly authWsService = inject(AuthWsService)
   private readonly visibilityService = inject(VisibilityService)
 
-  @HostListener('document:visibilitychange', ['$event'])
+  @HostListener('document:visibilitychange')
   visibilitychange() {
     this.visibilityService.isVisible$ = !document.hidden
   }
