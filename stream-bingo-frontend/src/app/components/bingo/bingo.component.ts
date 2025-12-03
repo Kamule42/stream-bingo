@@ -282,7 +282,7 @@ export class BingoComponent {
     const cells = this.cells$()
     cells[y][x].checked = !(cells[y][x].checked ?? false)
     this.cells$.set(cells)
-    this.gridService.flipGridCell(this.grid$()!.id, x+y*4)
+    this.gridService.flipGridCell(this.grid$()!.id, x+y*(this.round$()?.gridSize ?? 4), cells[y][x].checked)
   }
 
   public async screenshot(){

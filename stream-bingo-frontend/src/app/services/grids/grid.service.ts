@@ -83,14 +83,14 @@ export class GridService extends WebsocketService{
     this.currentStream$.set(streamId)
     this.sendMessage('createGridForStream', { streamId })
   }
-  public flipCell(roundId: string, cellId: string){
+  public flipCell(roundId: string, cellId: string, value: boolean){
     this.sendMessage('flipCell', {
-      roundId, cellId
+      roundId, cellId, value
     })
   }
-  public flipGridCell(gridId: string, cellIndex: number) {
+  public flipGridCell(gridId: string, cellIndex: number, value: boolean) {
     this.sendMessage('flipGridCell', {
-      gridId, cellIndex
+      gridId, cellIndex, value
     })
   }
   private readonly getHistoryForStream$$ = new Subject<{ streamId: string, pagination?: IPagination }>()

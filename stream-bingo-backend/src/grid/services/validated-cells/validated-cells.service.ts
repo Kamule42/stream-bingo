@@ -15,7 +15,7 @@ export class ValidatedCellsService {
         private readonly cellService: CellService
     ){}
 
-    async flipCell(roundId: string, cellId: string): Promise<Array<ValidatedCellEntity>> {
+    async flipCell(roundId: string, cellId: string, value: boolean): Promise<Array<ValidatedCellEntity>> {
         const round = await this.roundService.getRound(roundId)
         if(!round){
           throw new Error(`No active round for the round ${roundId}`)
@@ -24,17 +24,11 @@ export class ValidatedCellsService {
         if(cell == null || cell.stream?.id !== round.stream.id ){
             throw new Error('Cell not found')
         }
-        const validated = (await this.validatedCellsRepository.findOne({
-            where: {
-                round: { id: round.id },
-                cell: { id: cellId }
-            }
-        }))?.valide ?? false
 
         await this.validatedCellsRepository.save({
             round: { id: round.id },
             cell: { id: cell.id },
-            valide: !validated
+            valide: value
         })
         return this.getValidatedCellsForRound(round.id)
     }

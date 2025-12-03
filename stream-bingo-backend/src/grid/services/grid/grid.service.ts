@@ -99,7 +99,7 @@ export class GridService {
       })
   }
 
-  async flipCell(gridId: string, cellIndex: number, userId?: string) {
+  async flipCell(gridId: string, cellIndex: number, value: boolean, userId?: string) {
     const grid = await this.gridRepository.findOne({
       where: { id: gridId },
       relations: ['round', 'round.stream', 'cells', 'cells.cell', 'user'],
@@ -115,7 +115,7 @@ export class GridService {
       if(cell.index === cellIndex){
         return {
           ...cell,
-          checked: !cell.checked
+          checked: value
         }
       }
       return cell

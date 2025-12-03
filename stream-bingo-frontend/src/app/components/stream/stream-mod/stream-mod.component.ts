@@ -97,9 +97,10 @@ export class StreamModComponent {
 
   readonly _validatedCells$ = toSignal(this.gridService.validatedCells$.pipe(
     filter(val => val != null && val.roundId === this.round$()!.id),
-    map(val => val!.cells
+    map(({cells}) => cells
       .filter(({valide}) => valide === true)
-      .map(cell => cell.cellId)),
+      .map(cell => cell.cellId)
+    ),
     tap(cells => this.validatedCells$.set(cells)),
   ))
 
@@ -114,7 +115,7 @@ export class StreamModComponent {
     else {
       this.validatedCells$.set([...checkCells, cellId])
     }
-    this.gridService.flipCell(this.round$()!.id, cellId)
+    this.gridService.flipCell(this.round$()!.id, cellId, !contains)
   }
 
   updateStatus(status: RoundStatus){

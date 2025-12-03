@@ -115,9 +115,10 @@ export class GridGateway {
   async flipCell(
     @MessageBody('roundId') roundId: string,
     @MessageBody('cellId') cellId: string,
+    @MessageBody('value') value: boolean,
   ): Promise<void> {
     const cells: Array<IValidatedCell> = await this.validatedCellsService
-      .flipCell(roundId, cellId)
+      .flipCell(roundId, cellId, value)
       .then(cells => cells.map(cell => ({
         cellId: cell.cellId,
         valide: cell.valide,
@@ -133,10 +134,11 @@ export class GridGateway {
   async flipGridCell(
     @MessageBody('gridId') gridId: string,
     @MessageBody('cellIndex') cellIndex: number,
+    @MessageBody('value') value: boolean,
     @Session() session?: ISession,
   ): Promise<WsResponse<IGrid>> {
     return this.gridService
-      .flipCell(gridId, cellIndex, session?.sub)
+      .flipCell(gridId, cellIndex, value, session?.sub)
       .then(grid => ({
         event: 'gridForStream',
         data: gridMapper(grid)
