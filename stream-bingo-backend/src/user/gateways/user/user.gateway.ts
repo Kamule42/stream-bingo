@@ -91,7 +91,7 @@ export class UserGateway {
     const cookies = fastifyCookie.parse(client.handshake.headers.cookie)
     const identity = cookies.refresh_token
     this.authService.newToken = {
-      token: await this.authService.signSession(user),
+      token: await this.authService.signSession(user, undefined),
       socketId: identity
     }
   }

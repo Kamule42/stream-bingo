@@ -43,8 +43,6 @@ export class AuthGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
         }
         else{
           console.error('missing socket for', socketKey)
-          console.log('clients', this.clients)
-          console.log(this.namespace.sockets)
         }
       }
     })

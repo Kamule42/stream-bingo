@@ -108,10 +108,14 @@ export class BingoComponent {
 
   private gridRedirect = this.gridService.gridForStream$.pipe(
     debounceTime(250),
-    filter(grid => grid != null && this.bingoId() == null),
   ).subscribe({
     next: grid =>  {
-      this.router.navigate(['./b', grid!.id], { relativeTo: this.route })
+      if(grid != null && this.bingoId() == null){
+        this.router.navigate(['./b', grid!.id], { relativeTo: this.route })
+      }
+      else if(grid == null && this.bingoId() != null){
+        this.router.navigate(['../../'], { relativeTo: this.route })
+      }
     }
   })
   
@@ -219,7 +223,7 @@ export class BingoComponent {
         .map((row) => ({
           type: 'row',
           index: Math.floor(row[0].index / round.gridSize),
-          class: `row is-${Math.floor(row[0].index / 4)}`
+          class: `row is-${Math.ceil(row[0].index / round.gridSize)+1}-of-${round.gridSize}`
         })),
       // Cols
       ...indexesArray
@@ -227,7 +231,7 @@ export class BingoComponent {
         .map((index) => ({
           type: 'col',
           index: index,
-          class: `col is-${index}`
+          class: `col is-${index+1}-of-${round.gridSize}`
         })),
       // Diagonal Down
       ...(indexesArray.every(index => cells[index][index].checked) ? [{
@@ -277,6 +281,10 @@ export class BingoComponent {
 
   public flipCell(x: number, y:number){
     if(!this.isManual$()){
+      return
+    }
+    const round = this.round$()
+    if(!round){
       return
     }
     const cells = this.cells$()

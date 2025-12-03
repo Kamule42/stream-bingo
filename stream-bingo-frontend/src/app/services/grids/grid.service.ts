@@ -14,6 +14,13 @@ export class GridService extends WebsocketService{
 
   constructor(){
     super('/grids' )
+
+    this.authService.session$.pipe(
+      filter(session => !session),
+    ).subscribe(() => {
+      this.currentStream$.set(null)
+      this.invalidateGrid$.next(null)
+    })
   }
 
   private readonly currentStream$ = signal<string | null>(null)
