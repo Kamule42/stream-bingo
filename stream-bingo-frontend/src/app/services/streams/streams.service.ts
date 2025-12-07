@@ -1,12 +1,20 @@
 import { Injectable, signal } from '@angular/core'
-import { Subject, debounceTime, filter, fromEvent, map, merge, shareReplay, startWith, tap, throttleTime, zip, } from 'rxjs'
+import { Observable, Subject, debounceTime, filter, fromEvent, map, merge, shareReplay, startWith, tap, throttleTime, zip, } from 'rxjs'
 import { toSignal } from '@angular/core/rxjs-interop'
-import { ICell, IRight, IStream, } from './stream.interface'
+import { ICell, IRawSeason, IRight, ISeason, IStream, } from './stream.interface'
 import { IPaginated, IPagination } from '../../shared/models/pagination.interface'
 import { WebsocketService } from '../ws/websocket.service'
 import { IFav } from '../users/users.interface'
 import { paginationParam } from '../../shared/helpers/pagination.helper'
+import { PaginatedLoadable } from '../../shared/async/paginated-loadable'
+import { DateTime } from 'luxon'
 
+
+interface ILoadStreamSeasonsParams {
+  streamId?: string
+  searchTerm?: string
+  pagination?: IPagination
+}
 
 @Injectable({
   providedIn: 'root'
@@ -68,7 +76,9 @@ export class StreamsService extends WebsocketService {
         }),
         shareReplay(1)
       )
-  public readonly isStreamLoading$ = merge(
+
+  
+  public readonly isStreamLoading$: Observable<boolean> = merge(
     this.streamDetail$.pipe(map(() => false)),
     this._fetchDetail$$.pipe(map(() => true)),
   ).pipe(
@@ -149,22 +159,16 @@ export class StreamsService extends WebsocketService {
     this.sendMessage('searchByName', { name })
   }
 
-  private readonly _fetchStreamSeasons$$ = new Subject<{streamId: string, searchTerm: string, pagination: IPagination}>()
-  private readonly _fetchStreamSeasons$ = this._fetchStreamSeasons$$.asObservable().pipe(
-    throttleTime(100),
-  ).subscribe({
-    next: (params) => this.sendMessage('getStreamSeasons', params)
+  public readonly seasons = new PaginatedLoadable<ILoadStreamSeasonsParams, IRawSeason, ISeason>({
+    socket: this.socket,
+    loadEventName: 'getStreamSeasons',
+    resultEventName: 'streamSeasons',
+    converter: (rawSeason) => ({
+      ...(rawSeason as unknown as ISeason),
+      date: DateTime.fromISO(rawSeason.date).toJSDate(),
+    }),
+    loadOperations: (params) => params.pipe(
+      throttleTime(100),
+    )
   })
-  public fetchStreamSeasons(streamId: string, searchTerm = '', pagination?: IPagination): void {
-    this._fetchStreamSeasons$$.next({
-      streamId,
-      searchTerm,
-      pagination: paginationParam(pagination)
-    })
-  }
-  private readonly _streamSeasons$ = fromEvent<IPaginated<{id: string, name: string}>>(this.socket, 'streamSeasons')
-  public readonly streamSeasons$ = this._streamSeasons$.pipe(
-    map(({ data }) => data),
-    shareReplay(1),
-  )
 }

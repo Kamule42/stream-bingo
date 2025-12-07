@@ -17,7 +17,7 @@ export class SeasonPickerComponent implements OnInit {
   readonly unselectable = input<boolean>(true)
 
   readonly selectedSeason = model(null as string | null)
-  readonly seasons$ = toSignal(this.streamService.streamSeasons$.pipe(
+  readonly seasons$ = toSignal(this.streamService.seasons.value$.pipe(
     tap(seasons => {
       if(this.autoSelectLast() && this.selectedSeason() == null && seasons.length > 0){
         this.selectedSeason.set(seasons[0].id)
@@ -26,7 +26,7 @@ export class SeasonPickerComponent implements OnInit {
   ))
 
   ngOnInit(): void {
-    this.streamService.fetchStreamSeasons(this.streamId())
+    this.streamService.seasons.load({ streamId: this.streamId() })
   }
 
   flip(seasonId: string): void {

@@ -25,7 +25,16 @@ export interface ICell {
 	active: boolean,
 }
 
+
+
 export interface ISeason {
 	id: string,
 	name: string,
+	date: Date,
+}
+
+export interface IRawSeason {
+	id: string,
+	name: string,
+	date: string,
 }

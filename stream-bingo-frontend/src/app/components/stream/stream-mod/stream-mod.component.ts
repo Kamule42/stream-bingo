@@ -1,4 +1,4 @@
-import { Component, computed, effect, inject, input, Input, signal } from '@angular/core'
+import { Component, computed, effect, inject, input, signal } from '@angular/core'
 import { toObservable, toSignal } from '@angular/core/rxjs-interop'
 import { InputTextModule } from 'primeng/inputtext'
 import { FormsModule } from '@angular/forms'

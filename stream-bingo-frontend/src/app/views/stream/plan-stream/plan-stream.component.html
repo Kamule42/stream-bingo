@@ -68,10 +68,9 @@
                 [(ngModel)]="toEdit.seasonId"
                 name="round-season"
                 [suggestions]="seasonsFiltered$()"
-                [forceSelection]="true"
                 [inputSize]="49"
-                  [dropdown]="true"
-                  (completeMethod)="searchSeason($event)"
+                [dropdown]="true"
+                (completeMethod)="searchSeason($event)"
                 optionLabel="name"
                 optionValue="id"
               >

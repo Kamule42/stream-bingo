@@ -1,6 +1,6 @@
 import { Component, Input, computed, effect, inject, signal } from '@angular/core'
 import { toSignal } from '@angular/core/rxjs-interop'
-import { BehaviorSubject, combineLatest, concat, delay, map, mergeMap, of, switchMap, tap, throttle, throttleTime,  } from 'rxjs'
+import { BehaviorSubject, combineLatest, concat, delay, map, of, switchMap, tap, zip,  } from 'rxjs'
 import { TableModule } from 'primeng/table'
 import { ButtonModule } from 'primeng/button'
 import { IconFieldModule } from 'primeng/iconfield'
@@ -83,15 +83,20 @@ export class PlanStreamComponent{
       this.toEdit$.set(null)
     }
   })
+
   private readonly seasonsSearch$ = new BehaviorSubject<string | null>(null)
   private readonly _findSeason = this.seasonsSearch$.subscribe({
     next: (searchTerm) => {
-      this.streamService.fetchStreamSeasons(this.streamId$()!, searchTerm?.trim() ?? '')
+      this.streamService.seasons.load({
+        streamId: this.streamId$()!,
+        searchTerm: searchTerm?.trim() ?? '',
+        pagination: { page: 1, limit: 10},
+      })
     }
   })
   readonly newSeason$ = new BehaviorSubject<ISeason | null>(null)
   readonly seasonsFiltered$ = toSignal(combineLatest([
-    this.streamService.streamSeasons$,
+    this.streamService.seasons.value$,
     this.newSeason$.asObservable()
   ]).pipe(
     map(([seasons, newSeason]) => {
@@ -102,7 +107,12 @@ export class PlanStreamComponent{
     })
   ), {initialValue: []})
 
-  readonly isLoading$ = toSignal(this.roundService.roundCreationLoading$)
+  readonly isLoading$ = toSignal(zip([
+    this.roundService.roundCreationLoading$,
+    this.streamService.seasons.isLoading$,
+  ]).pipe(
+    map(loading => loading.some(Boolean))
+  ), {initialValue: false})
   readonly streamCreated$ = this.roundService.roundCreated$.subscribe({
     next: () => this.router.navigate(['s', this._webhandle])
   })
@@ -130,7 +140,7 @@ export class PlanStreamComponent{
 
   createSeason(): void {
     const id = uuid()
-    this.newSeason$.next({ id , name: this.seasonsSearch$.value?.trim() ?? '' })
+    this.newSeason$.next({ id , name: this.seasonsSearch$.value?.trim() ?? '', date: new Date() })
     this.toEdit$.set({ ...this.toEdit$()!, seasonId: id })
   }
 
