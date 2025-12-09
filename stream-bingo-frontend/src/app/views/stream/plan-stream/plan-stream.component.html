@@ -65,7 +65,7 @@
             </p-floatlabel>
             <p-floatlabel variant="on">
               <p-autocomplete
-                [(ngModel)]="toEdit.seasonId"
+                [(ngModel)]="selectedSeason$"
                 name="round-season"
                 [suggestions]="seasonsFiltered$()"
                 [inputSize]="49"

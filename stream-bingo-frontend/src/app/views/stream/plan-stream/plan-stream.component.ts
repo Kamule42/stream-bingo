@@ -1,6 +1,6 @@
 import { Component, Input, computed, effect, inject, signal } from '@angular/core'
 import { toSignal } from '@angular/core/rxjs-interop'
-import { BehaviorSubject, combineLatest, concat, delay, map, of, switchMap, tap, zip,  } from 'rxjs'
+import { BehaviorSubject, combineLatest, concat, delay, filter, map, of, switchMap, take, tap, zip,  } from 'rxjs'
 import { TableModule } from 'primeng/table'
 import { ButtonModule } from 'primeng/button'
 import { IconFieldModule } from 'primeng/iconfield'
@@ -50,39 +50,12 @@ export class PlanStreamComponent{
 
   readonly streamId$ = toSignal(this.streamService.streamDetail$.pipe(
     map(stream => stream?.id),
-    tap(streamId => {
-      if(streamId){
-        this.roundService.fetchCurrentRoundForStream(streamId)
-      }
-    }),
   ))
 
-  readonly isStreamPlanificator$ = computed(() => {
-    const streamId = this.streamId$()
-    if (streamId == null) {
-      return false
-    }
-    return this.sessionService.isAdmin ||
-      this.sessionService.isStreamPlanificator(streamId)
-  })
-  private readonly accessEffect = effect(() => {
-    if (this.isStreamPlanificator$() === false && this.streamId$() !== undefined) {
-      this.router.navigateByUrl(this.router.url.replace('/plan', ''))
-    }
-  })
-
-  readonly isTimelineValid = signal<boolean>(true)
-  readonly roundsToDelete = signal<string[]>([])
+  readonly isStreamPlanificator$ = computed(() => this.sessionService.isStreamPlanificator(this.streamId$()))
 
   readonly currentRound$ = toSignal(this.roundService.currentRound$)
   readonly toEdit$ = signal<IEditRound | null>(null)
-
-  private readonly _handleEffect = effect(()=> {
-    const streamId = this.streamId$()
-    if(!streamId){
-      this.toEdit$.set(null)
-    }
-  })
 
   private readonly seasonsSearch$ = new BehaviorSubject<string | null>(null)
   private readonly _findSeason = this.seasonsSearch$.subscribe({
@@ -113,9 +86,13 @@ export class PlanStreamComponent{
   ]).pipe(
     map(loading => loading.some(Boolean))
   ), {initialValue: false})
-  readonly streamCreated$ = this.roundService.roundCreated$.subscribe({
+
+  readonly streamCreated$ = this.roundService.roundCreated$.pipe(
+    delay(150)
+  ).subscribe({
     next: () => this.router.navigate(['s', this._webhandle])
   })
+
   readonly roundCreationError$ = toSignal(this.roundService.roundCreationError$.pipe(
     map(({code}) => {
       switch(code){
@@ -129,6 +106,32 @@ export class PlanStreamComponent{
       of(error).pipe(delay(10))
     )),
   ))
+
+  readonly selectedSeason$ = signal<ISeason | null>(null)
+
+  
+  constructor(){
+    // Fetch current round on streamId change
+    effect(() => {
+      const streamId = this.streamId$()
+      if(streamId == null){
+        this.toEdit$.set(null)
+      }
+      else{
+        this.roundService.fetchCurrentRoundForStream(streamId)
+      }
+    })
+    effect(() => {
+      if (this.isStreamPlanificator$() === false && this.streamId$() !== undefined) {
+        this.router.navigateByUrl(this.router.url.replace('/plan', ''))
+      }
+    })
+    this.streamService.seasons.value$.pipe(
+      filter(seasons => seasons.length > 0),
+    ).subscribe({
+      next: (vals) => this.selectedSeason$.set(vals[0])
+    })
+  }
 
   createRound(): void{
     this.toEdit$.set({ id: uuid(), name: '', gridSize: 4, })
@@ -153,7 +156,10 @@ export class PlanStreamComponent{
       this.messageService.add({ severity: 'error', summary: 'Le nom du round est obligatoire'})
       return
     }
-    this.roundService.createRound(this.streamId$()!, toEdit, this.newSeason$.value ?? undefined)
+    this.roundService.createRound(this.streamId$()!, {
+      ...toEdit,
+      seasonId: this.selectedSeason$()?.id,
+    }, this.newSeason$.value ?? undefined)
   }
 
   cancel(){

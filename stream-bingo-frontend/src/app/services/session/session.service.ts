@@ -57,8 +57,10 @@ export class SessionService {
   public isStreamManager(streamId: string): boolean {
     return this.isAdmin || this.hasRight('man', streamId)
   }
-  public isStreamPlanificator(streamId: string): boolean {
-    return this.isAdmin || this.hasRight(['plan', 'man'], streamId)
+  public isStreamPlanificator(streamId?: string): boolean {
+    return streamId != null && (
+      this.isAdmin || this.hasRight(['plan', 'man'], streamId)
+    )
   }
   
 
