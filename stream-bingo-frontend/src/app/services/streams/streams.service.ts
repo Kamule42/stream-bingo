@@ -8,6 +8,7 @@ import { IFav } from '../users/users.interface'
 import { paginationParam } from '../../shared/helpers/pagination.helper'
 import { PaginatedLoadable } from '../../shared/async/paginated-loadable'
 import { DateTime } from 'luxon'
+import { Loadable } from '../../shared/async/loadable'
 
 
 interface ILoadStreamSeasonsParams {
@@ -151,13 +152,12 @@ export class StreamsService extends WebsocketService {
     this.sendMessage('flipFav', { id })
   }
 
+  public readonly searchStream$ = new Loadable<{name: string}, IStream[], IStream[]>({
+    socket: this.socket,
+    loadEventName: 'searchByName',
+    resultEventName: 'searchResult',
+  })
   
-  public readonly searchResult$ = fromEvent<IStream[]>(this.socket, 'searchResult').pipe(
-    shareReplay(1)
-  )
-  searchByName(name: string): void {
-    this.sendMessage('searchByName', { name })
-  }
 
   public readonly seasons = new PaginatedLoadable<ILoadStreamSeasonsParams, IRawSeason, ISeason>({
     socket: this.socket,

@@ -19,7 +19,7 @@ export class UsersService extends WebsocketService {
   readonly accountDeleted$ = fromEvent<boolean>(this.socket, 'accountDeleted')
 
   public searchByName(name: string) {
-    this.sendMessage('searchByName', {name})
+    this.sendMessage('searchByName', { name })
   }
 
   public delete(){

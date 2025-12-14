@@ -5,7 +5,7 @@ import { ButtonModule } from 'primeng/button'
 import { InputGroupModule } from 'primeng/inputgroup'
 import { InputGroupAddonModule } from 'primeng/inputgroupaddon'
 import { InputTextModule } from 'primeng/inputtext'
-import { BehaviorSubject, debounceTime, map, shareReplay, startWith, switchMap, tap } from 'rxjs'
+import { BehaviorSubject, debounceTime, } from 'rxjs'
 import { StreamsService } from '../../../services/streams/streams.service'
 import { ProgressSpinnerModule } from 'primeng/progressspinner'
 import { RouterLink } from '@angular/router'
@@ -25,27 +25,24 @@ export class FindStreamComponent implements OnDestroy {
   private readonly streamService = inject(StreamsService)
 
   readonly search$ = signal<string | undefined>(undefined)
-  readonly results$ = toSignal(this.streamService.searchResult$)
+  readonly results$ = toSignal(this.streamService.searchStream$.value$)
+  readonly loading$ = toSignal(this.streamService.searchStream$.isLoading$)
 
-  private readonly searchStream$$ = new BehaviorSubject<string | null>(null)
-  private readonly _loading$ = this.searchStream$$.pipe(
-    debounceTime(250),
-    tap((val) => {
-      this.streamService.searchByName(val ?? '')
-    }),
-    switchMap(() => this.streamService.searchResult$.pipe(
-      map(() => false),
-      startWith(true)
-    )),
-    startWith(false),
-    shareReplay(1),
-  )
-  readonly loading$ = toSignal(this._loading$,)
+  private readonly searchStream$ = new BehaviorSubject<string | null>(null)
+  constructor(){
+    this.searchStream$.pipe(
+      debounceTime(300),
+    ).subscribe({
+      next: (term: string | null) => {
+        this.streamService.searchStream$.load({name: term ?? ''})
+      }
+    })
+  }
 
   onSearchChange($event: string){
-    this.searchStream$$.next($event)
+    this.searchStream$.next($event)
   }
   ngOnDestroy(): void {
-    this.streamService.searchByName('')
+    this.streamService.searchStream$.load({name: ''})
   }
 }

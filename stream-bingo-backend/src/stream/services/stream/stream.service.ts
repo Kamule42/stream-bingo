@@ -124,10 +124,13 @@ export class StreamService {
   findByName(name: string) {
     return this.streamRepository.find({
       where: [
-        {name:  Raw((alias) => `unaccent(${alias}) ILike unaccent('%:name%')`, { name: name }), enabled: true,  },
-        {twitchLogin:  Raw((alias) => `unaccent(${alias}) ILike unaccent(:name)`, { name: `%${name}%` }), enabled: true,  },
+        {name:  Raw((alias) => `lower(unaccent(${alias})) ILike lower(unaccent('%:name%'))`, { name }), enabled: true,  },
+        {twitchLogin:  Raw((alias) => `lower(unaccent(${alias})) ILike lower(unaccent(:name))`, { name: `%${name}%` }), enabled: true,  },
       ],
       take: 5,
+    }).then(streams => {
+      console.log(streams)
+      return streams
     })
   }
 }
